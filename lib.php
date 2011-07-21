@@ -378,12 +378,16 @@ function journal_print_overview($courses, &$htmlarray) {
     
     global $USER, $CFG, $DB;
 
+    if (!get_config('journal', 'overview')) {
+        return array();
+    }
+    
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
         return array();
     }
 
     if (!$journals = get_all_instances_in_courses('journal', $courses)) {
-        return;
+        return array();
     }
 
     $strjournal = get_string('modulename', 'journal');
