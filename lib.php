@@ -387,10 +387,11 @@ function journal_print_overview($courses, &$htmlarray) {
     }
 
     $strjournal = get_string('modulename', 'journal');
-    $strnextsession  = get_string('nextsession', 'journal');
 
     $timenow = time();
     foreach ($journals as $journal) {
+        
+        $courses[$journal->course]->format = $DB->get_field('course', 'format', array('id' => $journal->course));
         
         if ($courses[$journal->course]->format == 'weeks' AND $journal->days) {
             
