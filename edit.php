@@ -80,7 +80,8 @@ if ($fromform = $form->get_data()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($journal->name));
 
-echo $OUTPUT->box(format_text($journal->intro, $journal->introformat));
+$intro = format_module_intro('journal', $journal, $cm->id);
+echo $OUTPUT->box($intro);
 
 /// Otherwise fill and print the form.
 $form->display();

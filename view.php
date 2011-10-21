@@ -60,7 +60,9 @@ if ($entriesmanager) {
 $journal->intro = trim($journal->intro);
 
 if (!empty($journal->intro)) {
-    echo $OUTPUT->box(format_text($journal->intro,  $journal->introformat), 'generalbox', 'intro');
+    
+    $intro = format_module_intro('journal', $journal, $cm->id);
+    echo $OUTPUT->box($intro, 'generalbox', 'intro');
 }
 
 echo '<br />';
