@@ -1,24 +1,25 @@
-﻿<?php
+<?php
 
-$string['accessdenied'] = 'Zugriff verboten';//Access denied
-$string['alwaysopen'] = 'Immer geöffnet';//Always open, 1.9
-$string['blankentry'] = 'Leerer Eintrag';//Blank entry, 1.9
-$string['daysavailable'] = 'Verfügbare Tage';//Days available, 1.9
-$string['editingended'] = 'Bearbeitungszeitraum ist abgelaufen';//Editing period has ended, 1.9
-$string['editingends'] = 'Bearbeitungszeitraum abgelaufen';//Editing period ends, 1.9
-$string['entries'] = 'Einträge';//Entries, 1.9
-$string['feedbackupdated'] = 'Rückmeldung für {$a} Einträge aktualisiert';//Feedback updated for {$a} entries, 1.9
-$string['gradeingradebook'] = 'Aktuelle Bewertung in der Bewertungsübersicht';//Current grade in gradebook
-$string['journal:addentries'] = 'Journaleinträge erstellen';//Add journal entries
-$string['journal:manageentries'] = 'Journaleinträge verwalten';//Manage journal entries
+$string['accessdenied'] = 'Kein Zugriff'; //Access denied
+$string['alwaysopen'] = 'Immer geöffnet'; //Always open, 1.9
+$string['blankentry'] = 'Leerer Eintrag'; //Blank entry, 1.9
+$string['daysavailable'] = 'Verfügbare Tage'; //Days available, 1.9
+$string['editingended'] = 'Bearbeitungszeitraum ist abgelaufen'; //Editing period has ended, 1.9
+$string['editingends'] = 'Bearbeitungszeitraum läuft ab'; //Editing period ends, 1.9
+$string['entries'] = 'Einträge'; //Entries, 1.9
+$string['feedbackupdated'] = 'Rückmeldung für {$a} Einträge aktualisiert'; //Feedback updated for {$a} entries, 1.9
+$string['gradeingradebook'] = 'Aktuelle Bewertung in der Bewertungsübersicht'; //Current grade in gradebook
+$string['journal:addentries'] = 'Journaleinträge erstellen'; //Add journal entries
+$string['journal:addinstance'] = 'Journal anlegen'; //Add journal instance
+$string['journal:manageentries'] = 'Journaleinträge verwalten'; //Manage journal entries
 $string['journalmail'] = '{$a->teacher} hat eine Rückmeldung zu Ihrem Eintrag im Journal \'{$a->journal}\' abgegeben.
 
 Sie können diese Rückmeldung als Anhang an Ihrem Journaleintrag einsehen:
 
     {$a->url}';
 $string['journalmailhtml'] = '{$a->teacher} hat eine Rückmeldung zu Ihrem Eintrag im Journal \'<i>{$a->journal}</i>\' abgegeben.<br /><br />Sie können diese Rückmeldung als Anhang an Ihrem <a href=\"{$a->url}\">Journaleintrag</a> ansehen.';
-$string['journalname'] = 'Name';//Journal name
-$string['journalquestion'] = 'Zusammenfassung';//Journal question, 1.9
+$string['journalname'] = 'Name'; //Journal name
+$string['journalquestion'] = 'Beschreibung'; //Journal question, 1.9
 $string['mailsubject'] = 'Rückmeldung zu Journaleintrag';//Journal feedback
 $string['modulename'] = 'Journal';
 $string['modulenameplural'] = 'Journale';//Journals
@@ -35,7 +36,7 @@ $string['rate'] = 'Bewertung';//Rate, 1.9
 $string['removeentries'] = 'Alle Journaleinträge löschen';//Remove all entries
 $string['saveallfeedback'] = 'Alle meine Rückmeldungen speichern';//Save all my feedback, 1.9
 $string['showrecentactivity'] = 'Aktuelle Aktivitäten anzeigen';//Show recent activity
-$string['showoverview'] = 'Journalübersicht unter meine Startseite anzeigen';//Show journals overview on my moodle
+$string['showoverview'] = 'Journalübersicht auf \'Meine Startseite\' anzeigen'; //Show journals overview on my moodle
 $string['startoredit'] = 'Journaleintrag beginnen oder bearbeiten';//Start or edit my journal entry. 1.9
 $string['viewallentries'] = 'Zeige {$a} Journaleinträge';//View {$a} journal entries, 1.9
 $string['viewentries'] = 'Zeige Journaleinträge';//View entries, 1.9
