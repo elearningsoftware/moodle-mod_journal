@@ -27,6 +27,8 @@ $string['journalname'] = 'Journal name';
 $string['journalquestion'] = 'Journal question';
 $string['mailsubject'] = 'Journal feedback';
 $string['modulename'] = 'Journal';
+$string['modulename_help'] = 'The journal activity enables teachers to obtain students feedback 
+about a specific topic'; 
 $string['modulenameplural'] = 'Journals';
 $string['newjournalentries'] = 'New journal entries';
 $string['noentriesmanagers'] = 'There are no teachers';
