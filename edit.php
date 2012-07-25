@@ -41,6 +41,7 @@ if ($entry) {
     }
 }
 
+$data = new StdClass();
 $data->id = $cm->id;
 $form = new mod_journal_entry_form(null, array('current' => $data));
     
@@ -50,6 +51,7 @@ if ($fromform = $form->get_data()) {
     $timenow = time();
 
     // Common
+    $newentry = new StdClass();
     $newentry->text = $fromform->text["text"];
     $newentry->format = $fromform->text["format"];
     $newentry->modified = $timenow;
