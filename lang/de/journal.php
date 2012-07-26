@@ -1,13 +1,13 @@
 <?php
 
 $string['accessdenied'] = 'Kein Zugriff'; //Access denied
-$string['alwaysopen'] = 'Immer geöffnet'; //Always open, 1.9
-$string['blankentry'] = 'Leerer Eintrag'; //Blank entry, 1.9
-$string['daysavailable'] = 'Verfügbare Tage'; //Days available, 1.9
-$string['editingended'] = 'Bearbeitungszeitraum ist abgelaufen'; //Editing period has ended, 1.9
-$string['editingends'] = 'Bearbeitungszeitraum läuft ab'; //Editing period ends, 1.9
-$string['entries'] = 'Einträge'; //Entries, 1.9
-$string['feedbackupdated'] = 'Rückmeldung für {$a} Einträge aktualisiert'; //Feedback updated for {$a} entries, 1.9
+$string['alwaysopen'] = 'Immer verfügbar'; //Always open
+$string['blankentry'] = 'Leerer Eintrag'; //Blank entry
+$string['daysavailable'] = 'Verfügbarkeit'; //Days available
+$string['editingended'] = 'Bearbeitungszeitraum ist abgelaufen'; //Editing period has ended
+$string['editingends'] = 'Bearbeitungszeitraum läuft ab'; //Editing period ends
+$string['entries'] = 'Einträge'; //Entries
+$string['feedbackupdated'] = 'Rückmeldung für {$a} Einträge aktualisiert'; //Feedback updated for {$a} entries
 $string['gradeingradebook'] = 'Aktuelle Bewertung in der Bewertungsübersicht'; //Current grade in gradebook
 $string['journal:addentries'] = 'Journaleinträge erstellen'; //Add journal entries
 $string['journal:addinstance'] = 'Journal anlegen'; //Add journal instance
@@ -19,24 +19,25 @@ Sie können diese Rückmeldung als Anhang an Ihrem Journaleintrag einsehen:
     {$a->url}';
 $string['journalmailhtml'] = '{$a->teacher} hat eine Rückmeldung zu Ihrem Eintrag im Journal \'<i>{$a->journal}</i>\' abgegeben.<br /><br />Sie können diese Rückmeldung als Anhang an Ihrem <a href=\"{$a->url}\">Journaleintrag</a> ansehen.';
 $string['journalname'] = 'Name'; //Journal name
-$string['journalquestion'] = 'Beschreibung'; //Journal question, 1.9
-$string['mailsubject'] = 'Rückmeldung zu Journaleintrag';//Journal feedback
+$string['journalquestion'] = 'Beschreibung'; //Journal question
+$string['mailsubject'] = 'Rückmeldung zu Journaleintrag'; //Journal feedback
 $string['modulename'] = 'Journal';
-$string['modulenameplural'] = 'Journale';//Journals
-$string['newjournalentries'] = 'Neue Journaleinträge';//New journal entries, 1.9
-$string['noentriesmanagers'] = 'Keine Trainer eingeschrieben';//There are no teachers
-$string['noentry'] = 'Kein Eintrag';//No entry, 1.9
-$string['noratinggiven'] = 'Keine Bewertung abgegeben';//No rating given, 1.9
-$string['notopenuntil'] = 'Dieses Journal ist geschlossen bis';//This journal won\'t be open until, 1.9
-$string['notstarted'] = 'Sie haben mit Ihrem Journal noch nicht begonnen';//You have not started this journal yet, 1.9
-$string['overallrating'] = 'Allgemeine Bewertung';//Overall rating, 1.9
-$string['pluginadministration'] = 'Administration für das Journal-Modul';//Journal module administration
+$string['modulename_help'] = '<p>Die Aktivität \'Journal\' ermöglicht es, von Teilnehmer/innen eine Rückmeldung zu einem bestimmten Thema zu erhalten, die ausschließlich die schreibende Person selbst und die Trainer/innen lesen können.</p><p>Anwendungsbeispiele sind u.a.<ul><li>Tagebücher zum Projektverlauf</li><li>Rechenschaftsberichte</li></ul></p>'; 
+$string['modulenameplural'] = 'Journale'; //Journals
+$string['newjournalentries'] = 'Neue Journaleinträge'; //New journal entries
+$string['noentriesmanagers'] = 'Keine Trainer eingeschrieben'; //There are no teachers
+$string['noentry'] = 'Kein Eintrag'; //No entry
+$string['noratinggiven'] = 'Keine Bewertung abgegeben'; //No rating given
+$string['notopenuntil'] = 'Das Journal ist verfügbar ab'; //This journal won\'t be open until
+$string['notstarted'] = 'Sie haben mit dem Journal noch nicht begonnen'; //You have not started this journal yet
+$string['overallrating'] = 'Gesamtbewertung'; //Overall rating
+$string['pluginadministration'] = 'Journal-Administration'; //Journal module administration
 $string['pluginname'] = 'Journal';
-$string['rate'] = 'Bewertung';//Rate, 1.9
-$string['removeentries'] = 'Alle Journaleinträge löschen';//Remove all entries
-$string['saveallfeedback'] = 'Alle meine Rückmeldungen speichern';//Save all my feedback, 1.9
-$string['showrecentactivity'] = 'Aktuelle Aktivitäten anzeigen';//Show recent activity
+$string['rate'] = 'Bewertung'; //Rate
+$string['removeentries'] = 'Alle Journaleinträge löschen'; //Remove all entries
+$string['saveallfeedback'] = 'Meine Rückmeldungen speichern'; //Save all my feedback
+$string['showrecentactivity'] = 'Aktuelle Aktivitäten anzeigen'; //Show recent activity
 $string['showoverview'] = 'Journalübersicht auf \'Meine Startseite\' anzeigen'; //Show journals overview on my moodle
-$string['startoredit'] = 'Journaleintrag beginnen oder bearbeiten';//Start or edit my journal entry. 1.9
-$string['viewallentries'] = 'Zeige {$a} Journaleinträge';//View {$a} journal entries, 1.9
-$string['viewentries'] = 'Zeige Journaleinträge';//View entries, 1.9
+$string['startoredit'] = 'Journaleintrag bearbeiten'; //Start or edit my journal entry
+$string['viewallentries'] = 'Zeige {$a} Journaleinträge'; //View {$a} journal entries
+$string['viewentries'] = 'Zeige Journaleinträge'; //View entries
