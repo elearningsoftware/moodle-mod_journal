@@ -30,6 +30,8 @@ $PAGE->navbar->add(get_string('edit'));
 $PAGE->set_title(format_string($journal->name));
 $PAGE->set_heading($course->fullname);
 
+$data = new StdClass();
+
 $entry = $DB->get_record("journal_entries", array("userid" => $USER->id, "journal" => $journal->id));
 if ($entry) {
     
@@ -41,7 +43,6 @@ if ($entry) {
     }
 }
 
-$data = new StdClass();
 $data->id = $cm->id;
 $form = new mod_journal_entry_form(null, array('current' => $data));
     
