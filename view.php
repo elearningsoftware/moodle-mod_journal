@@ -89,9 +89,8 @@ if ($timenow > $timestart) {
     if ($timenow < $timefinish) {
         
         if ($canadd) {
-            echo '<center>';
-            echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit','journal'), 'get');
-            echo '</center>';
+            echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit','journal'), 'get',
+                array("class" => "singlebutton journalstart"));
         }
     }
 
