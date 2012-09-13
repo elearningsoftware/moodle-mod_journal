@@ -692,20 +692,20 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
     
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
-    echo "\n<table border=\"1\" cellspacing=\"0\" valign=\"top\" cellpadding=\"10\">";
+    echo "\n<table class=\"journaluserentry\">";
         
     echo "\n<tr>";
-    echo "\n<td rowspan=\"2\" width=\"35\" valign=\"top\">";
+    echo "\n<td class=\"userpix\" rowspan=\"2\">";
     echo $OUTPUT->user_picture($user, array('courseid' => $course->id));
     echo "</td>";
-    echo "<td nowrap=\"nowrap\" width=\"100%\">".fullname($user);
+    echo "<td class=\"userfullname\">".fullname($user);
     if ($entry) {
-        echo "&nbsp;&nbsp;<font size=\"1\">".get_string("lastedited").": ".userdate($entry->modified)."</font>";
+        echo " <span class=\"lastedit\">".get_string("lastedited").": ".userdate($entry->modified)."</span>";
     }
     echo "</td>";
     echo "</tr>";
 
-    echo "\n<tr><td width=\"100%\">";
+    echo "\n<tr><td>";
     if ($entry) {
         echo format_text($entry->text, $entry->format);
     } else {
@@ -715,7 +715,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     if ($entry) {
         echo "\n<tr>";
-        echo "<td width=\"35\" valign=\"top\">";
+        echo "<td class=\"userpix\">";
         if (!$entry->teacher) {
             $entry->teacher = $USER->id;
         }
@@ -750,21 +750,21 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         echo html_writer::select($grades, 'r'.$entry->id, $entry->rating, get_string("nograde").'...', $attrs);
         echo $hiddengradestr;
         if ($entry->timemarked) {
-            echo "&nbsp;&nbsp;<font size=\"1\">".userdate($entry->timemarked)."</font>";
+            echo " <span class=\"lastedit\">".userdate($entry->timemarked)."</span>";
         }
         echo $gradebookgradestr;
         
         // Feedback text
-        echo "<br /><textarea name=\"c$entry->id\" rows=\"12\" cols=\"60\" wrap=\"virtual\" $feedbackdisabledstr>";
+        echo "<p><textarea name=\"c$entry->id\" rows=\"12\" cols=\"60\" $feedbackdisabledstr>";
         p($feedbacktext);
-        echo "</textarea><br />";
+        echo "</textarea></p>";
         
         if ($feedbackdisabledstr != '') {
             echo '<input type="hidden" name="c'.$entry->id.'" value="'.$feedbacktext.'"/>';
         }
         echo "</td></tr>";
     }
-    echo "</table><br clear=\"all\" />\n";
+    echo "</table>\n";
     
 }
 
@@ -778,7 +778,7 @@ function journal_print_feedback($course, $entry, $grades) {
         print_error('Weird journal error');
     }
 
-    echo '<table cellspacing="0" align="center" class="feedbackbox">';
+    echo '<table class="feedbackbox">';
 
     echo '<tr>';
     echo '<td class="left picture">';
