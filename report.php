@@ -144,10 +144,10 @@ if (!$users) {
     }
 
     if ($allowedtograde) {
-        echo "<center>";
+        echo "<p class=\"feedbacksave\">";
         echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
         echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" />";
-        echo "</center>";
+        echo "</p>";
         echo "</form>";
     }
 }
