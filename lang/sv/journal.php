@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local language pack from http://lnv263.lnu.se/moodle
+ * Swedish language pack by Patrik Granlöv
  *
  * @package    mod
  * @subpackage journal
