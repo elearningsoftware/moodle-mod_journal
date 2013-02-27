@@ -33,15 +33,22 @@ class restore_journal_activity_task extends restore_activity_task {
 
     }
 
-    static public function define_restore_log_rules() {
+    public static function define_restore_log_rules() {
 
         $rules = array();
         $rules[] = new restore_log_rule('journal', 'view', 'view.php?id={course_module}', '{journal}');
-        $rules[] = new restore_log_rule('journal', 'view all', 'index.php?id={course_module}', '{journal}');
         $rules[] = new restore_log_rule('journal', 'view responses', 'report.php?id={course_module}', '{journal}');
         $rules[] = new restore_log_rule('journal', 'add entry', 'edit.php?id={course_module}', '{journal}');
         $rules[] = new restore_log_rule('journal', 'update entry', 'edit.php?id={course_module}', '{journal}');
         $rules[] = new restore_log_rule('journal', 'update feedback', 'report.php?id={course_module}', '{journal}');
+
+        return $rules;
+    }
+
+    public static function define_restore_log_rules_for_course() {
+
+        $rules = array();
+        $rules[] = new restore_log_rule('journal', 'view all', 'index.php?id={course}', null);
 
         return $rules;
     }
