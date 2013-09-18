@@ -74,7 +74,11 @@ if ($data = data_submitted()) {
     foreach ($feedback as $num => $vals) {
         $entry = $entrybyentry[$num];
         // Only update entries where feedback has actually changed.
-        if (($vals['r'] <> $entry->rating) || ($vals['c'] <> addslashes($entry->entrycomment))) {
+        $rating_changed = false;
+        if (($vals['r'] <> $entry->rating) && !($vars['r'] == '' && $entry->rating == "0")) {
+          $rating_changed = true;
+        }
+        if (($rating_changed) || (addslashes($vals['c']) <> addslashes($entry->entrycomment))) {
             $newentry = new StdClass();
             $newentry->rating     = $vals['r'];
             $newentry->entrycomment    = $vals['c'];
