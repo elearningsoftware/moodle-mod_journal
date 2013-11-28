@@ -75,7 +75,7 @@ if ($data = data_submitted()) {
         $entry = $entrybyentry[$num];
         // Only update entries where feedback has actually changed.
         $rating_changed = false;
-        if (($vals['r'] <> $entry->rating) && !($vars['r'] == '' && $entry->rating == "0")) {
+        if (($vals['r'] <> $entry->rating) && !($vals['r'] == '' && $entry->rating == "0")) {
           $rating_changed = true;
         }
         if (($rating_changed) || (addslashes($vals['c']) <> addslashes($entry->entrycomment))) {
