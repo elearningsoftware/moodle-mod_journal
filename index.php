@@ -32,7 +32,9 @@ if (! $journals = get_all_instances_in_course("journal", $course)) {
 // Sections
 $usesections = course_format_uses_sections($course->format);
 if ($usesections) {
-    $sections = get_all_sections($course->id);
+	// $sections = get_all_sections($course->id);
+	$modinfo = get_fast_modinfo($course->id);
+	$sections = $modinfo->get_section_info_all();
 }
 
 $timenow = time();
@@ -57,7 +59,7 @@ $currentsection = '';
 $i = 0;
 foreach ($journals as $journal) {
 
-    $context = get_context_instance(CONTEXT_MODULE, $journal->coursemodule);
+    $context = context_module::instance($journal->coursemodule);
     $entriesmanager = has_capability('mod/journal:manageentries', $context);
 
     // Section
@@ -106,7 +108,8 @@ foreach ($journals as $journal) {
             }
         }
 
-        $entrycount = journal_count_entries($journal, get_current_group($course->id));
+        //$entrycount = journal_count_entries($journal, get_current_group($course->id));
+		$entrycount = journal_count_entries($journal, groups_get_all_groups($course->id, $USER->id));
         $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">".get_string("viewallentries","journal", $entrycount)."</a>";
     } else if (!empty($managersomewhere)) {
         $table->data[$i][] = "";
@@ -119,6 +122,13 @@ echo "<br />";
 
 echo html_writer::table($table);
 
-add_to_log($course->id, "journal", "view all", "index.php?id=$course->id", "");
+//add_to_log($course->id, "journal", "view all", "index.php?id=$course->id", "");
+// Trigger course module instance list event.
+$params = array(
+    'context' => context_course::instance($course->id)
+);
+$event = \mod_journal\event\course_module_instance_list_viewed::create($params);
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 echo $OUTPUT->footer();

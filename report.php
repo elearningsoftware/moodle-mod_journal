@@ -16,7 +16,7 @@ if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
 
 require_login($course->id, false, $cm);
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 require_capability('mod/journal:manageentries', $context);
 
@@ -102,11 +102,31 @@ if ($data = data_submitted()) {
             journal_update_grades($journal, $entry->userid);
         }
     }
-    add_to_log($course->id, "journal", "update feedback", "report.php?id=$cm->id", "$count users", $cm->id);
+    // add_to_log($course->id, "journal", "update feedback", "report.php?id=$cm->id", "$count users", $cm->id);
+
+	// Trigger module feedback updated event.
+	$event = \mod_journal\event\feedback_updated::create(array(
+		'objectid' => $journal->id,
+		'context' => $context
+	));
+	$event->add_record_snapshot('course_modules', $cm);
+	$event->add_record_snapshot('course', $course);
+	$event->add_record_snapshot('journal', $journal);
+	$event->trigger();
+	
     notify(get_string("feedbackupdated", "journal", "$count"), "notifysuccess");
 
 } else {
-    add_to_log($course->id, "journal", "view responses", "report.php?id=$cm->id", "$journal->id", $cm->id);
+
+	// Trigger module viewed event.
+	$event = \mod_journal\event\entries_viewed::create(array(
+		'objectid' => $journal->id,
+		'context' => $context
+	));
+	$event->add_record_snapshot('course_modules', $cm);
+	$event->add_record_snapshot('course', $course);
+	$event->add_record_snapshot('journal', $journal);
+	$event->trigger();
 }
 
 /// Print out the journal entries

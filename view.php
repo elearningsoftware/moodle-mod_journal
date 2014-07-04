@@ -14,7 +14,7 @@ if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
     print_error("Course is misconfigured");
 }
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 require_login($course->id, true, $cm);
 
@@ -138,6 +138,16 @@ if ($timenow > $timestart) {
     echo userdate($timestart).'</div>';
 }
 
-add_to_log($course->id, "journal", "view", "view.php?id=$cm->id", $journal->id, $cm->id);
+//add_to_log($course->id, "journal", "view", "view.php?id=$cm->id", $journal->id, $cm->id);
+
+// Trigger module viewed event.
+$event = \mod_journal\event\course_module_viewed::create(array(
+   'objectid' => $journal->id,
+   'context' => $context
+));
+$event->add_record_snapshot('course_modules', $cm);
+$event->add_record_snapshot('course', $course);
+$event->add_record_snapshot('journal', $journal);
+$event->trigger();
 
 echo $OUTPUT->footer();
