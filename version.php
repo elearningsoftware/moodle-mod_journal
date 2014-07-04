@@ -1,8 +1,8 @@
 <?php
 
-$module->version  = 2013112800;
-$module->requires = 2013111800;  // Moodle 2.6
-$module->release = '1.10.4 (Build: 2013112800)';
+$module->version  = 2014053000;
+$module->requires = 2014051200;  // Moodle 2.7
+$module->release = '1.12.4 (Build: 2014053000)';
 $module->maturity = MATURITY_STABLE;
 $module->cron     = 60;
 
