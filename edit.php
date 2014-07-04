@@ -13,7 +13,7 @@ if (!$course = $DB->get_record("course", array("id" => $cm->course))) {
     print_error("Course is misconfigured");
 }
 
-$context = get_context_instance(CONTEXT_MODULE, $cm->id);
+$context = context_module::instance($cm->id);
 
 require_login($course->id, false, $cm);
 
@@ -36,11 +36,11 @@ $entry = $DB->get_record("journal_entries", array("userid" => $USER->id, "journa
 if ($entry) {
 
     $data->text["text"] = $entry->text;
-    if (can_use_html_editor()) {
-        $data->text["format"] = FORMAT_HTML;
-    } else {
-        $data->text["format"] = FORMAT_MOODLE;
-    }
+    // if (can_use_html_editor()) {
+    //    $data->text["format"] = FORMAT_HTML;
+    // } else {
+    //    $data->text["format"] = FORMAT_MOODLE;
+    // }
 }
 
 $data->id = $cm->id;
@@ -73,8 +73,16 @@ if ($fromform = $form->get_data()) {
         $logaction = "add entry";
     }
 
-    add_to_log($course->id, "journal", $logaction, 'view.php?id='.$cm->id, $newentry->id, $cm->id);
-
+    //add_to_log($course->id, "journal", $logaction, 'view.php?id='.$cm->id, $newentry->id, $cm->id);
+	// Trigger module entry updated event.
+	$event = \mod_journal\event\entry_updated::create(array(
+		'objectid' => $journal->id,
+		'context' => $context
+	));
+	$event->add_record_snapshot('course_modules', $cm);
+	$event->add_record_snapshot('course', $course);
+	$event->add_record_snapshot('journal', $journal);
+	$event->trigger();
     redirect(new moodle_url('/mod/journal/view.php?id='.$cm->id));
     die;
 }

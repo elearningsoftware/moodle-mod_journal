@@ -173,7 +173,7 @@ function journal_cron () {
                 continue;
             }
 
-            $context = get_context_instance(CONTEXT_MODULE, $mod->id);
+            $context = context_module::instance($mod->id);
             $canadd = has_capability('mod/journal:addentries', $context, $user);
             $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
@@ -592,7 +592,7 @@ function journal_get_users_done($journal, $currentgroup) {
     // remove unenrolled participants
     foreach ($journals as $key => $user) {
 
-        $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+        $context = context_module::instance($cm->id);
 
         $canadd = has_capability('mod/journal:addentries', $context, $user);
         $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
@@ -611,7 +611,7 @@ function journal_count_entries($journal, $groupid = 0) {
     global $DB;
 
     $cm = journal_get_coursemodule($journal->id);
-    $context = get_context_instance(CONTEXT_MODULE, $cm->id);
+    $context = context_module::instance($cm->id);
 
     if ($groupid) {     /// How many in a particular group?
 
