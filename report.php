@@ -102,31 +102,30 @@ if ($data = data_submitted()) {
             journal_update_grades($journal, $entry->userid);
         }
     }
-    // add_to_log($course->id, "journal", "update feedback", "report.php?id=$cm->id", "$count users", $cm->id);
 
-	// Trigger module feedback updated event.
-	$event = \mod_journal\event\feedback_updated::create(array(
-		'objectid' => $journal->id,
-		'context' => $context
-	));
-	$event->add_record_snapshot('course_modules', $cm);
-	$event->add_record_snapshot('course', $course);
-	$event->add_record_snapshot('journal', $journal);
-	$event->trigger();
-	
+    // Trigger module feedback updated event.
+    $event = \mod_journal\event\feedback_updated::create(array(
+        'objectid' => $journal->id,
+        'context' => $context
+    ));
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('journal', $journal);
+    $event->trigger();
+
     notify(get_string("feedbackupdated", "journal", "$count"), "notifysuccess");
 
 } else {
 
-	// Trigger module viewed event.
-	$event = \mod_journal\event\entries_viewed::create(array(
-		'objectid' => $journal->id,
-		'context' => $context
-	));
-	$event->add_record_snapshot('course_modules', $cm);
-	$event->add_record_snapshot('course', $course);
-	$event->add_record_snapshot('journal', $journal);
-	$event->trigger();
+    // Trigger module viewed event.
+    $event = \mod_journal\event\entries_viewed::create(array(
+        'objectid' => $journal->id,
+        'context' => $context
+    ));
+    $event->add_record_snapshot('course_modules', $cm);
+    $event->add_record_snapshot('course', $course);
+    $event->add_record_snapshot('journal', $journal);
+    $event->trigger();
 }
 
 /// Print out the journal entries
@@ -139,7 +138,7 @@ if ($currentgroup) {
 $users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '', '', $groups);
 
 if (!$users) {
-	echo $OUTPUT->heading(get_string("nousersyet"));
+    echo $OUTPUT->heading(get_string("nousersyet"));
 
 } else {
 

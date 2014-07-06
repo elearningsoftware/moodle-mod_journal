@@ -17,8 +17,8 @@
 /**
  * The mod_journal entry updated event.
  *
- * @package 	mod_journal
- * @copyright  	2014 drachels@drachels.com
+ * @package     mod_journal
+ * @copyright   2014 drachels@drachels.com
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

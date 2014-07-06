@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    mod_journal
  * @since      Moodle 2.7
- * @copyright  
+ * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_viewed extends \core\event\course_module_viewed {
@@ -65,6 +65,4 @@ class course_module_viewed extends \core\event\course_module_viewed {
         return array($this->courseid, 'journal', 'view journal', 'view.php?f=' . $this->objectid,
             $this->objectid, $this->contextinstanceid);
     }
-	
-	
 }

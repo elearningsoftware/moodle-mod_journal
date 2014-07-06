@@ -138,7 +138,6 @@ if ($timenow > $timestart) {
     echo userdate($timestart).'</div>';
 }
 
-//add_to_log($course->id, "journal", "view", "view.php?id=$cm->id", $journal->id, $cm->id);
 
 // Trigger module viewed event.
 $event = \mod_journal\event\course_module_viewed::create(array(

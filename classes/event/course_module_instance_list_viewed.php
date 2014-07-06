@@ -18,7 +18,7 @@
  * The mod_journal instance list viewed event.
  *
  * @package    mod_journal
- * @copyright  
+ * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    mod_journal
  * @since      Moodle 2.7
- * @copyright  
+ * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
