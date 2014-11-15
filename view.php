@@ -116,6 +116,10 @@ if ($timenow > $timestart) {
             echo "</div>";
         }
 
+		//Added three lines to mark entry as being dirty and needing regrade.
+        if ($entry->modified > $entry->timemarked) {
+			echo "<div class=\"lastedit\">".get_string("needsregrade", "journal"). "</div>";
+
         if (!empty($journal->days)) {
             echo '<div class="editend"><strong>'.get_string('editingends', 'journal').': </strong> ';
             echo userdate($timefinish).'</div>';

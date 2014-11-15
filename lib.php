@@ -749,7 +749,10 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         // Grade selector
         echo html_writer::select($grades, 'r'.$entry->id, $entry->rating, get_string("nograde").'...', $attrs);
         echo $hiddengradestr;
-        if ($entry->timemarked) {
+		//Rewrote next three lines to show entry needs to be regraded due to resubmission.
+        if ($entry->modified > $entry->timemarked) {
+			echo " <span class=\"lastedit\">".get_string("needsregrade", "journal"). "</span>";
+		} else {
             echo " <span class=\"lastedit\">".userdate($entry->timemarked)."</span>";
         }
         echo $gradebookgradestr;
