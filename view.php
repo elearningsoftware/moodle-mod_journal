@@ -116,7 +116,7 @@ if ($timenow > $timestart) {
             echo "</div>";
         }
 		//Added three lines to mark entry as being dirty and needing regrade.
-        if (!empty($entry->modified) AND (($entry->modified) > $entry->timemarked)) {
+		if (!empty($entry->modified) AND (($entry->modified) > $entry->timemarked)) {
 			echo "<div class=\"lastedit\">".get_string("needsregrade", "journal"). "</div>";
 		} 
 
