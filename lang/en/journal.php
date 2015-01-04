@@ -38,6 +38,7 @@ $string['modulename'] = 'Journal';
 $string['modulename_help'] = 'The journal activity enables teachers to obtain students feedback 
 about a specific topic'; 
 $string['modulenameplural'] = 'Journals';
+$string['needsregrade'] = 'Entry has changed since last feedback was saved.';
 $string['newjournalentries'] = 'New journal entries';
 $string['nodeadline'] = 'Always open';
 $string['noentriesmanagers'] = 'There are no teachers';
