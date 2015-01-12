@@ -25,7 +25,6 @@ if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
     print_error("Course module is incorrect");
 }
 
-
 // Header
 $PAGE->set_url('/mod/journal/report.php', array('id'=>$id));
 
@@ -64,7 +63,7 @@ if ($data = data_submitted()) {
 
     // Peel out all the data from variable names.
     foreach ($data as $key => $val) {
-        if ($key <> "id") {
+        if (strpos($key, 'r') === 0 || strpos($key, 'c') === 0) {
             $type = substr($key,0,1);
             $num  = substr($key,1);
             $feedback[$num][$type] = $val;
@@ -77,24 +76,29 @@ if ($data = data_submitted()) {
         $entry = $entrybyentry[$num];
         // Only update entries where feedback has actually changed.
         $rating_changed = false;
-        if (($vals['r'] <> $entry->rating) && !($vals['r'] == '' && $entry->rating == "0")) {
-          $rating_changed = true;
+
+        $studentrating = clean_param($vals['r'], PARAM_INT);
+        $studentcomment = clean_text($vals['c'], FORMAT_PLAIN);
+
+        if ($studentrating != $entry->rating && !($studentrating == '' && $entry->rating == "0")) {
+            $rating_changed = true;
         }
-        if (($rating_changed) || (addslashes($vals['c']) <> addslashes($entry->entrycomment))) {
+
+        if ($rating_changed || $studentcomment != $entry->entrycomment) {
             $newentry = new StdClass();
-            $newentry->rating     = $vals['r'];
-            $newentry->entrycomment    = $vals['c'];
-            $newentry->teacher    = $USER->id;
-            $newentry->timemarked = $timenow;
-            $newentry->mailed     = 0;           // Make sure mail goes out (again, even)
-            $newentry->id         = $num;
+            $newentry->rating       = $studentrating;
+            $newentry->entrycomment = $studentcomment;
+            $newentry->teacher      = $USER->id;
+            $newentry->timemarked   = $timenow;
+            $newentry->mailed       = 0;           // Make sure mail goes out (again, even)
+            $newentry->id           = $num;
             if (!$DB->update_record("journal_entries", $newentry)) {
                 notify("Failed to update the journal feedback for user $entry->userid");
             } else {
                 $count++;
             }
-            $entrybyuser[$entry->userid]->rating     = $vals['r'];
-            $entrybyuser[$entry->userid]->entrycomment    = $vals['c'];
+            $entrybyuser[$entry->userid]->rating     = $studentrating;
+            $entrybyuser[$entry->userid]->entrycomment    = $studentcomment;
             $entrybyuser[$entry->userid]->teacher    = $USER->id;
             $entrybyuser[$entry->userid]->timemarked = $timenow;
 

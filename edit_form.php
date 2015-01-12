@@ -16,6 +16,5 @@ class mod_journal_entry_form extends moodleform {
         $this->add_action_buttons();
 
         $this->set_data($this->_customdata['current']);
-
     }
 }

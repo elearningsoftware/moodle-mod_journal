@@ -816,7 +816,7 @@ function journal_print_feedback($course, $entry, $grades) {
     echo '</div>';
 
     // Feedback text
-    echo format_text($entry->entrycomment);
+    echo format_text($entry->entrycomment, FORMAT_PLAIN);
     echo '</td></tr></table>';
 }
 

@@ -33,34 +33,30 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
     print_error("Course module is incorrect");
 }
 
+$journalname = format_string($journal->name, true, array('context' => $context));
 
 // Header
 $PAGE->set_url('/mod/journal/view.php', array('id'=>$id));
-$PAGE->navbar->add(format_string($journal->name));
-$PAGE->set_title(format_string($journal->name));
+$PAGE->navbar->add($journalname);
+$PAGE->set_title($journalname);
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($journal->name));
+echo $OUTPUT->heading($journalname);
 
 /// Check to see if groups are being used here
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 groups_print_activity_menu($cm, $CFG->wwwroot . "/mod/journal/view.php?id=$cm->id");
 
-
 if ($entriesmanager) {
     $entrycount = journal_count_entries($journal, $currentgroup);
-
     echo '<div class="reportlink"><a href="report.php?id='.$cm->id.'">'.
           get_string('viewallentries','journal', $entrycount).'</a></div>';
-
 }
 
 $journal->intro = trim($journal->intro);
-
 if (!empty($journal->intro)) {
-
     $intro = format_module_intro('journal', $journal, $cm->id);
     echo $OUTPUT->box($intro, 'generalbox', 'intro');
 }
@@ -99,7 +95,7 @@ if ($timenow > $timestart) {
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry','journal').'</b></p>';
         } else {
-            echo format_text($entry->text, $entry->format);
+            echo format_text($entry->text, $entry->format, array('context' => $context));
         }
     } else {
         echo '<span class="warning">'.get_string('notstarted','journal').'</span>';

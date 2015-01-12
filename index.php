@@ -102,12 +102,13 @@ foreach ($journals as $journal) {
     }
 
     // Link
+    $journalname = format_string($journal->name,true, array('context' => $context));
     if (!$journal->visible) {
         //Show dimmed if the mod is hidden
-        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$journal->coursemodule\">".format_string($journal->name,true)."</a>";
+        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
     } else {
         //Show normal if the mod is visible
-        $table->data[$i][] = "<a href=\"view.php?id=$journal->coursemodule\">".format_string($journal->name,true)."</a>";
+        $table->data[$i][] = "<a href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
     }
 
     // Description
