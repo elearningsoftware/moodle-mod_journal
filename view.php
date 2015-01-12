@@ -115,10 +115,10 @@ if ($timenow > $timestart) {
             echo ' ('.get_string('numwords', '', count_words($entry->text)).')';
             echo "</div>";
         }
-		//Added three lines to mark entry as being dirty and needing regrade.
-		if (!empty($entry->modified) AND (($entry->modified) > $entry->timemarked)) {
-			echo "<div class=\"lastedit\">".get_string("needsregrade", "journal"). "</div>";
-		} 
+        //Added three lines to mark entry as being dirty and needing regrade.
+        if (!empty($entry->modified) AND !empty($entry->timemarked) AND $entry->modified > $entry->timemarked) {
+            echo "<div class=\"lastedit\">".get_string("needsregrade", "journal"). "</div>";
+        }
 
         if (!empty($journal->days)) {
             echo '<div class="editend"><strong>'.get_string('editingends', 'journal').': </strong> ';
