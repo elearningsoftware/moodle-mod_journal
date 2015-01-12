@@ -57,6 +57,8 @@ $currentgroup = groups_get_activity_group($cm, true);
 /// Process incoming data if there is any
 if ($data = data_submitted()) {
 
+    confirm_sesskey();
+
     $feedback = array();
     $data = (array)$data;
 
@@ -164,6 +166,7 @@ if (!$users) {
 
     echo "<p class=\"feedbacksave\">";
     echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
+    echo "<input type=\"hidden\" name=\"sesskey\" value=\"" . sesskey() . "\" />";
     echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" />";
     echo "</p>";
     echo "</form>";
