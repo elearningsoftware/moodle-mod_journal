@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/dmonllao/moodle-mod_journal.svg?branch=master)](https://travis-ci.org/dmonllao/moodle-mod_journal)
+
 ##
 # Moodle Journal module
 #
