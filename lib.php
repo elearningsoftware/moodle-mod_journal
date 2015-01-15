@@ -634,14 +634,14 @@ function journal_count_entries($journal, $groupid = 0) {
         return 0;
     }
 
+    $canadd = get_users_by_capability($context, 'mod/journal:addentries');
+    $entriesmanager = get_users_by_capability($context, 'mod/journal:manageentries');
+
     // remove unenrolled participants
-    foreach ($journals as $key => $user) {
+    foreach ($journals as $userid => $notused) {
 
-        $canadd = has_capability('mod/journal:addentries', $context, $user);
-        $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
-
-        if (!$entriesmanager && !$canadd) {
-            unset($journals[$key]);
+        if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
+            unset($journals[$userid]);
         }
     }
 
