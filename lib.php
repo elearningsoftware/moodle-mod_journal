@@ -634,8 +634,8 @@ function journal_count_entries($journal, $groupid = 0) {
         return 0;
     }
 
-    $canadd = get_users_by_capability($context, 'mod/journal:addentries');
-    $entriesmanager = get_users_by_capability($context, 'mod/journal:manageentries');
+    $canadd = get_users_by_capability($context, 'mod/journal:addentries', 'u.id');
+    $entriesmanager = get_users_by_capability($context, 'mod/journal:manageentries', 'u.id');
 
     // remove unenrolled participants
     foreach ($journals as $userid => $notused) {
