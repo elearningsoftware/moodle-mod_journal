@@ -15,14 +15,13 @@ if (!$course = $DB->get_record("course", array("id" => $cm->course))) {
 
 $context = context_module::instance($cm->id);
 
-require_login($course->id, false, $cm);
+require_login($course, false, $cm);
 
 require_capability('mod/journal:addentries', $context);
 
 if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
     print_error("Course module is incorrect");
 }
-
 
 // Header
 $PAGE->set_url('/mod/journal/edit.php', array('id' => $id));

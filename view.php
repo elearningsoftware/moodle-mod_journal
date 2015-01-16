@@ -16,7 +16,7 @@ if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
 
 $context = context_module::instance($cm->id);
 
-require_login($course->id, true, $cm);
+require_login($course, true, $cm);
 
 $entriesmanager = has_capability('mod/journal:manageentries', $context);
 $canadd = has_capability('mod/journal:addentries', $context);
