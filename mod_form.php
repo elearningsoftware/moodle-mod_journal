@@ -14,7 +14,7 @@ class mod_journal_mod_form extends moodleform_mod {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
-        $this->add_intro_editor(true, get_string('journalquestion', 'journal'));
+        $this->standard_intro_elements(get_string('journalquestion', 'journal'));
 
         $options = array();
         $options[0] = get_string('alwaysopen', 'journal');
