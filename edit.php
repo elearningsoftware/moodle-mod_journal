@@ -39,8 +39,10 @@ if ($entry) {
 $data->id = $cm->id;
 $form = new mod_journal_entry_form(null, array('current' => $data));
 
-/// If data submitted, then process and store.
-if ($fromform = $form->get_data()) {
+if ($form->is_cancelled()) {
+    redirect($CFG->wwwroot . '/mod/journal/view.php?id=' . $cm->id);
+} else if ($fromform = $form->get_data()) {
+    /// If data submitted, then process and store.
 
     // Prevent CSFR.
     confirm_sesskey();
