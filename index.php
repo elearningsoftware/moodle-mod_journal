@@ -112,7 +112,7 @@ foreach ($journals as $journal) {
     }
 
     // Description
-    $table->data[$i][] = format_text($journal->intro,  $journal->introformat);
+    $table->data[$i][] = format_text($journal->intro,  $journal->introformat, array('context' => $context));
 
     // Entries info
     if ($entriesmanager) {

@@ -120,7 +120,7 @@ function journal_user_complete($course, $user, $mod, $journal) {
             echo "<p><font size=\"1\">".get_string("lastedited").": ".userdate($entry->modified)."</font></p>";
         }
         if ($entry->text) {
-            echo format_text($entry->text, $entry->format);
+            echo format_text($entry->text, $entry->format, array('context' => context_course::instance($course->id)));
         }
         if ($entry->teacher) {
             $grades = make_grades_menu($journal->grade);
@@ -734,7 +734,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     echo "\n<tr><td>";
     if ($entry) {
-        echo format_text($entry->text, $entry->format);
+        echo format_text($entry->text, $entry->format, array('context' => context_course::instance($course->id)));
     } else {
         print_string("noentry", "journal");
     }
