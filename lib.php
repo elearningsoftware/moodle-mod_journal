@@ -723,7 +723,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     echo "\n<tr>";
     echo "\n<td class=\"userpix\" rowspan=\"2\">";
-    echo $OUTPUT->user_picture($user, array('courseid' => $course->id));
+    echo $OUTPUT->user_picture($user, array('courseid' => $course->id, 'alttext' => true));
     echo "</td>";
     echo "<td class=\"userfullname\">".fullname($user);
     if ($entry) {
@@ -749,7 +749,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         if (empty($teachers[$entry->teacher])) {
             $teachers[$entry->teacher] = $DB->get_record('user', array('id' => $entry->teacher));
         }
-        echo $OUTPUT->user_picture($teachers[$entry->teacher], array('courseid' => $course->id));
+        echo $OUTPUT->user_picture($teachers[$entry->teacher], array('courseid' => $course->id, 'alttext' => true));
         echo "</td>";
         echo "<td>".get_string("feedback").":";
 
@@ -818,7 +818,7 @@ function journal_print_feedback($course, $entry, $grades) {
 
     echo '<tr>';
     echo '<td class="left picture">';
-    echo $OUTPUT->user_picture($teacher, array('courseid' => $course->id));
+    echo $OUTPUT->user_picture($teacher, array('courseid' => $course->id, 'alttext' => true));
     echo '</td>';
     echo '<td class="entryheader">';
     echo '<span class="author">'.fullname($teacher).'</span>';
