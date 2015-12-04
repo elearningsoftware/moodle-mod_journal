@@ -1,3 +1,4 @@
+sudo: false
 notifications:
   email:
     recipients:
@@ -12,8 +13,7 @@ env:
 before_script:
  - git clone git://github.com/moodle/moodle ../moodle && cd ../moodle
  - git checkout $TRAVIS_BRANCH
- - sudo apt-get update > /dev/null
- - composer self-update
+ - travis_retry composer install --prefer-dist --no-interaction
  - mv ../moodle-mod_journal mod/journal
  - cp config-dist.php config.php
  - sh -c "psql -c 'create database moodle;' -U postgres"
