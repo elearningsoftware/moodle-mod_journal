@@ -1,14 +1,11 @@
 <?php
 
-// The version change from now will just be in
-// the last NN increasing it one by one. All lower
-// major versions version values will be lower
-// than this. Only when master becomes a stable
-// version the version value will be changed for
-// time() date.
+// Only when master becomes a stable the version value will be changed for
+// the current date. Otherwise we just increase the last NN by one.
+
 $plugin->component = 'mod_journal';
-$plugin->version  = 2015052700;
-$plugin->requires = 2015050500;  // Moodle 2.9
-$plugin->release = '29.0 (Build: 2015052700)';
+$plugin->version  = 2015120400;
+$plugin->requires = 2015111600;  // Moodle 3.0
+$plugin->release = '30.0 (Build: 2015120400)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;
