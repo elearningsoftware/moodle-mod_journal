@@ -93,7 +93,7 @@ if ($data = data_submitted()) {
             $newentry->mailed       = 0;           // Make sure mail goes out (again, even)
             $newentry->id           = $num;
             if (!$DB->update_record("journal_entries", $newentry)) {
-                notify("Failed to update the journal feedback for user $entry->userid");
+                echo $OUTPUT->notification("Failed to update the journal feedback for user $entry->userid");
             } else {
                 $count++;
             }
@@ -119,7 +119,7 @@ if ($data = data_submitted()) {
     $event->add_record_snapshot('journal', $journal);
     $event->trigger();
 
-    notify(get_string("feedbackupdated", "journal", "$count"), "notifysuccess");
+    echo $OUTPUT->notification(get_string("feedbackupdated", "journal", "$count"), "notifysuccess");
 
 } else {
 
