@@ -68,13 +68,14 @@ function journal_delete_instance($id) {
 function journal_supports($feature) {
     switch($feature) {
         case FEATURE_MOD_INTRO:               return true;
+		case FEATURE_SHOW_DESCRIPTION:        return true
         case FEATURE_GRADE_HAS_GRADE:         return true;
         case FEATURE_GRADE_OUTCOMES:          return false;
         case FEATURE_RATE:                    return false;
         case FEATURE_GROUPS:                  return true;
         case FEATURE_GROUPINGS:               return true;
         case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
+        case FEATURE_COMPLETION_TRACKS_VIEWS: return true;
         case FEATURE_BACKUP_MOODLE2:          return true;
 
         default: return null;

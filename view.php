@@ -18,6 +18,9 @@ $context = context_module::instance($cm->id);
 
 require_login($course, true, $cm);
 
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
 $entriesmanager = has_capability('mod/journal:manageentries', $context);
 $canadd = has_capability('mod/journal:addentries', $context);
 
