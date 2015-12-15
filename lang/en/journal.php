@@ -1,11 +1,11 @@
-<?PHP // $Id: journal.php,v 1.1 2011/01/24 11:36:58 davmon Exp $ 
-      // journal.php - created with Moodle 1.7 beta + (2006101003)
+<?php
 
 $string['eventjournalcreated'] = 'Journal created';
 $string['eventjournalviewed'] = 'Journal viewed';
 $string['evententriesviewed'] = 'Journal entries viewed';
 $string['eventjournaldeleted'] = 'Journal deleted';
 $string['evententryupdated'] = 'Journal entry updated';
+$string['evententrycreated'] = 'Journal entry created';
 $string['eventfeedbackupdated'] = 'Journal feedback updated';
 
 $string['accessdenied'] = 'Access denied';

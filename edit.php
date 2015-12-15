@@ -71,11 +71,20 @@ if ($form->is_cancelled()) {
         $logaction = "add entry";
     }
 
-    // Trigger module entry updated event.
-    $event = \mod_journal\event\entry_updated::create(array(
-        'objectid' => $journal->id,
-        'context' => $context
-    ));
+    if ($entry) {
+        // Trigger module entry updated event.
+        $event = \mod_journal\event\entry_updated::create(array(
+            'objectid' => $journal->id,
+            'context' => $context
+        ));
+    } else {
+        // Trigger module entry created event.
+        $event = \mod_journal\event\entry_created::create(array(
+            'objectid' => $journal->id,
+            'context' => $context
+        ));
+
+    }
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('journal', $journal);
