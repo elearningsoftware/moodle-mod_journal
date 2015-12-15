@@ -59,8 +59,8 @@ class entry_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has updated an entry for the journal activity with the course module id
-            '$this->contextinstanceid'";
+        return "The user with id '$this->userid' has updated an entry for the journal activity " .
+            "with the course module id '$this->contextinstanceid'";
     }
 
     /**
@@ -78,6 +78,6 @@ class entry_updated extends \core\event\base {
      */
     protected function get_legacy_logdata() {
         $url = new \moodle_url('edit.php', array('id' => $this->contextinstanceid));
-        return array($this->courseid, 'journal', 'edit', $url->out(), $this->objectid, $this->contextinstanceid);
+        return array($this->courseid, 'journal', 'update entry', $url->out(), $this->objectid, $this->contextinstanceid);
     }
 }
