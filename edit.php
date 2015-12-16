@@ -29,15 +29,32 @@ $PAGE->navbar->add(get_string('edit'));
 $PAGE->set_title(format_string($journal->name));
 $PAGE->set_heading($course->fullname);
 
-$data = new StdClass();
+$data = new stdClass();
 
 $entry = $DB->get_record("journal_entries", array("userid" => $USER->id, "journal" => $journal->id));
 if ($entry) {
-    $data->text["text"] = $entry->text;
+    $data->entryid = $entry->id;
+    $data->text = $entry->text;
+    $data->textformat = $entry->format;
+} else {
+    $data->entryid = null;
+    $data->text = '';
+    $data->textformat = FORMAT_HTML;
 }
 
 $data->id = $cm->id;
-$form = new mod_journal_entry_form(null, array('current' => $data));
+
+$editoroptions = array(
+    'maxfiles' => EDITOR_UNLIMITED_FILES,
+    'context' => $context,
+    'subdirs' => false,
+    'enable_filemanagement' => true
+);
+
+$data = file_prepare_standard_editor($data, 'text', $editoroptions, $context, 'mod_journal', 'entry', $data->entryid);
+
+$form = new mod_journal_entry_form(null, array('entryid' => $data->entryid, 'editoroptions' => $editoroptions));
+$form->set_data($data);
 
 if ($form->is_cancelled()) {
     redirect($CFG->wwwroot . '/mod/journal/view.php?id=' . $cm->id);
@@ -46,13 +63,12 @@ if ($form->is_cancelled()) {
 
     // Prevent CSFR.
     confirm_sesskey();
-
     $timenow = time();
 
-    // Common
-    $newentry = new StdClass();
-    $newentry->text = $fromform->text["text"];
-    $newentry->format = $fromform->text["format"];
+    // This will be overwriten after being we have the entryid.
+    $newentry = new stdClass();
+    $newentry->text = $fromform->text_editor['text'];
+    $newentry->format = $fromform->text_editor['format'];
     $newentry->modified = $timenow;
 
     if ($entry) {
@@ -60,16 +76,22 @@ if ($form->is_cancelled()) {
         if (!$DB->update_record("journal_entries", $newentry)) {
             print_error("Could not update your journal");
         }
-        $logaction = "update entry";
-
     } else {
         $newentry->userid = $USER->id;
         $newentry->journal = $journal->id;
         if (!$newentry->id = $DB->insert_record("journal_entries", $newentry)) {
             print_error("Could not insert a new journal entry");
         }
-        $logaction = "add entry";
     }
+
+    // Relink using the proper entryid.
+    // We need to do this as draft area didn't have an itemid associated when creating the entry.
+    $fromform = file_postupdate_standard_editor($fromform, 'text', $editoroptions,
+        $editoroptions['context'], 'mod_journal', 'entry', $newentry->id);
+    $newentry->text = $fromform->text;
+    $newentry->format = $fromform->textformat;
+
+    $DB->update_record('journal_entries', $newentry);
 
     if ($entry) {
         // Trigger module entry updated event.

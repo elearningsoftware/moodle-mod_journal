@@ -98,7 +98,7 @@ if ($timenow > $timestart) {
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry','journal').'</b></p>';
         } else {
-            echo format_text($entry->text, $entry->format, array('context' => $context));
+            echo journal_format_entry_text($entry, $course, $cm);
         }
     } else {
         echo '<span class="warning">'.get_string('notstarted','journal').'</span>';

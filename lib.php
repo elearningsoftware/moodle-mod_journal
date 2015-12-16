@@ -101,6 +101,7 @@ function journal_user_outline($course, $user, $mod, $journal) {
 
         $numwords = count(preg_split("/\w\b/", $entry->text)) - 1;
 
+        $result = new stdClass();
         $result->info = get_string("numwords", "", $numwords);
         $result->time = $entry->modified;
         return $result;
@@ -121,7 +122,7 @@ function journal_user_complete($course, $user, $mod, $journal) {
             echo "<p><font size=\"1\">".get_string("lastedited").": ".userdate($entry->modified)."</font></p>";
         }
         if ($entry->text) {
-            echo format_text($entry->text, $entry->format, array('context' => context_course::instance($course->id)));
+            echo journal_format_entry_text($entry, $course, $mod);
         }
         if ($entry->teacher) {
             $grades = make_grades_menu($journal->grade);
@@ -735,7 +736,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     echo "\n<tr><td>";
     if ($entry) {
-        echo format_text($entry->text, $entry->format, array('context' => context_course::instance($course->id)));
+        echo journal_format_entry_text($entry, $course);
     } else {
         print_string("noentry", "journal");
     }
@@ -846,5 +847,82 @@ function journal_print_feedback($course, $entry, $grades) {
     // Feedback text
     echo format_text($entry->entrycomment, FORMAT_PLAIN);
     echo '</td></tr></table>';
+}
+
+/**
+ * Serves the journal files.
+ *
+ * @package  mod_journal
+ * @category files
+ * @param stdClass $course course object
+ * @param stdClass $cm course module object
+ * @param stdClass $context context object
+ * @param string $filearea file area
+ * @param array $args extra arguments
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if file not found, does not return if found - just send the file
+ */
+function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $DB, $USER;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    require_course_login($course, true, $cm);
+
+    if (!$course->visible && !has_capability('moodle/course:viewhiddencourses', $context)) {
+        return false;
+    }
+
+    // args[0] should be the entry id.
+    $entryid = intval(array_shift($args));
+    $entry = $DB->get_record('journal_entries', array('id' => $entryid), 'id, userid', MUST_EXIST);
+
+    $canmanage = has_capability('mod/journal:manageentries', $context);
+    if (!$canmanage && !has_capability('mod/journal:addentries', $context)) {
+        // Even if it is your own entry.
+        return false;
+    }
+
+    // Students can only see their own entry.
+    if (!$canmanage && $USER->id !== $entry->userid) {
+        return false;
+    }
+
+    if ($filearea !== 'entry') {
+        return false;
+    }
+
+    $fs = get_file_storage();
+    $relativepath = implode('/', $args);
+    $fullpath = "/$context->id/mod_journal/$filearea/$entryid/$relativepath";
+    $file = $fs->get_file_by_hash(sha1($fullpath));
+
+    // Finally send the file.
+    send_stored_file($file, null, 0, $forcedownload, $options);
+}
+
+function journal_format_entry_text($entry, $course = false, $cm = false) {
+
+    if (!$cm) {
+        if ($course) {
+            $courseid = $course->id;
+        } else {
+            $courseid = 0;
+        }
+        $cm = get_coursemodule_from_instance('journal', $entry->journal, $courseid);
+    }
+
+    $context = context_module::instance($cm->id);
+    $entrytext = file_rewrite_pluginfile_urls($entry->text, 'pluginfile.php', $context->id, 'mod_journal', 'entry', $entry->id);
+
+    $formatoptions = array(
+        'context' => $context,
+        'noclean' => false,
+        'trusted' => false
+    );
+    return format_text($entrytext, $entry->format, $formatoptions);
 }
 
