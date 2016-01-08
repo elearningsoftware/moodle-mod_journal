@@ -7,8 +7,8 @@
 // version the version value will be changed for
 // time() date.
 $plugin->component = 'mod_journal';
-$plugin->version  = 2015052700;
+$plugin->version  = 2015052701;
 $plugin->requires = 2015050500;  // Moodle 2.9
-$plugin->release = '29.0 (Build: 2015052700)';
+$plugin->release = '29.1 (Build: 2015052701)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;
