@@ -764,7 +764,6 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         echo "</td>";
         echo "<td>".get_string("feedback").":";
 
-
         $attrs = array();
         $hiddengradestr = '';
         $gradebookgradestr = '';
