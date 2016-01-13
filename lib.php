@@ -1,4 +1,4 @@
-<?php // $Id: lib.php,v 1.5.2.1 2011/07/19 10:53:40 davmon Exp $
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
