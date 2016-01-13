@@ -1,4 +1,4 @@
-<?PHP // $Id: journal.php,v 1.1 2011/01/24 11:36:58 davmon Exp $ 
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify

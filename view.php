@@ -1,4 +1,4 @@
-<?php  // $Id: view.php,v 1.3 2011/04/06 15:20:30 davmon Exp $
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify

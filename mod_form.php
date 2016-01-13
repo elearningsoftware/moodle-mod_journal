@@ -14,11 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-require_once ($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_journal_mod_form extends moodleform_mod {
 
-    function definition() {
+    public function definition() {
 
         global $COURSE;
         $mform    =& $this->_form;
@@ -33,7 +33,7 @@ class mod_journal_mod_form extends moodleform_mod {
 
         $options = array();
         $options[0] = get_string('alwaysopen', 'journal');
-        for ($i=1; $i <= 13 ;$i++) {
+        for ($i = 1; $i <= 13; $i++) {
             $options[$i] = get_string('numdays', '', $i);
         }
         for ($i = 2; $i <= 16; $i++) {
