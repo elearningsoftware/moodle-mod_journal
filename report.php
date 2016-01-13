@@ -89,16 +89,16 @@ if ($data = data_submitted()) {
     foreach ($feedback as $num => $vals) {
         $entry = $entrybyentry[$num];
         // Only update entries where feedback has actually changed.
-        $rating_changed = false;
+        $ratingchanged = false;
 
         $studentrating = clean_param($vals['r'], PARAM_INT);
         $studentcomment = clean_text($vals['c'], FORMAT_PLAIN);
 
         if ($studentrating != $entry->rating && !($studentrating == '' && $entry->rating == "0")) {
-            $rating_changed = true;
+            $ratingchanged = true;
         }
 
-        if ($rating_changed || $studentcomment != $entry->entrycomment) {
+        if ($ratingchanged || $studentcomment != $entry->entrycomment) {
             $newentry = new StdClass();
             $newentry->rating       = $studentrating;
             $newentry->entrycomment = $studentcomment;

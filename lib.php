@@ -80,17 +80,27 @@ function journal_delete_instance($id) {
 
 function journal_supports($feature) {
     switch($feature) {
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_GRADE_HAS_GRADE:         return true;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_RATE:                    return false;
-        case FEATURE_GROUPS:                  return true;
-        case FEATURE_GROUPINGS:               return true;
-        case FEATURE_GROUPMEMBERSONLY:        return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_BACKUP_MOODLE2:          return true;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_RATE:
+            return false;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
 
-        default: return null;
+        default:
+            return null;
     }
 }
 
@@ -278,15 +288,15 @@ function journal_print_recent_activity($course, $isteacher, $timestart) {
     $modinfo = & get_fast_modinfo($course);
     foreach ($logs as $log) {
         // Get journal info.  I'll need it later
-        $j_log_info = journal_log_info($log);
+        $jloginfo = journal_log_info($log);
 
-        $cm = $modinfo->instances['journal'][$j_log_info->id];
+        $cm = $modinfo->instances['journal'][$jloginfo->id];
         if (!$cm->uservisible) {
             continue;
         }
 
         if (!isset($journals[$log->info])) {
-            $journals[$log->info] = $j_log_info;
+            $journals[$log->info] = $jloginfo;
             $journals[$log->info]->time = $log->time;
             $journals[$log->info]->url = str_replace('&', '&amp;', $log->url);
         }
@@ -771,17 +781,17 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         $feedbacktext = $entry->entrycomment;
 
         // If the grade was modified from the gradebook disable edition also skip if journal is not graded.
-        $grading_info = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($user->id));
-        if (!empty($grading_info->items[0]->grades[$entry->userid]->str_long_grade)) {
-            if ($gradingdisabled = $grading_info->items[0]->grades[$user->id]->locked || $grading_info->items[0]->grades[$user->id]->overridden) {
+        $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($user->id));
+        if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
+            if ($gradingdisabled = $gradinginfo->items[0]->grades[$user->id]->locked || $gradinginfo->items[0]->grades[$user->id]->overridden) {
                 $attrs['disabled'] = 'disabled';
                 $hiddengradestr = '<input type="hidden" name="r'.$entry->id.'" value="'.$entry->rating.'"/>';
                 $gradebooklink = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='.$course->id.'">';
-                $gradebooklink .= $grading_info->items[0]->grades[$user->id]->str_long_grade.'</a>';
+                $gradebooklink .= $gradinginfo->items[0]->grades[$user->id]->str_long_grade.'</a>';
                 $gradebookgradestr = '<br/>'.get_string("gradeingradebook", "journal").':&nbsp;'.$gradebooklink;
 
                 $feedbackdisabledstr = 'disabled="disabled"';
-                $feedbacktext = $grading_info->items[0]->grades[$user->id]->str_feedback;
+                $feedbacktext = $gradinginfo->items[0]->grades[$user->id]->str_feedback;
             }
         }
 
@@ -842,10 +852,10 @@ function journal_print_feedback($course, $entry, $grades) {
     echo '<div class="grade">';
 
     // Gradebook preference
-    $grading_info = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($entry->userid));
-    if (!empty($grading_info->items[0]->grades[$entry->userid]->str_long_grade)) {
+    $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($entry->userid));
+    if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
         echo get_string('grade').': ';
-        echo $grading_info->items[0]->grades[$entry->userid]->str_long_grade;
+        echo $gradinginfo->items[0]->grades[$entry->userid]->str_long_grade;
     } else {
         print_string('nograde');
     }
