@@ -1,0 +1,26 @@
+sudo: false
+notifications:
+  email:
+    recipients:
+      - david.monllao@gmail.com
+    on_success: never
+    on_failure: always
+language: php
+php:
+  - "5.4"
+env:
+ - DB=pgsql
+before_script:
+ - git clone git://github.com/moodle/moodle ../moodle && cd ../moodle
+ - git checkout $TRAVIS_BRANCH
+ - travis_retry composer install --prefer-dist --no-interaction
+ - mv ../moodle-mod_journal mod/journal
+ - cp config-dist.php config.php
+ - sh -c "psql -c 'create database moodle;' -U postgres"
+ - sh -c "sed -i -e s/'password'/''/ -e s%/home/example%$HOME% -e 's%\(\$CFG.*bht\)%\n\1%' -e 's%\(\$CFG.*behat_wwwroot.*http://127\)%\n\1%' -e s/\'username\'/\'postgres\'/ -e s%127.0.0.1/moodle%localhost:8000% config.php"
+ - cat config.php
+ - mkdir -m777 $HOME/bht_moodledata
+ - php admin/tool/behat/cli/init.php
+ - "(php -S localhost:8000 &) 2> /dev/null > /dev/null"
+script:
+ - vendor/bin/behat --config /home/travis/bht_moodledata/behat/behat.yml --tags @mod_journal

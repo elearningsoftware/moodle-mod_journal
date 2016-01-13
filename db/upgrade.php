@@ -1,4 +1,18 @@
-<?php  //$Id: upgrade.php,v 1.4 2011/04/26 06:20:25 davmon Exp $
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once($CFG->dirroot.'/mod/journal/lib.php');
 
@@ -45,7 +59,7 @@ function xmldb_journal_upgrade($oldversion=0) {
         $entries = $DB->get_records('journal_entries', array('timemarked' => 0));
         if ($entries) {
             foreach ($entries as $entry) {
-                $entry->rating = NULL;
+                $entry->rating = null;
                 $DB->update_record('journal_entries', $entry);
             }
         }
@@ -53,7 +67,6 @@ function xmldb_journal_upgrade($oldversion=0) {
         // journal savepoint reached
         upgrade_mod_savepoint(true, 2012032001, 'journal');
     }
-
 
     return $result;
 }

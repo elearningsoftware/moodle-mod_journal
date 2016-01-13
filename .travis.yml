@@ -1,26 +1,45 @@
-sudo: false
-notifications:
-  email:
-    recipients:
-      - david.monllao@gmail.com
-    on_success: never
-    on_failure: always
 language: php
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 php:
-  - "5.4"
+ - 5.4
+ - 5.5
+ - 5.6
+ - 7.0
+
+matrix:
+ allow_failures:
+  - php: 7.0
+
 env:
- - DB=pgsql
-before_script:
- - git clone git://github.com/moodle/moodle ../moodle && cd ../moodle
- - git checkout $TRAVIS_BRANCH
- - travis_retry composer install --prefer-dist --no-interaction
- - mv ../moodle-mod_journal mod/journal
- - cp config-dist.php config.php
- - sh -c "psql -c 'create database moodle;' -U postgres"
- - sh -c "sed -i -e s/'password'/''/ -e s%/home/example%$HOME% -e 's%\(\$CFG.*bht\)%\n\1%' -e 's%\(\$CFG.*behat_wwwroot.*http://127\)%\n\1%' -e s/\'username\'/\'postgres\'/ -e s%127.0.0.1/moodle%localhost:8000% config.php"
- - cat config.php
- - mkdir -m777 $HOME/bht_moodledata
- - php admin/tool/behat/cli/init.php
- - "(php -S localhost:8000 &) 2> /dev/null > /dev/null"
+ global:
+  - MOODLE_BRANCH=MOODLE_30_STABLE
+  - IGNORE_PATHS=javascript/RGraph
+ matrix:
+  - DB=pgsql
+  - DB=mysqli
+
+before_install:
+  - cd ../..
+  - composer selfupdate
+  - composer create-project -n --no-dev moodlerooms/moodle-plugin-ci ci ^1
+  - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
+
+install:
+  - moodle-plugin-ci install
+
 script:
- - vendor/bin/behat --config /home/travis/bht_moodledata/behat/behat.yml --tags @mod_journal
+  - moodle-plugin-ci phplint
+  - moodle-plugin-ci phpcpd
+  - moodle-plugin-ci phpmd
+  - moodle-plugin-ci codechecker
+  - moodle-plugin-ci csslint
+  - moodle-plugin-ci shifter
+  - moodle-plugin-ci jshint
+  - moodle-plugin-ci phpunit
+  - moodle-plugin-ci behat
