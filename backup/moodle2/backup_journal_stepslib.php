@@ -1,5 +1,4 @@
 <?php
-
 class backup_journal_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {

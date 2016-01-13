@@ -1,5 +1,4 @@
 <?php
-
 $string['accessdenied'] = 'S\'ha denegat l\'accés';
 $string['alwaysopen'] = 'Sempre obert';
 $string['blankentry'] = 'Entrada buida';
@@ -24,8 +23,8 @@ $string['journalname'] = 'Nom del diari';
 $string['journalquestion'] = 'Pregunta del diari';
 $string['mailsubject'] = 'Retroacció del diari';
 $string['modulename'] = 'Diari';
-$string['modulename_help'] = 'L\'activitat diari permet als professors obtenir feedback dels 
-estudiants sobre un tema concret';
+$string['modulename_help'] = 'L\'activitat diari permet als professors obtenir feedback dels '.
+	'estudiants sobre un tema concret';
 $string['modulenameplural'] = 'Diaris';
 $string['newjournalentries'] = 'Noves entrades al diari';
 $string['noentriesmanagers'] = 'No hi ha professors/mestres';

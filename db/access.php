@@ -1,6 +1,4 @@
 <?php
-
-
 $capabilities = array(
 
     'mod/journal:manageentries' => array(

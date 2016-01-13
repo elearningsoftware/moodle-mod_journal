@@ -1,4 +1,18 @@
 <?php // $Id: report.php,v 1.3 2011/04/06 15:20:30 davmon Exp $
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once("../../config.php");
 require_once("lib.php");
@@ -26,7 +40,7 @@ if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
 }
 
 // Header
-$PAGE->set_url('/mod/journal/report.php', array('id'=>$id));
+$PAGE->set_url('/mod/journal/report.php', array('id' => $id));
 
 $PAGE->navbar->add(get_string("entries", "journal"));
 $PAGE->set_title(get_string("modulenameplural", "journal"));
@@ -44,8 +58,8 @@ if ( $eee = $DB->get_records("journal_entries", array("journal" => $journal->id)
     }
 
 } else {
-    $entrybyuser  = array () ;
-    $entrybyentry = array () ;
+    $entrybyuser  = array ();
+    $entrybyentry = array ();
 }
 
 // Group mode
@@ -53,7 +67,7 @@ $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 
 
-/// Process incoming data if there is any
+// Process incoming data if there is any
 if ($data = data_submitted()) {
 
     confirm_sesskey();
@@ -64,8 +78,8 @@ if ($data = data_submitted()) {
     // Peel out all the data from variable names.
     foreach ($data as $key => $val) {
         if (strpos($key, 'r') === 0 || strpos($key, 'c') === 0) {
-            $type = substr($key,0,1);
-            $num  = substr($key,1);
+            $type = substr($key, 0, 1);
+            $num  = substr($key, 1);
             $feedback[$num][$type] = $val;
         }
     }
@@ -134,7 +148,7 @@ if ($data = data_submitted()) {
     $event->trigger();
 }
 
-/// Print out the journal entries
+// Print out the journal entries
 
 if ($currentgroup) {
     $groups = $currentgroup;
@@ -165,7 +179,7 @@ if (!$users) {
     }
 
     foreach ($users as $user) {       // Remaining users
-        journal_print_user_entry($course, $user, NULL, $teachers, $grades);
+        journal_print_user_entry($course, $user, null, $teachers, $grades);
     }
 
     echo "<p class=\"feedbacksave\">";

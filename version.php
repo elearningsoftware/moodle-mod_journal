@@ -1,5 +1,4 @@
 <?php
-
 // Only when master becomes a stable the version value will be changed for
 // the current date. Otherwise we just increase the last NN by one.
 

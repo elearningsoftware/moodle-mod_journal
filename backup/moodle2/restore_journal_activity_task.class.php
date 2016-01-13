@@ -1,12 +1,12 @@
 <?php
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/journal/backup/moodle2/restore_journal_stepslib.php');
 
 class restore_journal_activity_task extends restore_activity_task {
 
-    protected function define_my_settings() {}
+    protected function define_my_settings() {
+    }
 
     protected function define_my_steps() {
         $this->add_step(new restore_journal_activity_structure_step('journal_structure', 'journal.xml'));
