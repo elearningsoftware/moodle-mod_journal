@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -56,8 +55,8 @@ if (! $journals = get_all_instances_in_course("journal", $course)) {
 // Sections
 $usesections = course_format_uses_sections($course->format);
 if ($usesections) {
-	$modinfo = get_fast_modinfo($course);
-	$sections = $modinfo->get_section_info_all();
+    $modinfo = get_fast_modinfo($course);
+    $sections = $modinfo->get_section_info_all();
 }
 
 $timenow = time();
@@ -102,12 +101,12 @@ foreach ($journals as $journal) {
     }
 
     // Link
-    $journalname = format_string($journal->name,true, array('context' => $context));
+    $journalname = format_string($journal->name, true, array('context' => $context));
     if (!$journal->visible) {
-        //Show dimmed if the mod is hidden
+        // Show dimmed if the mod is hidden
         $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
     } else {
-        //Show normal if the mod is visible
+        // Show normal if the mod is visible
         $table->data[$i][] = "<a href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
     }
 
@@ -132,9 +131,10 @@ foreach ($journals as $journal) {
             }
         }
 
-        //$entrycount = journal_count_entries($journal, get_current_group($course->id));
-		$entrycount = journal_count_entries($journal, groups_get_all_groups($course->id, $USER->id));
-        $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">".get_string("viewallentries","journal", $entrycount)."</a>";
+        // $entrycount = journal_count_entries($journal, get_current_group($course->id));
+        $entrycount = journal_count_entries($journal, groups_get_all_groups($course->id, $USER->id));
+        $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">".
+            get_string("viewallentries", "journal", $entrycount)."</a>";
     } else if (!empty($managersomewhere)) {
         $table->data[$i][] = "";
     }

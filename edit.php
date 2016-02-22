@@ -1,4 +1,18 @@
-<?php // $Id: edit.php,v 1.2 2011/01/24 11:36:57 davmon Exp $
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once("../../config.php");
 require_once('./edit_form.php');
@@ -59,7 +73,7 @@ $form->set_data($data);
 if ($form->is_cancelled()) {
     redirect($CFG->wwwroot . '/mod/journal/view.php?id=' . $cm->id);
 } else if ($fromform = $form->get_data()) {
-    /// If data submitted, then process and store.
+    // If data submitted, then process and store.
 
     // Prevent CSFR.
     confirm_sesskey();
@@ -123,7 +137,7 @@ echo $OUTPUT->heading(format_string($journal->name));
 $intro = format_module_intro('journal', $journal, $cm->id);
 echo $OUTPUT->box($intro);
 
-/// Otherwise fill and print the form.
+// Otherwise fill and print the form.
 $form->display();
 
 echo $OUTPUT->footer();
