@@ -265,54 +265,119 @@ function journal_cron () {
     return true;
 }
 
-function journal_print_recent_activity($course, $isteacher, $timestart) {
-    global $CFG, $DB, $OUTPUT;
+/**
+ * Given a course and a time, this module should find recent activity
+ * that has occurred in journal activities and print it out.
+ * Return true if there was output, or false if there was none.
+ *
+ * @global stdClass $DB
+ * @global stdClass $OUTPUT
+ * @param stdClass $course
+ * @param bool $viewfullnames
+ * @param int $timestart
+ * @return bool
+ */
+function journal_print_recent_activity($course, $viewfullnames, $timestart) {
+    global $CFG, $USER, $DB, $OUTPUT;
+    // Check to see if Show Recent Activity is enabled.
+//    if (!get_config('journal', 'showrecentactivity')) {
+//        return false;
+//    }
 
-    if (!get_config('journal', 'showrecentactivity')) {
-        return false;
-    }
+    $dbparams = array($timestart, $course->id, 'journal');
+    $namefields = user_picture::fields('u', null, 'userid');
+    $sql = "SELECT je.id, je.modified, cm.id AS cmid, $namefields
+         FROM {journal_entries} je
+              JOIN {journal} j         ON j.id = je.journal
+              JOIN {course_modules} cm ON cm.instance = j.id
+              JOIN {modules} md        ON md.id = cm.module
+              JOIN {user} u            ON u.id = je.userid
+         WHERE je.modified > ? AND
+               j.course = ? AND
+               md.name = ?
+         ORDER BY je.modified ASC
+    ";
 
-    $content = false;
-    $journals = null;
+    $newentries = $DB->get_records_sql($sql, $dbparams);
 
-    // log table should not be used here
+    $modinfo = get_fast_modinfo($course);
+    $show    = array();
+    $grader  = array();
+    $showrecententries = get_config('journal', 'showrecentactivity');
 
-    $select = "time > ? AND
-               course = ? AND
-               module = 'journal' AND
-               (action = 'add entry' OR action = 'update entry')";
-    if (!$logs = $DB->get_records_select('log', $select, array($timestart, $course->id), 'time ASC')) {
-        return false;
-    }
+    foreach ($newentries as $anentry) {
 
-    $modinfo = & get_fast_modinfo($course);
-    foreach ($logs as $log) {
-        // Get journal info.  I'll need it later
-        $jloginfo = journal_log_info($log);
+        if (!array_key_exists($anentry->cmid, $modinfo->get_cms())) {
+            continue;
+        }
+        $cm = $modinfo->get_cm($anentry->cmid);
 
-        $cm = $modinfo->instances['journal'][$jloginfo->id];
         if (!$cm->uservisible) {
             continue;
         }
-
-        if (!isset($journals[$log->info])) {
-            $journals[$log->info] = $jloginfo;
-            $journals[$log->info]->time = $log->time;
-            $journals[$log->info]->url = str_replace('&', '&amp;', $log->url);
+        if ($anentry->userid == $USER->id) {
+            $show[] = $anentry;
+            continue;
         }
+        $context = context_module::instance($anentry->cmid);
+
+        // The act of submitting of entries may be considered private -
+        // only graders will see it if specified.
+        if (empty($showrecententries)) {
+            if (!array_key_exists($cm->id, $grader)) {
+                $grader[$cm->id] = has_capability('moodle/grade:viewall', $context);
+            }
+            if (!$grader[$cm->id]) {
+                continue;
+            }
+        }
+
+        $groupmode = groups_get_activity_groupmode($cm, $course);
+
+        if ($groupmode == SEPARATEGROUPS &&
+                !has_capability('moodle/site:accessallgroups',  $context)) {
+            if (isguestuser()) {
+                // Shortcut - guest user does not belong into any group.
+                continue;
+            }
+
+            // This will be slow - show only users that share group with me in this cm.
+            if (!$modinfo->get_groups($cm->groupingid)) {
+                continue;
+            }
+            $usersgroups =  groups_get_all_groups($course->id, $anentry->userid, $cm->groupingid);
+            if (is_array($usersgroups)) {
+                $usersgroups = array_keys($usersgroups);
+                $intersect = array_intersect($usersgroups, $modinfo->get_groups($cm->groupingid));
+                if (empty($intersect)) {
+                    continue;
+                }
+            }
+        }
+        $show[] = $anentry;
     }
 
-    if ($journals) {
-        $content = true;
-        echo $OUTPUT->heading(get_string('newjournalentries', 'journal').':', 3);
-        foreach ($journals as $journal) {
-            print_recent_activity_note($journal->time, $journal, $journal->name,
-                                       $CFG->wwwroot.'/mod/journal/'.$journal->url);
-        }
+    if (empty($show)) {
+        return false;
     }
 
-    return $content;
-}
+    echo $OUTPUT->heading(get_string('newjournalentries', 'journal').':', 3);
+    
+    foreach ($show as $submission) {
+        $cm = $modinfo->get_cm($submission->cmid);
+        $context = context_module::instance($submission->cmid);
+        $link = $CFG->wwwroot.'/mod/journal/report.php?id='.$cm->id;
+        print_recent_activity_note($submission->modified,
+                                   $submission,
+                                   $cm->name,
+                                   $link,
+                                   false,
+                                   $viewfullnames);
+    }
+
+    return true;    
+    
+}    
 
 function journal_get_participants($journalid) {
 // Returns the users with data in one journal
