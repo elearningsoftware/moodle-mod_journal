@@ -279,10 +279,6 @@ function journal_cron () {
  */
 function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
-    // Check to see if Show Recent Activity is enabled.
-//    if (!get_config('journal', 'showrecentactivity')) {
-//        return false;
-//    }
 
     $dbparams = array($timestart, $course->id, 'journal');
     $namefields = user_picture::fields('u', null, 'userid');
@@ -345,7 +341,7 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
             if (!$modinfo->get_groups($cm->groupingid)) {
                 continue;
             }
-            $usersgroups =  groups_get_all_groups($course->id, $anentry->userid, $cm->groupingid);
+            $usersgroups = groups_get_all_groups($course->id, $anentry->userid, $cm->groupingid);
             if (is_array($usersgroups)) {
                 $usersgroups = array_keys($usersgroups);
                 $intersect = array_intersect($usersgroups, $modinfo->get_groups($cm->groupingid));
@@ -362,11 +358,15 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     }
 
     echo $OUTPUT->heading(get_string('newjournalentries', 'journal').':', 3);
-    
+
     foreach ($show as $submission) {
         $cm = $modinfo->get_cm($submission->cmid);
         $context = context_module::instance($submission->cmid);
-        $link = $CFG->wwwroot.'/mod/journal/report.php?id='.$cm->id;
+        if (has_capability('mod/journal:manageentries', $context)) {
+            $link = $CFG->wwwroot.'/mod/journal/report.php?id='.$cm->id;
+        } else {
+            $link = $CFG->wwwroot.'/mod/journal/view.php?id='.$cm->id;
+        }
         print_recent_activity_note($submission->modified,
                                    $submission,
                                    $cm->name,
@@ -374,10 +374,8 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
                                    false,
                                    $viewfullnames);
     }
-
-    return true;    
-    
-}    
+    return true;
+}
 
 function journal_get_participants($journalid) {
 // Returns the users with data in one journal
