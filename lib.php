@@ -280,6 +280,10 @@ function journal_cron () {
 function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
 
+    if (!get_config('journal', 'showrecentactivity')) {
+        return false;
+    }
+
     $dbparams = array($timestart, $course->id, 'journal');
     $namefields = user_picture::fields('u', null, 'userid');
     $sql = "SELECT je.id, je.modified, cm.id AS cmid, $namefields
@@ -298,8 +302,6 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
 
     $modinfo = get_fast_modinfo($course);
     $show    = array();
-    $grader  = array();
-    $showrecententries = get_config('journal', 'showrecentactivity');
 
     foreach ($newentries as $anentry) {
 
@@ -317,15 +319,9 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
         }
         $context = context_module::instance($anentry->cmid);
 
-        // The act of submitting of entries may be considered private -
-        // only graders will see it if specified.
-        if (empty($showrecententries)) {
-            if (!array_key_exists($cm->id, $grader)) {
-                $grader[$cm->id] = has_capability('moodle/grade:viewall', $context);
-            }
-            if (!$grader[$cm->id]) {
-                continue;
-            }
+        // Only teachers can see other students entries.
+        if (!has_capability('mod/journal:manageentries', $context)) {
+            continue;
         }
 
         $groupmode = groups_get_activity_groupmode($cm, $course);
