@@ -7,13 +7,13 @@ notifications:
     on_failure: always
 language: php
 php:
-  - "5.4"
+  - "5.6"
 env:
  - DB=pgsql
 before_script:
  - git clone git://github.com/moodle/moodle ../moodle && cd ../moodle
  - git checkout $TRAVIS_BRANCH
- - travis_retry composer install --prefer-dist --no-interaction
+ - travis_retry composer install
  - mv ../moodle-mod_journal mod/journal
  - cp config-dist.php config.php
  - sh -c "psql -c 'create database moodle;' -U postgres"
