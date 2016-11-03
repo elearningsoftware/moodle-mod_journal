@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends \core_search\base_mod {
+class entry extends \core_search\area\base_mod {
 
     /**
      * Returns recordset containing required data for indexing journal entries.
