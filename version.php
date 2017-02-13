@@ -20,6 +20,6 @@
 $plugin->component = 'mod_journal';
 $plugin->version  = 2017021300;
 $plugin->requires = 2016120500;  // Moodle 3.2
-$plugin->release = '32.0 (Build: 2016062800)';
+$plugin->release = '32.0 (Build: 2017021300)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;
