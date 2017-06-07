@@ -14,10 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-$settings->add(new admin_setting_configselect('journal/showrecentactivity', get_string('showrecentactivity', 'journal'),
-                                              get_string('showrecentactivity', 'journal'), 0,
-                                              array('0' => get_string('no'), '1' => get_string('yes'))));
+defined('MOODLE_INTERNAL') || die;
 
-$settings->add(new admin_setting_configselect('journal/overview', get_string('showoverview', 'journal'),
-                                              get_string('showoverview', 'journal'), 1,
-                                              array('0' => get_string('no'), '1' => get_string('yes'))));
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configselect('journal/showrecentactivity', get_string('showrecentactivity', 'journal'),
+        get_string('showrecentactivity', 'journal'), 0,
+        array('0' => get_string('no'), '1' => get_string('yes'))));
+
+    $settings->add(new admin_setting_configselect('journal/overview', get_string('showoverview', 'journal'),
+        get_string('showoverview', 'journal'), 1,
+        array('0' => get_string('no'), '1' => get_string('yes'))));
+}
