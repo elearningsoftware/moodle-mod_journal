@@ -383,14 +383,14 @@ function journal_get_participants($journalid) {
     $students = $DB->get_records_sql("SELECT DISTINCT u.id
                                       FROM {user} u,
                                       {journal_entries} j
-                                      WHERE j.journal = '$journalid' and
-                                      u.id = j.userid");
+                                      WHERE j.journal = ? and
+                                      u.id = j.userid", array($journalid));
     // Get teachers
     $teachers = $DB->get_records_sql("SELECT DISTINCT u.id
                                       FROM {user} u,
                                       {journal_entries} j
-                                      WHERE j.journal = '$journalid' and
-                                      u.id = j.teacher");
+                                      WHERE j.journal = ? and
+                                      u.id = j.teacher", array($journalid));
 
     // Add teachers to students
     if ($teachers) {
@@ -540,9 +540,11 @@ function journal_print_overview($courses, &$htmlarray) {
 function journal_get_user_grades($journal, $userid=0) {
 
     global $DB;
+    $params = array();
 
     if ($userid) {
-        $userstr = 'AND userid = '.$userid;
+        $userstr = 'AND userid = :uid';
+        $params['uid'] = $userid;
     } else {
         $userstr = '';
     }
@@ -555,9 +557,10 @@ function journal_get_user_grades($journal, $userid=0) {
         $sql = "SELECT userid, modified as datesubmitted, format as feedbackformat,
                 rating as rawgrade, entrycomment as feedback, teacher as usermodifier, timemarked as dategraded
                 FROM {journal_entries}
-                WHERE journal = '$journal->id' ".$userstr;
+                WHERE journal = :jid ".$userstr;
+        $params['jid'] = $journal->id;
 
-        $grades = $DB->get_records_sql($sql);
+        $grades = $DB->get_records_sql($sql, $params);
 
         if ($grades) {
             foreach ($grades as $key => $grade) {
@@ -680,17 +683,20 @@ function journal_grade_item_delete($journal) {
 
 function journal_get_users_done($journal, $currentgroup) {
     global $DB;
+    $params = array();
 
     $sql = "SELECT u.* FROM {journal_entries} j
             JOIN {user} u ON j.userid = u.id ";
 
     // Group users
     if ($currentgroup != 0) {
-        $sql .= "JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = '$currentgroup'";
+        $sql .= "JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = ?";
+        $params[] = $currentgroup;
     }
 
-    $sql .= " WHERE j.journal = '$journal->id' ORDER BY j.modified DESC";
-    $journals = $DB->get_records_sql($sql);
+    $sql .= " WHERE j.journal = ? ORDER BY j.modified DESC";
+    $params[] = $journal->id;
+    $journals = $DB->get_records_sql($sql, $params);
 
     $cm = journal_get_coursemodule($journal->id);
     if (!$journals || !$cm) {
@@ -726,15 +732,15 @@ function journal_count_entries($journal, $groupid = 0) {
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {groups_members} g ON g.userid = j.userid
                 JOIN {user} u ON u.id = g.userid
-                WHERE j.journal = $journal->id AND g.groupid = '$groupid'";
-        $journals = $DB->get_records_sql($sql);
+                WHERE j.journal = ? AND g.groupid = ?";
+        $journals = $DB->get_records_sql($sql, array($journal->id, $groupid));
 
     } else { // Count all the entries from the whole course
 
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
-                WHERE j.journal = '$journal->id'";
-        $journals = $DB->get_records_sql($sql);
+                WHERE j.journal = ?";
+        $journals = $DB->get_records_sql($sql, array($journal->id));
     }
 
     if (!$journals) {
@@ -760,8 +766,8 @@ function journal_get_unmailed_graded($cutofftime) {
 
     $sql = "SELECT je.*, j.course, j.name FROM {journal_entries} je
             JOIN {journal} j ON je.journal = j.id
-            WHERE je.mailed = '0' AND je.timemarked < '$cutofftime' AND je.timemarked > 0";
-    return $DB->get_records_sql($sql);
+            WHERE je.mailed = '0' AND je.timemarked < ? AND je.timemarked > 0";
+    return $DB->get_records_sql($sql, array($cutofftime));
 }
 
 function journal_log_info($log) {
@@ -771,8 +777,8 @@ function journal_log_info($log) {
             FROM {journal} j
             JOIN {journal_entries} je ON je.journal = j.id
             JOIN {user} u ON u.id = je.userid
-            WHERE je.id = '$log->info'";
-    return $DB->get_record_sql($sql);
+            WHERE je.id = ?";
+    return $DB->get_record_sql($sql, array($log->info));
 }
 
 /**
@@ -787,7 +793,7 @@ function journal_get_coursemodule($journalid) {
 
     return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
                                 JOIN {modules} m ON m.id = cm.module
-                                WHERE cm.instance = '$journalid' AND m.name = 'journal'");
+                                WHERE cm.instance = ? AND m.name = 'journal'", array($journalid));
 }
 
 
