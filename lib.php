@@ -592,7 +592,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
         if ($grades = journal_get_user_grades($journal, $userid)) {
             journal_grade_item_update($journal, $grades);
         } else if ($userid && $nullifnone) {
-            $grade = new object();
+            $grade = new stdClass();
             $grade->userid   = $userid;
             $grade->rawgrade = null;
             journal_grade_item_update($journal, $grade);
