@@ -20,7 +20,7 @@ require_once($CFG->dirroot.'/mod/journal/lib.php');
 
 function xmldb_journal_upgrade($oldversion=0) {
     global $CFG, $DB;
-    
+
     $dbman = $DB->get_manager();
 
     // No DB changes since 1.9.0.
@@ -29,7 +29,7 @@ function xmldb_journal_upgrade($oldversion=0) {
     if ($oldversion < 2010120300) {
 
         journal_update_grades();
-        
+
         upgrade_mod_savepoint(true, 2010120300, 'journal');
     }
 
