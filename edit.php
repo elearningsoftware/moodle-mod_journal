@@ -17,7 +17,7 @@
 require_once("../../config.php");
 require_once('./edit_form.php');
 
-$id = required_param('id', PARAM_INT);    // Course Module ID
+$id = required_param('id', PARAM_INT);    // Course Module ID.
 
 if (!$cm = get_coursemodule_from_id('journal', $id)) {
     print_error("Course Module ID was incorrect");
@@ -37,7 +37,7 @@ if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
     print_error("Course module is incorrect");
 }
 
-// Header
+// Header.
 $PAGE->set_url('/mod/journal/edit.php', array('id' => $id));
 $PAGE->navbar->add(get_string('edit'));
 $PAGE->set_title(format_string($journal->name));

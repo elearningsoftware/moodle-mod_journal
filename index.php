@@ -27,7 +27,7 @@ require_once(__DIR__ . "/../../config.php");
 require_once("lib.php");
 
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // Course.
 
 if (! $course = $DB->get_record("course", array("id" => $id))) {
     print_error("Course ID is incorrect");
@@ -36,7 +36,7 @@ if (! $course = $DB->get_record("course", array("id" => $id))) {
 require_course_login($course);
 
 
-// Header
+// Header.
 $strjournals = get_string("modulenameplural", "journal");
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_url('/mod/journal/index.php', array('id' => $id));
@@ -52,7 +52,7 @@ if (! $journals = get_all_instances_in_course("journal", $course)) {
     die;
 }
 
-// Sections
+// Sections.
 $usesections = course_format_uses_sections($course->format);
 if ($usesections) {
     $modinfo = get_fast_modinfo($course);
@@ -62,7 +62,7 @@ if ($usesections) {
 $timenow = time();
 
 
-// Table data
+// Table data.
 $table = new html_table();
 
 $table->head = array();
@@ -84,7 +84,7 @@ foreach ($journals as $journal) {
     $context = context_module::instance($journal->coursemodule);
     $entriesmanager = has_capability('mod/journal:manageentries', $context);
 
-    // Section
+    // Section.
     $printsection = '';
     if ($journal->section !== $currentsection) {
         if ($journal->section) {
@@ -100,29 +100,29 @@ foreach ($journals as $journal) {
         $table->data[$i][] = $printsection;
     }
 
-    // Link
+    // Link.
     $journalname = format_string($journal->name, true, array('context' => $context));
     if (!$journal->visible) {
-        // Show dimmed if the mod is hidden
+        // Show dimmed if the mod is hidden.
         $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
     } else {
-        // Show normal if the mod is visible
+        // Show normal if the mod is visible.
         $table->data[$i][] = "<a href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
     }
 
-    // Description
+    // Description.
     $table->data[$i][] = format_text($journal->intro,  $journal->introformat, array('context' => $context));
 
-    // Entries info
+    // Entries info.
     if ($entriesmanager) {
 
-        // Display the report.php col only if is a entries manager in some CONTEXT_MODULE
+        // Display the report.php col only if is a entries manager in some CONTEXT_MODULE.
         if (empty($managersomewhere)) {
             $table->head[] = get_string('viewentries', 'journal');
             $table->align[] = 'left';
             $managersomewhere = true;
 
-            // Fill the previous col cells
+            // Fill the previous col cells.
             $manageentriescell = count($table->head) - 1;
             for ($j = 0; $j < $i; $j++) {
                 if (is_array($table->data[$j])) {
@@ -131,7 +131,6 @@ foreach ($journals as $journal) {
             }
         }
 
-        // $entrycount = journal_count_entries($journal, get_current_group($course->id));
         $entrycount = journal_count_entries($journal, groups_get_all_groups($course->id, $USER->id));
         $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">".
             get_string("viewallentries", "journal", $entrycount)."</a>";
