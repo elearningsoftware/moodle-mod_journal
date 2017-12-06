@@ -14,20 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Search area for mod_journal activities.
+ *
+ * @package    mod_journal
+ * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace mod_journal\search;
+
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/lib/formslib.php');
-
-class mod_journal_entry_form extends moodleform {
-
-    public function definition() {
-        $this->_form->addElement('editor', 'text_editor', get_string('entry', 'mod_journal'),
-                null, $this->_customdata['editoroptions']);
-        $this->_form->setType('text_editor', PARAM_RAW);
-        $this->_form->addRule('text_editor', null, 'required', null, 'client');
-        $this->_form->addElement('hidden', 'id');
-        $this->_form->setType('id', PARAM_INT);
-
-        $this->add_action_buttons();
-    }
+/**
+ * Search area for mod_journal activities.
+ *
+ * @package    mod_journal
+ * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class activity extends \core_search\area\base_activity {
 }

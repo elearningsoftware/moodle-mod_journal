@@ -14,14 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// STANDARD MODULE FUNCTIONS /////////////////////////////////////////////////////////
 
+defined('MOODLE_INTERNAL') || die();
+
+
+/**
+ * Given an object containing all the necessary data,
+ * (defined by the form in mod.html) this function
+ * will create a new instance and return the id number
+ * of the new instance.
+ * @param object $journal Object containing required journal properties
+ * @return int Journal ID
+ */
 function journal_add_instance($journal) {
-// Given an object containing all the necessary data,
-// (defined by the form in mod.html) this function
-// will create a new instance and return the id number
-// of the new instance.
-
     global $DB;
 
     $journal->timemodified = time();
@@ -32,12 +37,14 @@ function journal_add_instance($journal) {
     return $journal->id;
 }
 
-
+/**
+ * Given an object containing all the necessary data,
+ * (defined by the form in mod.html) this function
+ * will update an existing instance with new data.
+ * @param object $journal Object containing required journal properties
+ * @return boolean True if successful
+ */
 function journal_update_instance($journal) {
-// Given an object containing all the necessary data,
-// (defined by the form in mod.html) this function
-// will update an existing instance with new data.
-
     global $DB;
 
     $journal->timemodified = time();
@@ -52,12 +59,14 @@ function journal_update_instance($journal) {
     return $result;
 }
 
-
+/**
+ * Given an ID of an instance of this module,
+ * this function will permanently delete the instance
+ * nd any data that depends on it.
+ * @param int $id Journal ID
+ * @return boolean True if successful
+ */
 function journal_delete_instance($id) {
-// Given an ID of an instance of this module,
-// this function will permanently delete the instance
-// and any data that depends on it.
-
     global $DB;
 
     $result = true;
@@ -157,11 +166,11 @@ function journal_user_complete($course, $user, $mod, $journal) {
     }
 }
 
-
+/**
+ * Function to be run periodically according to the moodle cron.
+ * Finds all journal notifications that have yet to be mailed out, and mails them.
+ */
 function journal_cron () {
-// Function to be run periodically according to the moodle cron
-// Finds all journal notifications that have yet to be mailed out, and mails them
-
     global $CFG, $USER, $DB;
 
     $cutofftime = time() - $CFG->maxeditingtime;
@@ -170,7 +179,8 @@ function journal_cron () {
         $timenow = time();
 
         $usernamefields = get_all_user_name_fields();
-        $requireduserfields = 'id, auth, mnethostid, email, mailformat, maildisplay, lang, deleted, suspended, ' . implode(', ', $usernamefields);
+        $requireduserfields = 'id, auth, mnethostid, email, mailformat, maildisplay, lang, deleted, suspended, '
+                .implode(', ', $usernamefields);
 
         // To save some db queries.
         $users = array();
@@ -226,7 +236,7 @@ function journal_cron () {
             $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
             if (!$canadd and $entriesmanager) {
-                continue;  // Not an active participant
+                continue;  // Not an active participant.
             }
 
             $journalinfo = new stdClass();
@@ -241,7 +251,7 @@ function journal_cron () {
             $posttext .= "---------------------------------------------------------------------\n";
             $posttext .= get_string("journalmail", "journal", $journalinfo)."\n";
             $posttext .= "---------------------------------------------------------------------\n";
-            if ($user->mailformat == 1) {  // HTML
+            if ($user->mailformat == 1) {  // HTML.
                 $posthtml = "<p><font face=\"sans-serif\">".
                 "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->".
                 "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->".
@@ -250,7 +260,7 @@ function journal_cron () {
                 $posthtml .= "<p>".get_string("journalmailhtml", "journal", $journalinfo)."</p>";
                 $posthtml .= "</font><hr />";
             } else {
-              $posthtml = "";
+                $posthtml = "";
             }
 
             if (! email_to_user($user, $teacher, $postsubject, $posttext, $posthtml)) {
@@ -265,86 +275,154 @@ function journal_cron () {
     return true;
 }
 
-function journal_print_recent_activity($course, $isteacher, $timestart) {
-    global $CFG, $DB, $OUTPUT;
+/**
+ * Given a course and a time, this module should find recent activity
+ * that has occurred in journal activities and print it out.
+ * Return true if there was output, or false if there was none.
+ *
+ * @global stdClass $DB
+ * @global stdClass $OUTPUT
+ * @param stdClass $course
+ * @param bool $viewfullnames
+ * @param int $timestart
+ * @return bool
+ */
+function journal_print_recent_activity($course, $viewfullnames, $timestart) {
+    global $CFG, $USER, $DB, $OUTPUT;
 
     if (!get_config('journal', 'showrecentactivity')) {
         return false;
     }
 
-    $content = false;
-    $journals = null;
+    $dbparams = array($timestart, $course->id, 'journal');
+    $namefields = user_picture::fields('u', null, 'userid');
+    $sql = "SELECT je.id, je.modified, cm.id AS cmid, $namefields
+         FROM {journal_entries} je
+              JOIN {journal} j         ON j.id = je.journal
+              JOIN {course_modules} cm ON cm.instance = j.id
+              JOIN {modules} md        ON md.id = cm.module
+              JOIN {user} u            ON u.id = je.userid
+         WHERE je.modified > ? AND
+               j.course = ? AND
+               md.name = ?
+         ORDER BY je.modified ASC
+    ";
 
-    // log table should not be used here
+    $newentries = $DB->get_records_sql($sql, $dbparams);
 
-    $select = "time > ? AND
-               course = ? AND
-               module = 'journal' AND
-               (action = 'add entry' OR action = 'update entry')";
-    if (!$logs = $DB->get_records_select('log', $select, array($timestart, $course->id), 'time ASC')) {
-        return false;
-    }
+    $modinfo = get_fast_modinfo($course);
+    $show    = array();
 
-    $modinfo = & get_fast_modinfo($course);
-    foreach ($logs as $log) {
-        // Get journal info.  I'll need it later
-        $jloginfo = journal_log_info($log);
+    foreach ($newentries as $anentry) {
 
-        $cm = $modinfo->instances['journal'][$jloginfo->id];
+        if (!array_key_exists($anentry->cmid, $modinfo->get_cms())) {
+            continue;
+        }
+        $cm = $modinfo->get_cm($anentry->cmid);
+
         if (!$cm->uservisible) {
             continue;
         }
-
-        if (!isset($journals[$log->info])) {
-            $journals[$log->info] = $jloginfo;
-            $journals[$log->info]->time = $log->time;
-            $journals[$log->info]->url = str_replace('&', '&amp;', $log->url);
+        if ($anentry->userid == $USER->id) {
+            $show[] = $anentry;
+            continue;
         }
+        $context = context_module::instance($anentry->cmid);
+
+        // Only teachers can see other students entries.
+        if (!has_capability('mod/journal:manageentries', $context)) {
+            continue;
+        }
+
+        $groupmode = groups_get_activity_groupmode($cm, $course);
+
+        if ($groupmode == SEPARATEGROUPS &&
+                !has_capability('moodle/site:accessallgroups',  $context)) {
+            if (isguestuser()) {
+                // Shortcut - guest user does not belong into any group.
+                continue;
+            }
+
+            // This will be slow - show only users that share group with me in this cm.
+            if (!$modinfo->get_groups($cm->groupingid)) {
+                continue;
+            }
+            $usersgroups = groups_get_all_groups($course->id, $anentry->userid, $cm->groupingid);
+            if (is_array($usersgroups)) {
+                $usersgroups = array_keys($usersgroups);
+                $intersect = array_intersect($usersgroups, $modinfo->get_groups($cm->groupingid));
+                if (empty($intersect)) {
+                    continue;
+                }
+            }
+        }
+        $show[] = $anentry;
     }
 
-    if ($journals) {
-        $content = true;
-        echo $OUTPUT->heading(get_string('newjournalentries', 'journal').':', 3);
-        foreach ($journals as $journal) {
-            print_recent_activity_note($journal->time, $journal, $journal->name,
-                                       $CFG->wwwroot.'/mod/journal/'.$journal->url);
-        }
+    if (empty($show)) {
+        return false;
     }
 
-    return $content;
+    echo $OUTPUT->heading(get_string('newjournalentries', 'journal').':', 3);
+
+    foreach ($show as $submission) {
+        $cm = $modinfo->get_cm($submission->cmid);
+        $context = context_module::instance($submission->cmid);
+        if (has_capability('mod/journal:manageentries', $context)) {
+            $link = $CFG->wwwroot.'/mod/journal/report.php?id='.$cm->id;
+        } else {
+            $link = $CFG->wwwroot.'/mod/journal/view.php?id='.$cm->id;
+        }
+        print_recent_activity_note($submission->modified,
+                                   $submission,
+                                   $cm->name,
+                                   $link,
+                                   false,
+                                   $viewfullnames);
+    }
+    return true;
 }
 
+/**
+ * Returns the users with data in one journal
+ * (users with records in journal_entries, students and teachers)
+ * @param int $journalid Journal ID
+ * @return array Array of user ids
+ */
 function journal_get_participants($journalid) {
-// Returns the users with data in one journal
-// (users with records in journal_entries, students and teachers)
-
     global $DB;
 
-    // Get students
+    // Get students.
     $students = $DB->get_records_sql("SELECT DISTINCT u.id
                                       FROM {user} u,
                                       {journal_entries} j
                                       WHERE j.journal = '$journalid' and
                                       u.id = j.userid");
-    // Get teachers
+    // Get teachers.
     $teachers = $DB->get_records_sql("SELECT DISTINCT u.id
                                       FROM {user} u,
                                       {journal_entries} j
                                       WHERE j.journal = '$journalid' and
                                       u.id = j.teacher");
 
-    // Add teachers to students
+    // Add teachers to students.
     if ($teachers) {
         foreach ($teachers as $teacher) {
             $students[$teacher->id] = $teacher;
         }
     }
-    // Return students array (it contains an array of unique users)
-    return ($students);
+    // Return students array (it contains an array of unique users).
+    return $students;
 }
 
+/**
+ * This function returns true if a scale is being used by one journal
+ * @param int $journalid Journal ID
+ * @param int $scaleid Scale ID
+ * @return boolean True if a scale is being used by one journal
+ */
 function journal_scale_used ($journalid, $scaleid) {
-// This function returns if a scale is being used by one journal
+
     global $DB;
     $return = false;
 
@@ -525,7 +603,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
 
     global $CFG, $DB;
 
-    if (!function_exists('grade_update')) { // workaround for buggy PHP versions
+    if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
         require_once($CFG->libdir.'/gradelib.php');
     }
 
@@ -568,7 +646,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
  */
 function journal_grade_item_update($journal, $grades=null) {
     global $CFG;
-    if (!function_exists('grade_update')) { // workaround for buggy PHP versions
+    if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
         require_once($CFG->libdir.'/gradelib.php');
     }
 
@@ -617,7 +695,6 @@ function journal_grade_item_delete($journal) {
 }
 
 
-// SQL FUNCTIONS ///////////////////////////////////////////////////////////////////
 
 function journal_get_users_done($journal, $currentgroup) {
     global $DB;
@@ -625,7 +702,7 @@ function journal_get_users_done($journal, $currentgroup) {
     $sql = "SELECT u.* FROM {journal_entries} j
             JOIN {user} u ON j.userid = u.id ";
 
-    // Group users
+    // Group users.
     if ($currentgroup != 0) {
         $sql .= "JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = '$currentgroup'";
     }
@@ -638,7 +715,7 @@ function journal_get_users_done($journal, $currentgroup) {
         return null;
     }
 
-    // remove unenrolled participants
+    // Remove unenrolled participants.
     foreach ($journals as $key => $user) {
 
         $context = context_module::instance($cm->id);
@@ -654,9 +731,10 @@ function journal_get_users_done($journal, $currentgroup) {
     return $journals;
 }
 
+/**
+ * Counts all the journal entries (optionally in a given group)
+ */
 function journal_count_entries($journal, $groupid = 0) {
-// Counts all the journal entries (optionally in a given group)
-
     global $DB;
 
     $cm = journal_get_coursemodule($journal->id);
@@ -670,7 +748,7 @@ function journal_count_entries($journal, $groupid = 0) {
                 WHERE j.journal = $journal->id AND g.groupid = '$groupid'";
         $journals = $DB->get_records_sql($sql);
 
-    } else { // Count all the entries from the whole course
+    } else { // Count all the entries from the whole course.
 
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
@@ -685,7 +763,7 @@ function journal_count_entries($journal, $groupid = 0) {
     $canadd = get_users_by_capability($context, 'mod/journal:addentries', 'u.id');
     $entriesmanager = get_users_by_capability($context, 'mod/journal:manageentries', 'u.id');
 
-    // remove unenrolled participants
+    // Remove unenrolled participants.
     foreach ($journals as $userid => $notused) {
 
         if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
@@ -732,7 +810,6 @@ function journal_get_coursemodule($journalid) {
 }
 
 
-// OTHER JOURNAL FUNCTIONS ///////////////////////////////////////////////////////////////////
 
 function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
@@ -740,7 +817,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
-    echo "\n<table class=\"journaluserentry\">";
+    echo "\n<table class=\"journaluserentry\" id=\"entry-" . $user->id . "\">";
 
     echo "\n<tr>";
     echo "\n<td class=\"userpix\" rowspan=\"2\">";
@@ -783,7 +860,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         // If the grade was modified from the gradebook disable edition also skip if journal is not graded.
         $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($user->id));
         if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
-            if ($gradingdisabled = $gradinginfo->items[0]->grades[$user->id]->locked || $gradinginfo->items[0]->grades[$user->id]->overridden) {
+            if ($gradingdisabled = $gradinginfo->items[0]->grades[$user->id]->locked
+                    || $gradinginfo->items[0]->grades[$user->id]->overridden) {
                 $attrs['disabled'] = 'disabled';
                 $hiddengradestr = '<input type="hidden" name="r'.$entry->id.'" value="'.$entry->rating.'"/>';
                 $gradebooklink = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='.$course->id.'">';
@@ -795,9 +873,9 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
             }
         }
 
-        // Grade selector
+        // Grade selector.
         $attrs['id'] = 'r' . $entry->id;
-        echo html_writer::label(fullname($user) . " " . get_string('grade'), 'r' . $entry->id, true, array('class' => 'accesshide'));
+        echo html_writer::label(fullname($user)." ".get_string('grade'), 'r'.$entry->id, true, array('class' => 'accesshide'));
         echo html_writer::select($grades, 'r'.$entry->id, $entry->rating, get_string("nograde").'...', $attrs);
         echo $hiddengradestr;
         // Rewrote next three lines to show entry needs to be regraded due to resubmission.
@@ -808,8 +886,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
         }
         echo $gradebookgradestr;
 
-        // Feedback text
-        echo html_writer::label(fullname($user) . " " . get_string('feedback'), 'c' . $entry->id, true, array('class' => 'accesshide'));
+        // Feedback text.
+        echo html_writer::label(fullname($user)." ".get_string('feedback'), 'c'.$entry->id, true, array('class' => 'accesshide'));
         echo "<p><textarea id=\"c$entry->id\" name=\"c$entry->id\" rows=\"12\" cols=\"60\" $feedbackdisabledstr>";
         p($feedbacktext);
         echo "</textarea></p>";
@@ -851,7 +929,7 @@ function journal_print_feedback($course, $entry, $grades) {
 
     echo '<div class="grade">';
 
-    // Gradebook preference
+    // Gradebook preference.
     $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($entry->userid));
     if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
         echo get_string('grade').': ';
@@ -861,7 +939,7 @@ function journal_print_feedback($course, $entry, $grades) {
     }
     echo '</div>';
 
-    // Feedback text
+    // Feedback text.
     echo format_text($entry->entrycomment, FORMAT_PLAIN);
     echo '</td></tr></table>';
 }
@@ -893,7 +971,7 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
         return false;
     }
 
-    // args[0] should be the entry id.
+    // Args[0] should be the entry id.
     $entryid = intval(array_shift($args));
     $entry = $DB->get_record('journal_entries', array('id' => $entryid), 'id, userid', MUST_EXIST);
 

@@ -18,7 +18,7 @@ require_once("../../config.php");
 require_once("lib.php");
 
 
-$id = required_param('id', PARAM_INT);    // Course Module ID
+$id = required_param('id', PARAM_INT);    // Course Module ID.
 
 if (! $cm = get_coursemodule_from_id('journal', $id)) {
     print_error("Course Module ID was incorrect");
@@ -52,7 +52,7 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
 
 $journalname = format_string($journal->name, true, array('context' => $context));
 
-// Header
+// Header.
 $PAGE->set_url('/mod/journal/view.php', array('id' => $id));
 $PAGE->navbar->add($journalname);
 $PAGE->set_title($journalname);
@@ -61,7 +61,7 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($journalname);
 
-// Check to see if groups are being used here
+// Check to see if groups are being used here.
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 groups_print_activity_menu($cm, $CFG->wwwroot . "/mod/journal/view.php?id=$cm->id");
@@ -88,7 +88,7 @@ if ($course->format == 'weeks' and $journal->days) {
     } else {
         $timefinish = $course->enddate;
     }
-} else {  // Have no time limits on the journals
+} else {  // Have no time limits on the journals.
 
     $timestart = $timenow - 1;
     $timefinish = $timenow + 1;
@@ -98,7 +98,7 @@ if ($timenow > $timestart) {
 
     echo $OUTPUT->box_start();
 
-    // Edit button
+    // Edit button.
     if ($timenow < $timefinish) {
 
         if ($canadd) {
@@ -107,7 +107,7 @@ if ($timenow > $timestart) {
         }
     }
 
-    // Display entry
+    // Display entry.
     if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry', 'journal').'</b></p>';
@@ -120,7 +120,7 @@ if ($timenow > $timestart) {
 
     echo $OUTPUT->box_end();
 
-    // Info
+    // Info.
     if ($timenow < $timefinish) {
         if (!empty($entry->modified)) {
             echo '<div class="lastedit"><strong>'.get_string('lastedited').': </strong> ';
@@ -143,7 +143,7 @@ if ($timenow > $timestart) {
         echo userdate($timefinish).'</div>';
     }
 
-    // Feedback
+    // Feedback.
     if (!empty($entry->entrycomment) or !empty($entry->rating)) {
         $grades = make_grades_menu($journal->grade);
         echo $OUTPUT->heading(get_string('feedback'));

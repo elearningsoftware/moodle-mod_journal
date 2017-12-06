@@ -18,7 +18,7 @@ require_once("../../config.php");
 require_once("lib.php");
 
 
-$id = required_param('id', PARAM_INT);   // course module
+$id = required_param('id', PARAM_INT);   // Course module.
 
 if (! $cm = get_coursemodule_from_id('journal', $id)) {
     print_error("Course Module ID was incorrect");
@@ -39,7 +39,7 @@ if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
     print_error("Course module is incorrect");
 }
 
-// Header
+// Header.
 $PAGE->set_url('/mod/journal/report.php', array('id' => $id));
 
 $PAGE->navbar->add(get_string("entries", "journal"));
@@ -50,7 +50,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string("entries", "journal"));
 
 
-// make some easy ways to access the entries.
+// Make some easy ways to access the entries.
 if ( $eee = $DB->get_records("journal_entries", array("journal" => $journal->id))) {
     foreach ($eee as $ee) {
         $entrybyuser[$ee->userid] = $ee;
@@ -62,12 +62,12 @@ if ( $eee = $DB->get_records("journal_entries", array("journal" => $journal->id)
     $entrybyentry = array ();
 }
 
-// Group mode
+// Group mode.
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 
 
-// Process incoming data if there is any
+// Process incoming data if there is any.
 if ($data = data_submitted()) {
 
     confirm_sesskey();
@@ -104,7 +104,7 @@ if ($data = data_submitted()) {
             $newentry->entrycomment = $studentcomment;
             $newentry->teacher      = $USER->id;
             $newentry->timemarked   = $timenow;
-            $newentry->mailed       = 0;           // Make sure mail goes out (again, even)
+            $newentry->mailed       = 0;           // Make sure mail goes out (again, even).
             $newentry->id           = $num;
             if (!$DB->update_record("journal_entries", $newentry)) {
                 echo $OUTPUT->notification("Failed to update the journal feedback for user $entry->userid");
@@ -148,7 +148,7 @@ if ($data = data_submitted()) {
     $event->trigger();
 }
 
-// Print out the journal entries
+// Print out the journal entries.
 
 if ($currentgroup) {
     $groups = $currentgroup;
@@ -178,7 +178,7 @@ if (!$users) {
         }
     }
 
-    foreach ($users as $user) {       // Remaining users
+    foreach ($users as $user) {       // Remaining users.
         journal_print_user_entry($course, $user, null, $teachers, $grades);
     }
 
