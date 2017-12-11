@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/elearningsoftware/moodle-mod_journal.svg?branch=master)](https://travis-ci.org/elearningsoftware/moodle-mod_journal)
+[![Build Status](https://travis-ci.org/elearningsoftware/moodle-mod_journal.svg?branch=MOODLE_32_STABLE)](https://travis-ci.org/elearningsoftware/moodle-mod_journal)
 
 # Moodle Journal module
 - Moodle tracker component: http://tracker.moodle.org/browse/CONTRIB/component/10880
