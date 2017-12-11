@@ -20,8 +20,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_journal';
-$plugin->version  = 2017120500;
-$plugin->requires = 2016052300;  /* Moodle 3.1 */
-$plugin->release = '31.0 (Build: 2016062800)';
+$plugin->version  = 2017121100;
+$plugin->requires = 2017111300;  /* Moodle 3.4 */
+$plugin->release = '34.0 (Build: 2017121100)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;
