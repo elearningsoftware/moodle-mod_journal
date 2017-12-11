@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 class mod_journal_mod_form extends moodleform_mod {

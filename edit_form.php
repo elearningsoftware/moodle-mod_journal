@@ -14,12 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/lib/formslib.php');
 
 class mod_journal_entry_form extends moodleform {
 
     public function definition() {
-        $this->_form->addElement('editor', 'text_editor', get_string('entry', 'mod_journal'), null, $this->_customdata['editoroptions']);
+        $this->_form->addElement('editor', 'text_editor', get_string('entry', 'mod_journal'),
+                null, $this->_customdata['editoroptions']);
         $this->_form->setType('text_editor', PARAM_RAW);
         $this->_form->addRule('text_editor', null, 'required', null, 'client');
         $this->_form->addElement('hidden', 'id');

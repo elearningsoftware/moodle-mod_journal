@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends \core_search\base_mod {
+class entry extends \core_search\area\base_mod {
 
     /**
      * Returns recordset containing required data for indexing journal entries.
@@ -79,8 +79,10 @@ class entry extends \core_search\base_mod {
         // Prepare associative array with data from DB.
         $doc = \core_search\document_factory::instance($entry->id, $this->componentname, $this->areaname);
 
-        // Not a nice solution to copy a subset of the content but I don't want to use a kind of "Firstname Lastname journal entry"
-        // because of i18n (the entry can be searched by both the student and any course teacher (they all have different languages).
+        // Not a nice solution to copy a subset of the content but I don't want
+        // to use a kind of "Firstname Lastname journal entry"
+        // because of i18n (the entry can be searched by both the student and
+        // any course teacher (they all have different languages).
         $doc->set('title', shorten_text(content_to_text($entry->text, $entry->format), 50));
         $doc->set('content', content_to_text($entry->text, $entry->format));
         $doc->set('contextid', $context->id);

@@ -1,4 +1,6 @@
 
+[![Build Status](https://travis-ci.org/elearningsoftware/moodle-mod_journal.svg?branch=master)](https://travis-ci.org/elearningsoftware/moodle-mod_journal)
+
 # Moodle Journal module
 - Moodle tracker component: http://tracker.moodle.org/browse/CONTRIB/component/10880
 - Documentation: http://docs.moodle.org/dev/en/Journal_module

@@ -17,9 +17,11 @@
 // Only when master becomes a stable the version value will be changed for
 // the current date. Otherwise we just increase the last NN by one.
 
+defined('MOODLE_INTERNAL') || die();
+
 $plugin->component = 'mod_journal';
-$plugin->version  = 2017021300;
-$plugin->requires = 2016120500;  // Moodle 3.2
-$plugin->release = '32.0 (Build: 2017021300)';
+$plugin->version  = 2017121102;
+$plugin->requires = 2016120500;  /* Moodle 3.2 */
+$plugin->release = '32.0 (Build: 2017121102)';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->cron     = 60;

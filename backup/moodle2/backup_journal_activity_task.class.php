@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/mod/journal/backup/moodle2/backup_journal_stepslib.php');
 
 class backup_journal_activity_task extends backup_activity_task {
