@@ -7,7 +7,7 @@ Feature: Students can add and edit entries to journal activities
   Scenario: A student edits his/her entry
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
-      | Course 1 | C1 | 0 | 1 |
+      | Course1 | C1 | 0 | 1 |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
@@ -20,7 +20,7 @@ Feature: Students can add and edit entries to journal activities
       | activity | name               | intro            | course | idnumber |
       | journal  | Test journal name  | Journal question | C1     | journal1 |
     And I log in as "student1"
-    When I follow "Course 1"
+    When I follow "Course1"
     And I follow "Test journal name"
     And I press "Start or edit my journal entry"
     And I set the following fields to these values:

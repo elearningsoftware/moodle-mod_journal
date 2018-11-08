@@ -7,7 +7,7 @@ Feature: Teacher can view, comment and grade students entries
   Background:
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |
-      | Course 1 | C1 | 0 | 1 |
+      | Course1 | C1 | 0 | 1 |
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@asd.com |
@@ -23,7 +23,7 @@ Feature: Teacher can view, comment and grade students entries
       | activity | name               | intro            | course | idnumber |
       | journal  | Test journal name  | Journal question | C1     | journal1 |
     And I log in as "student1"
-    And I follow "Course 1"
+    And I follow "Course1"
     And I follow "Test journal name"
     And I press "Start or edit my journal entry"
     And I set the following fields to these values:
@@ -31,7 +31,7 @@ Feature: Teacher can view, comment and grade students entries
     And I press "Save changes"
     And I log out
     And I log in as "student2"
-    And I follow "Course 1"
+    And I follow "Course1"
     And I follow "Test journal name"
     And I should see "Journal question"
     And I press "Start or edit my journal entry"
@@ -40,10 +40,10 @@ Feature: Teacher can view, comment and grade students entries
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I follow "Course1"
 
   Scenario: Teacher can access students entries from the journals list page
-    When I follow "Course 1"
+    When I follow "Course1"
     And I turn editing mode on
     And I add the "Activities" block
     And I click on "Journals" "link" in the "Activities" "block"
@@ -78,7 +78,7 @@ Feature: Teacher can view, comment and grade students entries
     # Check that users see the regraded message
     And I log out
     And I log in as "student1"
-    And I follow "Course 1"
+    And I follow "Course1"
     And I follow "Test journal name"
     And I press "Start or edit my journal entry"
     And I set the following fields to these values:
@@ -87,7 +87,7 @@ Feature: Teacher can view, comment and grade students entries
     And I should see "Entry has changed since last feedback was saved"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course 1"
+    And I follow "Course1"
     And I follow "Test journal name"
     And I follow "View 2 journal entries"
     And I should see "Entry has changed since last feedback was saved" in the "//table[@class='journaluserentry'][contains(., 'Student 1')]" "xpath_element"

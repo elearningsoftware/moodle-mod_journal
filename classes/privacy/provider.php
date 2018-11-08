@@ -184,8 +184,7 @@ class provider implements
                 $journalentry->entrycomment = $journal->entrycomment;
             }
 
-            writer::with_context($context)
-                ->export_data([], $journalentry);
+            writer::with_context($context)->export_data([], $journalentry);
         }
         $journals->close();
     }
