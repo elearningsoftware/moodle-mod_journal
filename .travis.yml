@@ -15,15 +15,15 @@ cache:
     - $HOME/.npm
 
 php:
- - 7.0
- - 7.1
+  - 7.0
+  - 7.1
 
 env:
- global:
-  - MOODLE_BRANCH=MOODLE_35_STABLE
- matrix:
-  - DB=pgsql
-  - DB=mysqli
+  global:
+    - MOODLE_BRANCH=MOODLE_36_STABLE
+  matrix:
+    - DB=pgsql
+    - DB=mysqli
 
 before_install:
   - phpenv config-rm xdebug.ini
