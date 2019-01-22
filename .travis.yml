@@ -41,10 +41,6 @@ before_install:
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
-  - if [ -n "$GITHUB_APITOKEN" ]; then
-        composer config github-oauth.github.com $GITHUB_APITOKEN;
-        echo 'auth.json' >> .git/info/exclude;
-    fi
   - cd ../..
   - if [[ $MOODLE_CI_VERSION == 1 ]];
     then composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
@@ -53,6 +49,10 @@ before_install:
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
+  - if [ -n "$GITHUB_APITOKEN" ]; then
+        composer config github-oauth.github.com $GITHUB_APITOKEN;
+        echo 'auth.json' >> .git/info/exclude;
+    fi
   - moodle-plugin-ci install
 
 script:
