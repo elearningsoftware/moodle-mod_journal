@@ -3,34 +3,58 @@ language: php
 sudo: true
 
 addons:
+  firefox: "47.0.1"
   postgresql: "9.4"
   apt:
     packages:
-      - oracle-java8-installer
-      - oracle-java8-set-default
+      - openjdk-8-jre-headless
 
 cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.npm
 
-php:
-  - 7.0
-  - 7.1
-
 env:
-  global:
-    - MOODLE_BRANCH=MOODLE_36_STABLE
   matrix:
     - DB=pgsql
     - DB=mysqli
+
+matrix:
+  include:
+    - php: 5.6
+      env: 
+        -MOODLE_BRANCH=MOODLE_20_STABLE
+        -MOODLE_BRANCH=MOODLE_21_STABLE
+        -MOODLE_BRANCH=MOODLE_22_STABLE
+        -MOODLE_BRANCH=MOODLE_23_STABLE
+        -MOODLE_BRANCH=MOODLE_24_STABLE
+        -MOODLE_BRANCH=MOODLE_25_STABLE
+        -MOODLE_BRANCH=MOODLE_26_STABLE
+        -MOODLE_BRANCH=MOODLE_27_STABLE
+        -MOODLE_BRANCH=MOODLE_28_STABLE
+        -MOODLE_BRANCH=MOODLE_29_STABLE
+        -MOODLE_BRANCH=MOODLE_30_STABLE
+        -MOODLE_BRANCH=MOODLE_31_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 7.1
+      env: 
+        -MOODLE_BRANCH=MOODLE_32_STABLE
+        -MOODLE_BRANCH=MOODLE_33_STABLE
+        -MOODLE_BRANCH=MOODLE_34_STABLE
+        -MOODLE_BRANCH=MOODLE_35_STABLE
+        -MOODLE_BRANCH=MOODLE_36_STABLE
+        MOODLE_CI_VERSION=2
+
 
 before_install:
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
   - cd ../..
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
+  - if [MOODLE_CI_VERSION == 1]; 
+    then composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^1;
+    else composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2;
+    fi
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
