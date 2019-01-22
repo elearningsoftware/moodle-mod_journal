@@ -43,8 +43,8 @@ before_install:
   - nvm use 8.9
   - cd ../..
   - if [[ $MOODLE_CI_VERSION == 1 ]];
-    then composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^1;
-    else composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2;
+    then composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
+    else composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
     fi
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
