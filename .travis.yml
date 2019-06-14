@@ -53,7 +53,7 @@ before_install:
   - nvm use 8.9
   - cd ../..
   - curl -sS https://getcomposer.org/installer | php
-  - mv composer.phar /usr/local/bin/composer
+  - mv composer.phar composer
   - if [[ $MOODLE_CI_VERSION == 1 ]];
     then composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
     else composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
