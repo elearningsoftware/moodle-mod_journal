@@ -53,16 +53,15 @@ before_install:
   - nvm use 8.9
   - cd ../..
   - curl -sS https://getcomposer.org/installer | php
-  - mv composer.phar composer
   - if [[ $MOODLE_CI_VERSION == 1 ]];
-    then composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
-    else composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
+    then php composer.phar create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
+    else php composer.phar create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
     fi
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
   - if [ -n "$GITHUB_APITOKEN" ]; then
-        composer config github-oauth.github.com $GITHUB_APITOKEN;
+        php composer.phar config github-oauth.github.com $GITHUB_APITOKEN;
         echo 'auth.json' >> .git/info/exclude;
     fi
   - moodle-plugin-ci install
