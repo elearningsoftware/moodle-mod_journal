@@ -36,12 +36,24 @@ matrix:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_35_STABLE
         MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=master
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=master
+        MOODLE_CI_VERSION=2
 
 before_install:
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
   - cd ../..
+  - curl -sS https://getcomposer.org/installer | php
+  - mv composer.phar /usr/local/bin/composer
   - if [[ $MOODLE_CI_VERSION == 1 ]];
     then composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
     else composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
