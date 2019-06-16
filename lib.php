@@ -713,7 +713,10 @@ function journal_get_users_done($journal, $currentgroup) {
         $params[] = $currentgroup;
     }
 
-    $sql .= " WHERE j.journal=? ORDER BY j.modified DESC";
+    // Modified 06/15/2019 so that report listing is in alphabetical order.
+    //$sql .= " WHERE j.journal=? ORDER BY j.modified DESC";
+    $sql .= " WHERE j.journal=? ORDER BY u.lastname ASC";
+
     $params[] = $journal->id;
     $journals = $DB->get_records_sql($sql, $params);
 
