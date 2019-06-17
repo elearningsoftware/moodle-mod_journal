@@ -155,7 +155,7 @@ if ($currentgroup) {
 } else {
     $groups = '';
 }
-$users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '', '', $groups);
+$users = get_users_by_capability($context, 'mod/journal:addentries', '', $sort='lastname ASC, firstname ASC', '', '', $groups);
 
 if (!$users) {
     echo $OUTPUT->heading(get_string("nousersyet"));
