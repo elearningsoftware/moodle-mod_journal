@@ -23,7 +23,7 @@ Feature: Teacher can view, comment and grade students entries
       | activity | name               | intro            | course | idnumber |
       | journal  | Test journal name  | Journal question | C1     | journal1 |
     And I log in as "student1"
-    And I follow "Course1"
+    And I am on "Course1" course homepage
     And I follow "Test journal name"
     And I press "Start or edit my journal entry"
     And I set the following fields to these values:
@@ -31,7 +31,7 @@ Feature: Teacher can view, comment and grade students entries
     And I press "Save changes"
     And I log out
     And I log in as "student2"
-    And I follow "Course1"
+    And I am on "Course1" course homepage
     And I follow "Test journal name"
     And I should see "Journal question"
     And I press "Start or edit my journal entry"
@@ -40,7 +40,7 @@ Feature: Teacher can view, comment and grade students entries
     And I press "Save changes"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course1"
+    And I am on "Course1" course homepage
 
   Scenario: Teacher can access students entries from the journals list page
     When I follow "Course1"
@@ -78,7 +78,7 @@ Feature: Teacher can view, comment and grade students entries
     # Check that users see the regraded message
     And I log out
     And I log in as "student1"
-    And I follow "Course1"
+    And I am on "Course1" course homepage
     And I follow "Test journal name"
     And I press "Start or edit my journal entry"
     And I set the following fields to these values:
@@ -87,7 +87,7 @@ Feature: Teacher can view, comment and grade students entries
     And I should see "Entry has changed since last feedback was saved"
     And I log out
     And I log in as "teacher1"
-    And I follow "Course1"
+    And I am on "Course1" course homepage
     And I follow "Test journal name"
     And I follow "View 2 journal entries"
     And I should see "Entry has changed since last feedback was saved" in the "//table[@class='journaluserentry'][contains(., 'Student 1')]" "xpath_element"
