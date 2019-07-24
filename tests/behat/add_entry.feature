@@ -20,7 +20,7 @@ Feature: Students can add and edit entries to journal activities
       | activity | name               | intro            | course | idnumber |
       | journal  | Test journal name  | Journal question | C1     | journal1 |
     And I log in as "student1"
-    When I follow "Course1"
+    And I am on "Course1" course homepage
     And I follow "Test journal name"
     And I press "Start or edit my journal entry"
     And I set the following fields to these values:
