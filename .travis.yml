@@ -16,31 +16,7 @@ cache:
 
 matrix:
   include:
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_27_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_27_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 7.1
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_35_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_35_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=master
-        MOODLE_CI_VERSION=2
+
     - php: 7.1
       env: 
         DB=mysqli
@@ -64,7 +40,7 @@ install:
  #       composer config github-oauth.github.com $GITHUB_APITOKEN;
  #       echo 'auth.json' >> .git/info/exclude;
  #   fi
-  - moodle-plugin-ci install
+  - moodle-plugin-ci install --verbose
 
 script:
   - moodle-plugin-ci phplint
