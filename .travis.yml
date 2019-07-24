@@ -59,11 +59,15 @@ before_install:
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
- # - if [ -n "$GITHUB_APITOKEN" ]; then
- #       cd ci;
- #       composer config github-oauth.github.com $GITHUB_APITOKEN;
- #       echo 'auth.json' >> .git/info/exclude;
- #   fi
+  - if [[ $MOODLE_CI_VERSION == 1 ]];
+    then
+      if [ -n "$GITHUB_APITOKEN" ]; then
+        cd ci;
+        composer config github-oauth.github.com $GITHUB_APITOKEN;
+        echo 'auth.json' >> .git/info/exclude;
+      fi
+    fi
+
   - moodle-plugin-ci install --verbose
 
 script:
