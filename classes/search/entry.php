@@ -60,7 +60,6 @@ class entry extends \core_search\base_mod {
      * @return \core_search\document
      */
     public function get_document($entry, $options = array()) {
-        global $DB;
 
         try {
             $cm = $this->get_cm('journal', $entry->journal, $entry->course);
@@ -140,7 +139,6 @@ class entry extends \core_search\base_mod {
     public function get_doc_url(\core_search\document $doc) {
         global $USER;
 
-        $entry = $this->get_entry($doc->get('itemid'));
         $contextmodule = \context::instance_by_id($doc->get('contextid'));
 
         $entryuserid = $doc->get('userid');
