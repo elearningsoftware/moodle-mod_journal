@@ -63,7 +63,7 @@ install:
     then
       if [ -n $GITHUB_APITOKEN ]; then
         cd ci;
-        composer config github-oauth.github.com $GITHUB_APITOKEN;
+        composer config -g github-oauth.github.com $GITHUB_APITOKEN;
         cd ..;
       fi
     fi
