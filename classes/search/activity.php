@@ -26,12 +26,28 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * Search area for mod_journal activities.
- *
- * @package    mod_journal
- * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class activity extends \core_search\base_activity {
+
+if($CFG->branch <= '31') {
+    /**
+     * Search area for mod_journal activities.
+     *
+     * @package    mod_journal
+     * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
+     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
+    class activity extends \core_search\area\base_activity {
+
+    }
+}
+else {
+    /**
+     * Search area for mod_journal activities.
+     *
+     * @package    mod_journal
+     * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
+     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     */
+    class activity extends \core_search\base_activity {
+
+    }
 }
