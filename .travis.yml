@@ -64,7 +64,6 @@ install:
       if [ -n "$GITHUB_APITOKEN" ]; then
         cd ci;
         composer config github-oauth.github.com $GITHUB_APITOKEN;
-        #echo 'auth.json' >> .git/info/exclude;
         cd ..;
       fi
     fi
