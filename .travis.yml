@@ -68,7 +68,7 @@ install:
       fi
     fi
 
-  - moodle-plugin-ci install --verbose --prefer-dist
+  - moodle-plugin-ci install
 
 script:
   - moodle-plugin-ci phplint
