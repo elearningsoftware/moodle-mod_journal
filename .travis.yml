@@ -61,7 +61,7 @@ before_install:
 install:
   - if [[ $MOODLE_CI_VERSION == 1 ]];
     then
-      if [ -n "$GITHUB_APITOKEN" ]; then
+      if [ -n $GITHUB_APITOKEN ]; then
         cd ci;
         composer config github-oauth.github.com $GITHUB_APITOKEN;
         cd ..;
