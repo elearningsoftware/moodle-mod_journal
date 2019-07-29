@@ -27,7 +27,7 @@ namespace mod_journal\search;
 defined('MOODLE_INTERNAL') || die();
 
 
-if( $CFG->branch <= '31' ) {
+if ( $CFG->branch <= '31' ) {
     /**
      * Search area for mod_journal activities.
      *
