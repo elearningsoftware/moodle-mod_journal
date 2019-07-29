@@ -19,6 +19,76 @@ matrix:
     - php: 5.6
       env: 
         DB=pgsql
+        MOODLE_BRANCH=MOODLE_20_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_20_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_21_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_21_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_22_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_22_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_23_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_23_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_24_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_24_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_25_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_25_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_26_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_26_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
         MOODLE_BRANCH=MOODLE_27_STABLE
         MOODLE_CI_VERSION=1
     - php: 5.6
@@ -26,6 +96,76 @@ matrix:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_27_STABLE
         MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_28_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_28_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_29_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_29_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_30_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_30_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_31_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 5.6
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_31_STABLE
+        MOODLE_CI_VERSION=1
+    - php: 7.1
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_32_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_32_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_33_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_33_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_34_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_34_STABLE
+        MOODLE_CI_VERSION=2
     - php: 7.1
       env: 
         DB=pgsql
@@ -35,6 +175,26 @@ matrix:
       env: 
         DB=mysqli
         MOODLE_BRANCH=MOODLE_35_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_36_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_36_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_37_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_37_STABLE
         MOODLE_CI_VERSION=2
     - php: 7.1
       env: 
