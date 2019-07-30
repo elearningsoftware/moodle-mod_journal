@@ -26,8 +26,24 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
-if ( $CFG->branch <= '31' ) {
-    require_once $CFG->dirroot.'/mod/journal/classes/search/activity/activitypre31.php';
-} else {
-    require_once $CFG->dirroot.'/mod/journal/classes/search/activity/activitypost31.php';
+function get_dynamic_parent() {
+    global $CFG;
+    if ( $CFG->branch <= '31' ) {
+        return '\core_search\area/base_activity';
+    } else {
+        return '\core_search\base_activity';
+    }
 }
+class_alias(get_dynamic_parent(), 'mod_journal\search\DynamicParent');
+
+/**
+ * Search area for mod_journal activities.
+ *
+ * @package    mod_journal
+ * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class activity extends DynamicParent {
+
+}
+
