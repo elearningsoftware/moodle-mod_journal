@@ -34,7 +34,7 @@ function get_dynamic_parent_activity() {
         return '\core_search\base_activity';
     }
 }
-class_alias(get_dynamic_parent_activity(), 'mod_journal\search\DynamicParent');
+class_alias(get_dynamic_parent_activity(), 'mod_journal\search\DynamicParentActivity');
 
 /**
  * Search area for mod_journal activities.
@@ -43,7 +43,7 @@ class_alias(get_dynamic_parent_activity(), 'mod_journal\search\DynamicParent');
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activity extends DynamicParent {
+class activity extends DynamicParentActivity {
 
 }
 

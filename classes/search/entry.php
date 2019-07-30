@@ -36,7 +36,7 @@ function get_dynamic_parent_entry() {
         return '\core_search\base_mod';
     }
 }
-class_alias(get_dynamic_parent_entry(), 'mod_journal\search\DynamicParent');
+class_alias(get_dynamic_parent_entry(), 'mod_journal\search\DynamicParentEntry');
 
 /**
  * Journal entries search.
@@ -45,7 +45,7 @@ class_alias(get_dynamic_parent_entry(), 'mod_journal\search\DynamicParent');
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends DynamicParent {
+class entry extends DynamicParentEntry {
 
     /**
      * Returns recordset containing required data for indexing journal entries.
