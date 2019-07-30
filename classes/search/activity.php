@@ -26,7 +26,7 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
-function get_dynamic_parent() {
+function get_dynamic_parent_activity() {
     global $CFG;
     if ( $CFG->branch <= '31' ) {
         return '\core_search\area\base_activity';
@@ -34,7 +34,7 @@ function get_dynamic_parent() {
         return '\core_search\base_activity';
     }
 }
-class_alias(get_dynamic_parent(), 'mod_journal\search\DynamicParent');
+class_alias(get_dynamic_parent_activity(), 'mod_journal\search\DynamicParent');
 
 /**
  * Search area for mod_journal activities.

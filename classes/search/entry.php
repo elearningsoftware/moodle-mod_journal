@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
-function get_dynamic_parent() {
+function get_dynamic_parent_entry() {
     global $CFG;
     if ( $CFG->branch <= '31' ) {
         return '\core_search\area\base_mod';
@@ -36,7 +36,7 @@ function get_dynamic_parent() {
         return '\core_search\base_mod';
     }
 }
-class_alias(get_dynamic_parent(), 'mod_journal\search\DynamicParent');
+class_alias(get_dynamic_parent_entry(), 'mod_journal\search\DynamicParent');
 
 /**
  * Journal entries search.
