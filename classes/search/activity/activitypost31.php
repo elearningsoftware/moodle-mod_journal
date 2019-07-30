@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Journal entries search.
+ * Search area for mod_journal activities.
  *
  * @package    mod_journal
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
@@ -26,10 +26,14 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/journal/lib.php');
+/**
+ * Search area for mod_journal activities.
+ *
+ * @package    mod_journal
+ * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class activity extends \core_search\base_activity {
 
-if ( $CFG->branch <= '31' ) {
-    require_once $CFG->dirroot.'/mod/journal/classes/search/entry/entrypre31.php';
-} else {
-    require_once $CFG->dirroot.'/mod/journal/classes/search/entry/entrypost31.php';
 }
+

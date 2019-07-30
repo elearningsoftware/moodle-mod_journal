@@ -26,27 +26,8 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 if ( $CFG->branch <= '31' ) {
-    /**
-     * Search area for mod_journal activities.
-     *
-     * @package    mod_journal
-     * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
-     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-     */
-    class activity extends \core_search\area\base_activity {
-
-    }
+    require_once $CFG->dirroot.'/mod/journal/classes/search/activity/activitypre31.php';
 } else {
-    /**
-     * Search area for mod_journal activities.
-     *
-     * @package    mod_journal
-     * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
-     * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-     */
-    class activity extends \core_search\base_activity {
-
-    }
+    require_once $CFG->dirroot.'/mod/journal/classes/search/activity/activitypost31.php';
 }
