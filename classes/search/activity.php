@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 function get_dynamic_parent() {
     global $CFG;
     if ( $CFG->branch <= '31' ) {
-        return '\core_search\area/base_activity';
+        return '\core_search\area\base_activity';
     } else {
         return '\core_search\base_activity';
     }
