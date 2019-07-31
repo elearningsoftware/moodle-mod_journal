@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 function get_dynamic_parent_activity() {
     global $CFG;
-    if ( $CFG->branch <= '31' ) {
+    if (class_exists('\core_search\area\base_activity')) {
         return '\core_search\area\base_activity';
     } else {
         return '\core_search\base_activity';

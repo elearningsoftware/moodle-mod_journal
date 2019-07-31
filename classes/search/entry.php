@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
 
 function get_dynamic_parent_entry() {
     global $CFG;
-    if ( $CFG->branch <= '31' ) {
+    if (class_exists('\core_search\area\base_mod')) {
         return '\core_search\area\base_mod';
     } else {
         return '\core_search\base_mod';
