@@ -62,7 +62,13 @@ class mod_journal_external extends external_api {
         require_capability('mod/journal:addentries', $context);
 
         if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
-             return array('text' => $entry->text, 'modified' => $entry->modified, 'rating' => $entry->rating, 'comment' => $entry->entrycomment, 'teacher' => $entry->teacher);
+            return array(
+                'text' => $entry->text,
+                'modified' => $entry->modified,
+                'rating' => $entry->rating,
+                'comment' => $entry->entrycomment,
+                'teacher' => $entry->teacher
+            );
         } else {
             return "";
         }
@@ -86,7 +92,10 @@ class mod_journal_external extends external_api {
     public static function set_text($journalid, $text, $format) {
         global $DB, $USER;
 
-        $params = self::validate_parameters(self::set_text_parameters(), array('journalid' => $journalid, 'text' => $text, 'format' => $format));
+        $params = self::validate_parameters(
+            self::set_text_parameters(),
+            array('journalid' => $journalid, 'text' => $text, 'format' => $format)
+        );
 
         if (! $cm = get_coursemodule_from_id('journal', $params['journalid'])) {
             throw new invalid_parameter_exception('Course Module ID was incorrect');
