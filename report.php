@@ -82,9 +82,7 @@ if ($data = data_submitted()) {
             $num  = substr($key, 1);
             if (strpos($key, 'r') === 0 && $val === '') {
                 $feedback[$num][$type] = -1;
-
-            }
-            else {
+            } else {
                 $feedback[$num][$type] = $val;
             }
         }
