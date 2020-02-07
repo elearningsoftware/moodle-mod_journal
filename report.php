@@ -124,7 +124,7 @@ if ($data = data_submitted()) {
 
             $journal = $DB->get_record("journal", array("id" => $entrybyuser[$entry->userid]->journal));
             $journal->cmidnumber = $cm->idnumber;
-var_dump($entry);die();
+
             journal_update_grades($journal, $entry->userid);
         }
     }
