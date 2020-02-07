@@ -141,6 +141,16 @@ matrix:
     - php: 7.1
       env: 
         DB=pgsql
+        MOODLE_BRANCH=MOODLE_38_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_38_STABLE
+        MOODLE_CI_VERSION=2
+    - php: 7.1
+      env: 
+        DB=pgsql
         MOODLE_BRANCH=master
         MOODLE_CI_VERSION=2
     - php: 7.1

@@ -20,7 +20,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_journal';
-$plugin->version  = 2019061600;
+$plugin->version  = 2020020700;
 $plugin->requires = 2013111800;  /* Moodle 2.6 */
 $plugin->release = '2.0.0 (Build: 2019061600)';
 $plugin->maturity = MATURITY_STABLE;
