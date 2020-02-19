@@ -189,7 +189,7 @@ if (!$users) {
     echo "<p class=\"feedbacksave\">";
     echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
     echo "<input type=\"hidden\" name=\"sesskey\" value=\"" . sesskey() . "\" />";
-    echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" />";
+    echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" class=\"btn btn-secondary m-t-1\"/>";
     echo "</p>";
     echo "</form>";
 }
