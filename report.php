@@ -98,7 +98,7 @@ if ($data = data_submitted()) {
         $studentrating = clean_param($vals['r'], PARAM_INT);
         $studentcomment = clean_text($vals['c'], FORMAT_PLAIN);
 
-        if ($studentrating != $entry->rating && !($studentrating == '' && $entry->rating == "0")) {
+        if ($studentrating != $entry->rating) {
             $ratingchanged = true;
         }
 
