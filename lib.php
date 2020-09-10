@@ -656,7 +656,7 @@ function journal_grade_item_update($journal, $grades=null) {
         require_once($CFG->libdir.'/gradelib.php');
     }
 
-    if (array_key_exists('cmidnumber', $journal)) {
+    if (property_exists($journal, 'cmidnumber')) {
         $params = array('itemname' => $journal->name, 'idnumber' => $journal->cmidnumber);
     } else {
         $params = array('itemname' => $journal->name);
