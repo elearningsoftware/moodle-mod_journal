@@ -18,168 +18,96 @@ cache:
 
 matrix:
   include:
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_26_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_26_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_27_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_27_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_28_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_28_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_29_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_29_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_30_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_30_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_31_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 5.6
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_31_STABLE
-        MOODLE_CI_VERSION=1
-    - php: 7.1
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_32_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_32_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
-        DB=pgsql
-        MOODLE_BRANCH=MOODLE_33_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
-        DB=mysqli
-        MOODLE_BRANCH=MOODLE_33_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=pgsql
         MOODLE_BRANCH=MOODLE_34_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_34_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=pgsql
         MOODLE_BRANCH=MOODLE_35_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_35_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=pgsql
         MOODLE_BRANCH=MOODLE_36_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_36_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=pgsql
         MOODLE_BRANCH=MOODLE_37_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_37_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=pgsql
         MOODLE_BRANCH=MOODLE_38_STABLE
-        MOODLE_CI_VERSION=2
-    - php: 7.1
-      env: 
+    - php: 7.2
+      env:
         DB=mysqli
         MOODLE_BRANCH=MOODLE_38_STABLE
-        MOODLE_CI_VERSION=2
     - php: 7.2
-      env: 
+      env:
         DB=pgsql
         MOODLE_BRANCH=master
-        MOODLE_CI_VERSION=2
     - php: 7.2
-      env: 
+      env:
         DB=mysqli
         MOODLE_BRANCH=master
-        MOODLE_CI_VERSION=2
+    - php: 7.3
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_36_STABLE
+    - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_36_STABLE
+    - php: 7.3
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_37_STABLE
+    - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_37_STABLE
+    - php: 7.3
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_38_STABLE
+    - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_38_STABLE
+    - php: 7.3
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=master
+    - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=master
 
 before_install:
   - phpenv config-rm xdebug.ini
   - nvm install 8.9
   - nvm use 8.9
   - cd ../..
-  - if [[ $MOODLE_CI_VERSION == 1 ]];
-    then composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^1;
-    else composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
-    fi
+  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
 install:
-  - if [[ $MOODLE_CI_VERSION == 1 ]];
-    then
-      if [ -n $GITHUB_APITOKEN ]; then
-        cd ci;
-        composer config -g github-oauth.github.com $GITHUB_APITOKEN;
-        cd ..;
-      fi
-    fi
-
   - moodle-plugin-ci install
 
 script:
@@ -188,11 +116,8 @@ script:
   - moodle-plugin-ci phpmd
   - moodle-plugin-ci codechecker
   - moodle-plugin-ci validate
-  - if [[ $MOODLE_CI_VERSION == 2 ]];
-    then
-      moodle-plugin-ci savepoints;
-      moodle-plugin-ci mustache;
-      moodle-plugin-ci grunt;
-    fi
+  - moodle-plugin-ci savepoints;
+  - moodle-plugin-ci mustache;
+  - moodle-plugin-ci grunt;
   - moodle-plugin-ci phpunit
   - moodle-plugin-ci behat
