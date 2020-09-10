@@ -34,7 +34,7 @@ $string['entry'] = 'Entry';
 $string['feedbackupdated'] = 'Feedback updated for {$a} entries';
 $string['gradeingradebook'] = 'Current grade in gradebook';
 $string['journal:addentries'] = 'Add journal entries';
-$string['journal:addinstance'] = 'Add journal instances';
+$string['journal:addinstance'] = 'Add a new journal';
 $string['journal:manageentries'] = 'Manage journal entries';
 $string['journalmail'] = '{$a->teacher} has posted some feedback on your
 journal entry for \'{$a->journal}\'
