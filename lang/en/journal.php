@@ -51,6 +51,7 @@ $string['mailsubject'] = 'Journal feedback';
 $string['modulename'] = 'Journal';
 $string['modulename_help'] = 'The journal activity enables teachers to obtain students feedback
  about a specific topic';
+$string['modulename_link'] = 'mod/journal/view';
 $string['modulenameplural'] = 'Journals';
 $string['needsregrade'] = 'Entry has changed since last feedback was saved.';
 $string['newjournalentries'] = 'New journal entries';
