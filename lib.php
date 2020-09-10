@@ -827,7 +827,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
-    echo "\n<table class=\"journaluserentry\" id=\"entry-" . $user->id . "\">";
+    echo "\n<table class=\"journaluserentry m-b-1\" id=\"entry-" . $user->id . "\">";
 
     echo "\n<tr>";
     echo "\n<td class=\"userpix\" rowspan=\"2\">";
