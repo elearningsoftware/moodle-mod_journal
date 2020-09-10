@@ -584,6 +584,9 @@ function journal_get_user_grades($journal, $userid=0) {
         if ($grades) {
             foreach ($grades as $key => $grade) {
                 $grades[$key]->id = $grade->userid;
+                if ($grade->rawgrade == -1) {
+                    $grades[$key]->rawgrade = null;
+                }
             }
         } else {
             return false;
