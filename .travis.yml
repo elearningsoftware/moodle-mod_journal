@@ -103,6 +103,7 @@ matrix:
         MOODLE_BRANCH=master
 
 before_install:
+  - which mysql && until mysql -u root -e "show status" &>/dev/null; do sleep 1; done
   - phpenv config-rm xdebug.ini
   - if [[ $MOODLE_BRANCH == MOODLE_34_STABLE || $MOODLE_BRANCH == MOODLE_36_STABLE ]];
     then nvm install 8.9 && nvm use 8.9;
