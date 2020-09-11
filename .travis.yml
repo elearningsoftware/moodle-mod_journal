@@ -103,7 +103,7 @@ before_install:
   - phpenv config-rm xdebug.ini
   - if [[ $MOODLE_BRANCH == MOODLE_34_STABLE ]];
     then nvm install 8.9 && nvm use 8.9;
-    else nvm install 14.0 && nvm use 14.0;
+    else nvm install 14.8 && nvm use 14.8;
     fi
   - cd ../..
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
