@@ -6,7 +6,7 @@ dist: trusty
 
 addons:
   firefox: "47.0.1"
-  postgresql: "9.5"
+  postgresql: "9.6"
   apt:
     packages:
       - openjdk-8-jre-headless
@@ -101,9 +101,9 @@ matrix:
 
 before_install:
   - phpenv config-rm xdebug.ini
-  - if [[ $MOODLE_BRANCH == MOODLE_34_STABLE ]];
+  - if [[ $MOODLE_BRANCH == MOODLE_34_STABLE || $MOODLE_BRANCH == MOODLE_36_STABLE ]];
     then nvm install 8.9 && nvm use 8.9;
-    else nvm install 14.8 && nvm use 14.8;
+    else nvm install 14.0 && nvm use 14.0;
     fi
   - cd ../..
   - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2;
