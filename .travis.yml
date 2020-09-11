@@ -4,6 +4,9 @@ sudo: true
 
 dist: xenial
 
+services:
+  - mysql
+  
 addons:
   firefox: "47.0.1"
   postgresql: "9.6"
