@@ -144,7 +144,7 @@ if ($timenow > $timestart) {
     }
 
     // Feedback.
-    if (!empty($entry->entrycomment) or !empty($entry->rating)) {
+    if (!empty($entry->entrycomment) or (!empty($entry->rating) and !$entry->rating)) {
         $grades = make_grades_menu($journal->grade);
         echo $OUTPUT->heading(get_string('feedback'));
         journal_print_feedback($course, $entry, $grades);
