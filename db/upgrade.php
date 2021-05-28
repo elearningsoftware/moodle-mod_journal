@@ -19,7 +19,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/mod/journal/lib.php');
 
 function xmldb_journal_upgrade($oldversion=0) {
-    global $CFG, $DB;
+    global $DB;
 
     $dbman = $DB->get_manager();
 

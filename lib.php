@@ -584,6 +584,9 @@ function journal_get_user_grades($journal, $userid=0) {
         if ($grades) {
             foreach ($grades as $key => $grade) {
                 $grades[$key]->id = $grade->userid;
+                if ($grade->rawgrade == -1) {
+                    $grades[$key]->rawgrade = null;
+                }
             }
         } else {
             return false;
@@ -653,7 +656,7 @@ function journal_grade_item_update($journal, $grades=null) {
         require_once($CFG->libdir.'/gradelib.php');
     }
 
-    if (array_key_exists('cmidnumber', $journal)) {
+    if (property_exists($journal, 'cmidnumber')) {
         $params = array('itemname' => $journal->name, 'idnumber' => $journal->cmidnumber);
     } else {
         $params = array('itemname' => $journal->name);
@@ -827,7 +830,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
-    echo "\n<table class=\"journaluserentry\" id=\"entry-" . $user->id . "\">";
+    echo "\n<table class=\"journaluserentry m-b-1\" id=\"entry-" . $user->id . "\">";
 
     echo "\n<tr>";
     echo "\n<td class=\"userpix\" rowspan=\"2\">";

@@ -26,6 +26,17 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
+function get_dynamic_parent_activity() {
+    global $CFG;
+    if (class_exists('\core_search\area\base_activity')) {
+        return '\core_search\area\base_activity';
+    } else {
+        return '\core_search\base_activity';
+    }
+}
+class_alias(get_dynamic_parent_activity(), '\mod_journal\search\DynamicParentActivity');
+
+
 /**
  * Search area for mod_journal activities.
  *
@@ -33,5 +44,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activity extends \core_search\base_activity {
+class activity extends \mod_journal\search\DynamicParentActivity {
+
 }
+

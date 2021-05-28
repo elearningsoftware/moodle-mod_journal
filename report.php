@@ -80,7 +80,11 @@ if ($data = data_submitted()) {
         if (strpos($key, 'r') === 0 || strpos($key, 'c') === 0) {
             $type = substr($key, 0, 1);
             $num  = substr($key, 1);
-            $feedback[$num][$type] = $val;
+            if (strpos($key, 'r') === 0 && $val === '') {
+                $feedback[$num][$type] = -1;
+            } else {
+                $feedback[$num][$type] = $val;
+            }
         }
     }
 
@@ -94,7 +98,7 @@ if ($data = data_submitted()) {
         $studentrating = clean_param($vals['r'], PARAM_INT);
         $studentcomment = clean_text($vals['c'], FORMAT_PLAIN);
 
-        if ($studentrating != $entry->rating && !($studentrating == '' && $entry->rating == "0")) {
+        if ($studentrating != $entry->rating) {
             $ratingchanged = true;
         }
 
@@ -185,7 +189,7 @@ if (!$users) {
     echo "<p class=\"feedbacksave\">";
     echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
     echo "<input type=\"hidden\" name=\"sesskey\" value=\"" . sesskey() . "\" />";
-    echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" />";
+    echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" class=\"btn btn-secondary m-t-1\"/>";
     echo "</p>";
     echo "</form>";
 }

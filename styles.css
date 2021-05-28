@@ -58,7 +58,7 @@
 }
 
 #page-mod-journal-report .journaluserentry {
-    border: 1px solid #000;
+    border: 1px solid #dee2e6;
     border-collapse: collapse;
     border-spacing: 0;
 }
@@ -76,4 +76,7 @@
 #page-mod-journal-report .journaluserentry td .lastedit {
     font-size: 0.76em;
     margin-left: 10px;
+}
+#page-mod-journal-report .mediaplugin {
+    width: auto;
 }
