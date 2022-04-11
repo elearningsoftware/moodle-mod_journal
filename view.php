@@ -57,6 +57,7 @@ $PAGE->set_url('/mod/journal/view.php', array('id' => $id));
 $PAGE->navbar->add($journalname);
 $PAGE->set_title($journalname);
 $PAGE->set_heading($course->fullname);
+$PAGE->force_settings_menu();
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($journalname);
