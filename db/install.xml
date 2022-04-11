@@ -30,7 +30,7 @@
         <FIELD NAME="modified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="text"/>
         <FIELD NAME="text" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="modified" NEXT="format"/>
         <FIELD NAME="format" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="text" NEXT="rating"/>
-        <FIELD NAME="rating" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" SEQUENCE="false" PREVIOUS="format" NEXT="entrycomment"/>
+        <FIELD NAME="rating" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="-1" SEQUENCE="false" PREVIOUS="format" NEXT="entrycomment"/>
         <FIELD NAME="entrycomment" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="rating" NEXT="teacher"/>
         <FIELD NAME="teacher" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="entrycomment" NEXT="timemarked"/>
         <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="teacher" NEXT="mailed"/>
