@@ -103,19 +103,21 @@ if ($timenow > $timestart) {
 
         if ($canadd) {
             echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit', 'journal'), 'get',
-                array("class" => "singlebutton journalstart"));
+                array("class" => "singlebutton journalstart mb-3", "primary" => 1));
         }
     }
 
     // Display entry.
     if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
+        echo "<div>";
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry', 'journal').'</b></p>';
         } else {
             echo journal_format_entry_text($entry, $course, $cm);
         }
+        echo "</div>";
     } else {
-        echo '<span class="warning">'.get_string('notstarted', 'journal').'</span>';
+        echo '<div><span class="warning">'.get_string('notstarted', 'journal').'</span></div>';
     }
 
     echo $OUTPUT->box_end();
