@@ -885,7 +885,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
         // Grade selector.
         $attrs['id'] = 'r' . $entry->id;
-        echo html_writer::label(fullname($user)." ".get_string('grade'), 'r'.$entry->id, true, array('class' => 'accesshide'));
+        echo html_writer::label(fullname($user)." ".get_string('gradenoun'), 'r'.$entry->id, true, array('class' => 'accesshide'));
         echo html_writer::select($grades, 'r'.$entry->id, $entry->rating, get_string("nograde").'...', $attrs);
         echo $hiddengradestr;
         // Rewrote next three lines to show entry needs to be regraded due to resubmission.
@@ -942,7 +942,7 @@ function journal_print_feedback($course, $entry, $grades) {
     // Gradebook preference.
     $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($entry->userid));
     if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
-        echo get_string('grade').': ';
+        echo get_string('gradenoun').': ';
         echo $gradinginfo->items[0]->grades[$entry->userid]->str_long_grade;
     } else {
         print_string('nograde');
