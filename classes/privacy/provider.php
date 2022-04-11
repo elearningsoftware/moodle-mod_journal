@@ -147,7 +147,8 @@ class provider implements
                     jen.modified,
                     jen.text,
                     jen.rating,
-                    jen.entrycomment
+                    jen.entrycomment,
+                    cm.id as cmid
                     FROM {context} c
                     INNER JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
                     INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname

@@ -14,13 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Only when master becomes a stable the version value will be changed for
-// the current date. Otherwise we just increase the last NN by one.
+/**
+ * Definition of Journal scheduled tasks.
+ *
+ * @package   mod_journal
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_journal';
-$plugin->version  = 2022041201;
-$plugin->requires = 2017111300;  /* Moodle 3.4 */
-$plugin->release = '2.1.0 (Build: 2020091100)';
-$plugin->maturity = MATURITY_STABLE;
+$tasks = array(
+    array(
+        'classname' => 'mod_journal\task\cron_task',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*'
+    )
+);

@@ -69,7 +69,7 @@ function xmldb_journal_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2012032001, 'journal');
     }
 
-    if ($oldversion < 2020091101) {
+    if ($oldversion < 2022041100) {
 
         // Changing the default of field rating on table
         // journal_entries to fix
@@ -90,7 +90,7 @@ function xmldb_journal_upgrade($oldversion=0) {
         }
 
         // Journal savepoint reached.
-        upgrade_mod_savepoint(true, 2020091101, 'journal');
+        upgrade_mod_savepoint(true, 2022041100, 'journal');
     }
 
     return true;

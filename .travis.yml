@@ -64,11 +64,19 @@ matrix:
     - php: 7.2
       env:
         DB=pgsql
-        MOODLE_BRANCH=master
+        MOODLE_BRANCH=MOODLE_39_STABLE
     - php: 7.2
       env:
         DB=mysqli
-        MOODLE_BRANCH=master
+        MOODLE_BRANCH=MOODLE_39_STABLE
+    - php: 7.2
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_310_STABLE
+    - php: 7.2
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_310_STABLE
     - php: 7.3
       env:
         DB=pgsql
@@ -96,8 +104,32 @@ matrix:
     - php: 7.3
       env:
         DB=pgsql
+        MOODLE_BRANCH=MOODLE_39_STABLE
+    - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_39_STABLE
+    - php: 7.3
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=MOODLE_310_STABLE
+    - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=MOODLE_310_STABLE
+    - php: 7.3
+      env:
+        DB=pgsql
         MOODLE_BRANCH=master
     - php: 7.3
+      env:
+        DB=mysqli
+        MOODLE_BRANCH=master
+    - php: 7.4
+      env:
+        DB=pgsql
+        MOODLE_BRANCH=master
+    - php: 7.4
       env:
         DB=mysqli
         MOODLE_BRANCH=master
