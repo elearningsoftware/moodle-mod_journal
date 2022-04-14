@@ -70,8 +70,7 @@ class mod_journal_external extends external_api {
     /**
      * Return one entry record from the database, including contents optionally.
      *
-     * @param int $entryid          the record entry id id
-     * @param bool $returncontents  whether to return the entries contents or not
+     * @param int $journalid Journal id
      * @return array of warnings and the entries
      * @since Moodle 3.3
      * @throws moodle_exception
@@ -112,7 +111,7 @@ class mod_journal_external extends external_api {
 
     /**
      * Returns description of method parameters
-     * 
+     *
      * @since Moodle 3.3
      * @throws moodle_exception
      */
@@ -138,7 +137,7 @@ class mod_journal_external extends external_api {
 
     /**
      * Sets the text for the element
-     * 
+     *
      * @param int $journalid Journal ID
      * @param string $text Text parameter
      * @param string $format Format constant for the string

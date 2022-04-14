@@ -371,9 +371,8 @@ function journal_scale_used ($journalid, $scaleid) {
 
 /**
  * Checks if scale is being used by any instance of journal
- *
  * This is used to find out if scale used anywhere
- * @param $scaleid int Scale id
+ * @param int $scaleid Scale id
  * @return boolean True if the scale is used by any journal
  */
 function journal_scale_used_anywhere($scaleid) {
@@ -594,7 +593,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
  * Create grade item for given journal
  *
  * @param object $journal object with extra cmidnumber
- * @param mixed optional array/object of grade(s); 'reset' means reset grades in gradebook
+ * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
 function journal_grade_item_update($journal, $grades=null) {
@@ -775,8 +774,8 @@ function journal_log_info($log) {
 /**
  * Returns the journal instance course_module id
  *
- * @param integer $journal
- * @return object
+ * @param integer $journalid Journal id
+ * @return object Course module object
  */
 function journal_get_coursemodule($journalid) {
 
@@ -861,8 +860,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades) {
 
         // Grade selector.
         $attrs['id'] = 'r' . $entry->id;
-        $gradeString = get_string_manager()->string_exists('gradenoun', 'moodle')? get_string('gradenoun') : get_string('grade');
-        echo html_writer::label(fullname($user)." ".$gradeString, 'r'.$entry->id, true, array('class' => 'accesshide'));
+        $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ? get_string('gradenoun') : get_string('grade');
+        echo html_writer::label(fullname($user)." ".$gradestring, 'r'.$entry->id, true, array('class' => 'accesshide'));
         echo html_writer::select($grades, 'r'.$entry->id, $entry->rating, get_string("nograde").'...', $attrs);
         echo $hiddengradestr;
         // Rewrote next three lines to show entry needs to be regraded due to resubmission.
@@ -927,8 +926,8 @@ function journal_print_feedback($course, $entry, $grades) {
     // Gradebook preference.
     $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, array($entry->userid));
     if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
-        $gradeString = get_string_manager()->string_exists('gradenoun', 'moodle')? get_string('gradenoun') : get_string('grade');
-        echo $gradeString.': ';
+        $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ? get_string('gradenoun') : get_string('grade');
+        echo $gradestring.': ';
         echo $gradinginfo->items[0]->grades[$entry->userid]->str_long_grade;
     } else {
         print_string('nograde');
