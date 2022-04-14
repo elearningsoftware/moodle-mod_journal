@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * mod_journal view page
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 require_once("../../config.php");
 require_once("lib.php");
 
@@ -21,11 +29,11 @@ require_once("lib.php");
 $id = required_param('id', PARAM_INT);    // Course Module ID.
 
 if (! $cm = get_coursemodule_from_id('journal', $id)) {
-    print_error("Course Module ID was incorrect");
+    throw new \moodle_exception(get_string("Course Module ID was incorrect"));
 }
 
 if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-    print_error("Course is misconfigured");
+    throw new \moodle_exception(get_string("Course is misconfigured"));
 }
 
 $context = context_module::instance($cm->id);
@@ -39,15 +47,15 @@ $entriesmanager = has_capability('mod/journal:manageentries', $context);
 $canadd = has_capability('mod/journal:addentries', $context);
 
 if (!$entriesmanager && !$canadd) {
-    print_error('accessdenied', 'journal');
+    throw new \moodle_exception(get_string('accessdenied', 'journal'));
 }
 
 if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-    print_error("Course module is incorrect");
+    throw new \moodle_exception(get_string("Course module is incorrect"));
 }
 
 if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
-    print_error("Course module is incorrect");
+    throw new \moodle_exception(get_string("Course module is incorrect"));
 }
 
 $journalname = format_string($journal->name, true, array('context' => $context));

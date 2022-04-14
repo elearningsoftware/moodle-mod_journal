@@ -14,12 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This page lists all the instances of journal in a particular course
+ *
+ * @package mod_journal
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/externallib.php");
 
+/**
+ * The mod_journal_external class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_journal_external extends external_api {
 
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.3
+     */
     public static function get_entry_parameters() {
         return new external_function_parameters(
             array(
@@ -28,6 +49,12 @@ class mod_journal_external extends external_api {
         );
     }
 
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     * @since Moodle 3.3
+     */
     public static function get_entry_returns() {
         return new external_single_structure(
             array(
@@ -40,6 +67,15 @@ class mod_journal_external extends external_api {
         );
     }
 
+    /**
+     * Return one entry record from the database, including contents optionally.
+     *
+     * @param int $entryid          the record entry id id
+     * @param bool $returncontents  whether to return the entries contents or not
+     * @return array of warnings and the entries
+     * @since Moodle 3.3
+     * @throws moodle_exception
+     */
     public static function get_entry($journalid) {
         global $DB, $USER;
 
@@ -74,7 +110,12 @@ class mod_journal_external extends external_api {
         }
     }
 
-
+    /**
+     * Returns description of method parameters
+     * 
+     * @since Moodle 3.3
+     * @throws moodle_exception
+     */
     public static function set_text_parameters() {
         return new external_function_parameters(
             array(
@@ -85,10 +126,23 @@ class mod_journal_external extends external_api {
         );
     }
 
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     * @since Moodle 3.3
+     */
     public static function set_text_returns() {
         return new external_value(PARAM_RAW, 'new text');
     }
 
+    /**
+     * Sets the text for the element
+     * 
+     * @param int $journalid Journal ID
+     * @param string $text Text parameter
+     * @param string $format Format constant for the string
+     */
     public static function set_text($journalid, $text, $format) {
         global $DB, $USER;
 

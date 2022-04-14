@@ -14,7 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * mod_journal backup moodle 1
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 
 /**
  * Journal conversion handler
@@ -24,11 +31,11 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
     /**
      * Declare the paths in moodle.xml we are able to convert
      *
-     * The method returns list of {@link convert_path} instances.
+     * The method returns list of Journal instances.
      * For each path returned, the corresponding conversion method must be
      * defined.
      *
-     * @return array of {@link convert_path} instances
+     * @return array of Journal instances
      */
     public function get_paths() {
         return array(
@@ -45,6 +52,12 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
         );
     }
 
+    /**
+     * Process backup
+     *
+     * @param array $data Journal data array
+     * @return void
+     */
     public function process_journal($data) {
 
         // Get the course module id and context id.
@@ -77,6 +90,7 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
     /**
      * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/JOURNAL/ENTRIES/ENTRY
      * data available
+     * @param array $data Journal data array
      */
     public function process_entry($data) {
         $this->write_xml('entry', $data, array('/entry/id'));

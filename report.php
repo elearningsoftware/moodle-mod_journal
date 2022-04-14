@@ -14,18 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * The report page for the mod_journal plugin
+ *
+ * @package mod_journal
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
+
 require_once("../../config.php");
 require_once("lib.php");
-
 
 $id = required_param('id', PARAM_INT);   // Course module.
 
 if (! $cm = get_coursemodule_from_id('journal', $id)) {
-    print_error("Course Module ID was incorrect");
+    throw new \moodle_exception(get_string("Course Module ID was incorrect"));
 }
 
 if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
-    print_error("Course module is misconfigured");
+    throw new \moodle_exception(get_string("Course module is misconfigured"));
 }
 
 require_login($course, false, $cm);
@@ -36,7 +43,7 @@ require_capability('mod/journal:manageentries', $context);
 
 
 if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-    print_error("Course module is incorrect");
+    throw new \moodle_exception(get_string("Course module is incorrect"));
 }
 
 // Header.
@@ -170,7 +177,7 @@ if (!$users) {
 
     $grades = make_grades_menu($journal->grade);
     if (!$teachers = get_users_by_capability($context, 'mod/journal:manageentries')) {
-        print_error('noentriesmanagers', 'journal');
+        throw new \moodle_exception(get_string('noentriesmanagers', 'journal'));
     }
 
     echo '<form action="report.php" method="post">';

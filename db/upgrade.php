@@ -14,10 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade script for mod_journal
+ *
+ * @package mod_journal
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/mod/journal/lib.php');
 
+/**
+ * Upgrade steps for mod_journal
+ *
+ * @param integer $oldversion Old plugin version
+ * @return bool True if succesfull, false otherwise
+ */
 function xmldb_journal_upgrade($oldversion=0) {
     global $DB;
 

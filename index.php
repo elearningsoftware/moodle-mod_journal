@@ -30,7 +30,7 @@ require_once("lib.php");
 $id = required_param('id', PARAM_INT);   // Course.
 
 if (! $course = $DB->get_record("course", array("id" => $id))) {
-    print_error("Course ID is incorrect");
+    throw new \moodle_exception(get_string("Course ID is incorrect"));
 }
 
 require_course_login($course);

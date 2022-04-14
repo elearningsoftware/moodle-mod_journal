@@ -26,6 +26,11 @@ namespace mod_journal\search;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Return proper class name
+ *
+ * @return void
+ */
 function get_dynamic_parent_activity() {
     global $CFG;
     if (class_exists('\core_search\area\base_activity')) {

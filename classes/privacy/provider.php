@@ -40,6 +40,13 @@ use core_privacy\local\request\writer;
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
+/**
+ * The provider class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,

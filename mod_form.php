@@ -14,12 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Form structure for mod_journal
+ *
+ * @package mod_journal
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
+/**
+ * The mod_journal_mod_form class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_journal_mod_form extends moodleform_mod {
 
+    /**
+     * Set up the form definition.
+     */
     public function definition() {
         global $COURSE;
 

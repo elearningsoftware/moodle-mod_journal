@@ -23,7 +23,6 @@
  */
 
 namespace mod_journal\event;
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * The mod_journal entries viewed event class.

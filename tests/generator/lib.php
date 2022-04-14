@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * mod_journal data generator class.
  *
@@ -50,7 +48,13 @@ class mod_journal_generator extends testing_module_generator {
         parent::reset();
     }
 
-
+    /**
+     * Create instance of mod_journal
+     *
+     * @param [type] $record Jounal record
+     * @param array|null $options Options array
+     * @return void
+     */
     public function create_instance($record = null, array $options = null) {
         $record = (object)(array)$record;
 

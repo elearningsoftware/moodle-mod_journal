@@ -14,20 +14,49 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * mod_journal backup moodle 2 structure
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once($CFG->dirroot.'/mod/journal/backup/moodle2/backup_journal_stepslib.php');
 
+/**
+ * The backup_journal_activity_task class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class backup_journal_activity_task extends backup_activity_task {
 
+    /**
+     * Define the settings for the backup process
+     *
+     * @return void
+     */
     protected function define_my_settings() {
     }
 
+    /**
+     * Define the steps for the backup process
+     *
+     * @return void
+     */
     protected function define_my_steps() {
         $this->add_step(new backup_journal_activity_structure_step('journal_structure', 'journal.xml'));
     }
 
-    static public function encode_content_links($content) {
+    /**
+     * Encode content links for the backup process
+     *
+     * @param string $content Content
+     * @return string $content with links encoded
+     */
+    public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot.'/mod/journal', '#');

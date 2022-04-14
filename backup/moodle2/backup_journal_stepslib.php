@@ -14,10 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * mod_journal backup moodle 2 structure
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
+/**
+ * The backup_journal_activity_structure_step class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class backup_journal_activity_structure_step extends backup_activity_structure_step {
 
+    /**
+     * Define the structure
+     *
+     * @return void
+     */
     protected function define_structure() {
 
         $journal = new backup_nested_element('journal', array('id'), array(

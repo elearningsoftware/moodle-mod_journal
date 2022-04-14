@@ -28,6 +28,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
+/**
+ * Return proper class name
+ *
+ * @return void
+ */
 function get_dynamic_parent_entry() {
     global $CFG;
     if (class_exists('\core_search\area\base_mod')) {

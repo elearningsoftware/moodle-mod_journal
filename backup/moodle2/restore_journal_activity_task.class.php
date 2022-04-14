@@ -14,20 +14,48 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * mod_journal backup moodle 2 structure
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once($CFG->dirroot.'/mod/journal/backup/moodle2/restore_journal_stepslib.php');
 
+/**
+ * The restore_journal_activity_task class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class restore_journal_activity_task extends restore_activity_task {
 
+    /**
+     * Define the settings for the restore process
+     *
+     * @return void
+     */
     protected function define_my_settings() {
     }
 
+    /**
+     * Define the steps for the restore process
+     *
+     * @return void
+     */
     protected function define_my_steps() {
         $this->add_step(new restore_journal_activity_structure_step('journal_structure', 'journal.xml'));
     }
 
-    static public function define_decode_contents() {
+    /**
+     * Define decode contents for the restore process
+     *
+     * @return void
+     */
+    public static function define_decode_contents() {
 
         $contents = array();
         $contents[] = new restore_decode_content('journal', array('intro'), 'journal');
@@ -36,7 +64,12 @@ class restore_journal_activity_task extends restore_activity_task {
         return $contents;
     }
 
-    static public function define_decode_rules() {
+    /**
+     * Define decode rules for the restore process
+     *
+     * @return void
+     */
+    public static function define_decode_rules() {
 
         $rules = array();
         $rules[] = new restore_decode_rule('JOURNALINDEX', '/mod/journal/index.php?id=$1', 'course');
@@ -48,6 +81,11 @@ class restore_journal_activity_task extends restore_activity_task {
 
     }
 
+    /**
+     * Define decode log rules for the restore process
+     *
+     * @return void
+     */
     public static function define_restore_log_rules() {
 
         $rules = array();
@@ -60,6 +98,11 @@ class restore_journal_activity_task extends restore_activity_task {
         return $rules;
     }
 
+    /**
+     * Define decode log rules for the course restore process
+     *
+     * @return void
+     */
     public static function define_restore_log_rules_for_course() {
 
         $rules = array();

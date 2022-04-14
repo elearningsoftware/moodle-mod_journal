@@ -17,6 +17,14 @@
 // Only when master becomes a stable the version value will be changed for
 // the current date. Otherwise we just increase the last NN by one.
 
+/**
+ * mod_journal version file
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_journal';

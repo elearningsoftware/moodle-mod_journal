@@ -24,8 +24,6 @@
 
 namespace mod_journal\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The mod_journal instance list viewed event class.
  *

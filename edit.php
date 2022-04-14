@@ -14,17 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Edit page for mod_journal
+ *
+ * @package mod_journal
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ **/
+
 require_once("../../config.php");
 require_once('./edit_form.php');
 
 $id = required_param('id', PARAM_INT);    // Course Module ID.
 
 if (!$cm = get_coursemodule_from_id('journal', $id)) {
-    print_error("Course Module ID was incorrect");
+    throw new \moodle_exception(get_string("Course Module ID was incorrect"));
 }
 
 if (!$course = $DB->get_record("course", array("id" => $cm->course))) {
-    print_error("Course is misconfigured");
+    throw new \moodle_exception(get_string("Course is misconfigured"));
 }
 
 $context = context_module::instance($cm->id);
@@ -34,7 +42,7 @@ require_login($course, false, $cm);
 require_capability('mod/journal:addentries', $context);
 
 if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-    print_error("Course module is incorrect");
+    throw new \moodle_exception(get_string("Course module is incorrect"));
 }
 
 // Header.
@@ -88,13 +96,13 @@ if ($form->is_cancelled()) {
     if ($entry) {
         $newentry->id = $entry->id;
         if (!$DB->update_record("journal_entries", $newentry)) {
-            print_error("Could not update your journal");
+            throw new \moodle_exception(get_string("Could not update your journal"));
         }
     } else {
         $newentry->userid = $USER->id;
         $newentry->journal = $journal->id;
         if (!$newentry->id = $DB->insert_record("journal_entries", $newentry)) {
-            print_error("Could not insert a new journal entry");
+            throw new \moodle_exception(get_string("Could not insert a new journal entry"));
         }
     }
 

@@ -18,6 +18,7 @@
  * A scheduled task for journal cron.
  *
  * @package    mod_journal
+ * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_journal\task;
@@ -26,6 +27,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
+/**
+ * The cron_task class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class cron_task extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task (shown to admins).
@@ -124,7 +132,9 @@ class cron_task extends \core\task\scheduled_task {
                     $posthtml = "<p><font face=\"sans-serif\">".
                     "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->".
                     "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->".
-                    "<a href=\"$CFG->wwwroot/mod/journal/view.php?id=$mod->id\">".format_string($entry->name, true)."</a></font></p>";
+                    "<a href=\"$CFG->wwwroot/mod/journal/view.php?id=$mod->id\">"
+                        .format_string($entry->name, true)
+                    ."</a></font></p>";
                     $posthtml .= "<hr /><font face=\"sans-serif\">";
                     $posthtml .= "<p>".get_string("journalmailhtml", "journal", $journalinfo)."</p>";
                     $posthtml .= "</font><hr />";
@@ -133,7 +143,8 @@ class cron_task extends \core\task\scheduled_task {
                 }
 
                 if (! email_to_user($user, $teacher, $postsubject, $posttext, $posthtml)) {
-                    echo "Error: Journal cron: Could not send out mail for id $entry->id to user $user->id ($user->email)\n";
+                    echo "Error: Journal cron: Could not send out mail for "
+                        . "id $entry->id to user $user->id ($user->email)\n";
                 }
                 if (!$DB->set_field("journal_entries", "mailed", "1", array("id" => $entry->id))) {
                     echo "Could not update the mailed field for id $entry->id\n";

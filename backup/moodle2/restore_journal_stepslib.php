@@ -14,10 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * mod_journal backup moodle 2 structure
+ *
+ * @package    mod_journal
+ * @copyright  2014 David Monllao <david.monllao@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
+/**
+ * The mod_journal_entry_form class.
+ *
+ * @package    mod_journal
+ * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class restore_journal_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define the structure of the backup
+     *
+     * @return void
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -30,6 +48,12 @@ class restore_journal_activity_structure_step extends restore_activity_structure
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process step
+     *
+     * @param array $data Journal data array
+     * @return void
+     */
     protected function process_journal($data) {
 
         global $DB;
@@ -45,6 +69,12 @@ class restore_journal_activity_structure_step extends restore_activity_structure
         $this->apply_activity_instance($newid);
     }
 
+    /**
+     * Process journal entry element
+     *
+     * @param array $data Data array
+     * @return void
+     */
     protected function process_journal_entry($data) {
 
         global $DB;
@@ -64,6 +94,11 @@ class restore_journal_activity_structure_step extends restore_activity_structure
         $this->set_mapping('journal_entry', $oldid, $newid);
     }
 
+    /**
+     * Code to run after backup finished
+     *
+     * @return void
+     */
     protected function after_execute() {
         $this->add_related_files('mod_journal', 'intro', null);
         $this->add_related_files('mod_journal_entries', 'text', null);

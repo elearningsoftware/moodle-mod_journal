@@ -35,85 +35,85 @@ jobs:
             database: pgsql
             moodle-branch: MOODLE_34_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_34_STABLE
           - php: 7.2
             database: pgsql
             moodle-branch: MOODLE_35_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_35_STABLE
           - php: 7.2
             database: pgsql
             moodle-branch: MOODLE_36_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_36_STABLE
           - php: 7.2
             database: pgsql
             moodle-branch: MOODLE_37_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_37_STABLE
           - php: 7.2
             database: pgsql
             moodle-branch: MOODLE_38_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_38_STABLE
           - php: 7.2
             database: pgsql
             moodle-branch: MOODLE_39_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_39_STABLE
           - php: 7.2
             database: pgsql
             moodle-branch: MOODLE_310_STABLE
           - php: 7.2
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_310_STABLE
           - php: 7.3
             database: pgsql
             moodle-branch: MOODLE_36_STABLE
           - php: 7.3
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_36_STABLE
           - php: 7.3
             database: pgsql
             moodle-branch: MOODLE_37_STABLE
           - php: 7.3
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_37_STABLE
           - php: 7.3
             database: pgsql
             moodle-branch: MOODLE_38_STABLE
           - php: 7.3
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_38_STABLE
           - php: 7.3
             database: pgsql
             moodle-branch: MOODLE_39_STABLE
           - php: 7.3
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_39_STABLE
           - php: 7.3
             database: pgsql
             moodle-branch: MOODLE_310_STABLE
           - php: 7.3
-            database: mysqli
+            database: mariadb
             moodle-branch: MOODLE_310_STABLE
           - php: 7.3
             database: pgsql
             moodle-branch: master
           - php: 7.3
-            database: mysqli
-            moodle-branch: master
-          - php: 7.4
-            database: pgsql
+            database: mariadb
             moodle-branch: master
           - php: 7.4
-            database: mysqli
+            database: pgsql
+            moodle-branch: master
+          - php: 7.4
+            database: mariadb
             moodle-branch: master
         # php: ['7.3', '7.4', '8.0']
         # moodle-branch: ['MOODLE_311_STABLE']
