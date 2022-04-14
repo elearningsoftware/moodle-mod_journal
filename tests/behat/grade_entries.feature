@@ -53,7 +53,7 @@ Feature: Teacher can view, comment and grade students entries
     And I am on "Course1" course homepage
 
   Scenario: Teacher can access students entries from the journals list page
-    When I follow "Course1"
+    When I am on "Course1" course homepage
     And I turn editing mode on
     And I add the "Activities" block
     And I click on "Journals" "link" in the "Activities" "block"
