@@ -108,7 +108,7 @@ class cron_task extends \core\task\scheduled_task {
                 $mod = $coursejournals[$entry->journal];
 
                 // This is already cached internally.
-                $context = context_module::instance($mod->id);
+                $context = \context_module::instance($mod->id);
                 $canadd = has_capability('mod/journal:addentries', $context, $user);
                 $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
