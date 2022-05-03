@@ -116,7 +116,7 @@ class cron_task extends \core\task\scheduled_task {
                     continue;  // Not an active participant.
                 }
 
-                $journalinfo = new stdClass();
+                $journalinfo = new \stdClass();
                 $journalinfo->teacher = fullname($teacher);
                 $journalinfo->journal = format_string($entry->name, true);
                 $journalinfo->url = "$CFG->wwwroot/mod/journal/view.php?id=$mod->id";
