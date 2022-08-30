@@ -697,25 +697,27 @@ function journal_get_users_done($journal, $currentgroup) {
 /**
  * Counts all the journal entries (optionally in a given group)
  * @param stdClass $journal Journal object
- * @param int $groupid Group id
+ * @param boolean|int|array $groupids Group id or array of ids. 0 or false = see all.
  * @return int Number of entries
  */
-function journal_count_entries($journal, $groupid = 0) {
+function journal_count_entries($journal, $groupids = 0) {
     global $DB;
 
     $cm = journal_get_coursemodule($journal->id);
     $context = context_module::instance($cm->id);
+    $journals = null;
 
-    if ($groupid) {     // How many in a particular group?
+    if (!empty($groupids)) {     // How many in a particular group?
+        $params = array($journal->id);
+        $sqlin = $DB->get_in_or_equal($groupids);
 
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {groups_members} g ON g.userid = j.userid
                 JOIN {user} u ON u.id = g.userid
-                WHERE j.journal = ? AND g.groupid = ?";
-        $journals = $DB->get_records_sql($sql, array($journal->id, $groupid));
+                WHERE j.journal = ? AND g.groupid $sqlin[0]";
+        $journals = $DB->get_records_sql($sql, array_merge($params, $sqlin[1]));
 
-    } else { // Count all the entries from the whole course.
-
+    } else if ($groupids === 0 || $groupids === false) { // Count all the entries from the whole course.
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
                 WHERE j.journal = ?";

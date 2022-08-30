@@ -72,12 +72,18 @@ echo $OUTPUT->heading($journalname);
 // Check to see if groups are being used here.
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
+$allowedgroups = groups_get_activity_allowed_groups($cm);
 groups_print_activity_menu($cm, $CFG->wwwroot . "/mod/journal/view.php?id=$cm->id");
 
 if ($entriesmanager) {
-    $entrycount = journal_count_entries($journal, $currentgroup);
-    echo '<div class="reportlink"><a href="report.php?id='.$cm->id.'">'.
-          get_string('viewallentries', 'journal', $entrycount).'</a></div>';
+    if ($currentgroup === 0 && $groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
+        $currentgroup = null;
+    }
+    if (!$currentgroup || array_key_exists($currentgroup, $allowedgroups)) {
+        $entrycount = journal_count_entries($journal, $currentgroup);
+        echo '<div class="reportlink"><a href="report.php?id='.$cm->id.'">'.
+            get_string('viewallentries', 'journal', $entrycount).'</a></div>';
+    }
 }
 
 $journal->intro = trim($journal->intro);

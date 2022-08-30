@@ -131,7 +131,14 @@ foreach ($journals as $journal) {
             }
         }
 
-        $entrycount = journal_count_entries($journal, groups_get_all_groups($course->id, $USER->id));
+        $cm = get_coursemodule_from_id('journal', $journal->coursemodule);
+        if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
+            $groupids = array_keys(groups_get_activity_allowed_groups($cm, $USER->id));
+        } else {
+            $groupids = 0;
+        }
+
+        $entrycount = journal_count_entries($journal, $groupids);
         $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">".
             get_string("viewallentries", "journal", $entrycount)."</a>";
     } else if (!empty($managersomewhere)) {
