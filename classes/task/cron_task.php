@@ -112,7 +112,7 @@ class cron_task extends \core\task\scheduled_task {
                 $canadd = has_capability('mod/journal:addentries', $context, $user);
                 $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
-                if (!$canadd and $entriesmanager) {
+                if (!$canadd && $entriesmanager) {
                     continue;  // Not an active participant.
                 }
 

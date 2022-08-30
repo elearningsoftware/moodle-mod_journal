@@ -89,7 +89,7 @@ if (!empty($journal->intro)) {
 echo '<br />';
 
 $timenow = time();
-if ($course->format == 'weeks' and $journal->days) {
+if ($course->format == 'weeks' && $journal->days) {
     $timestart = $course->startdate + (($cw->section - 1) * 604800);
     if ($journal->days) {
         $timefinish = $timestart + (3600 * 24 * $journal->days);
@@ -139,7 +139,7 @@ if ($timenow > $timestart) {
             echo "</div>";
         }
         // Added three lines to mark entry as being dirty and needing regrade.
-        if (!empty($entry->modified) AND !empty($entry->timemarked) AND $entry->modified > $entry->timemarked) {
+        if (!empty($entry->modified) && !empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
             echo "<div class=\"lastedit\">".get_string("needsregrade", "journal"). "</div>";
         }
 
@@ -154,7 +154,7 @@ if ($timenow > $timestart) {
     }
 
     // Feedback.
-    if (!empty($entry->entrycomment) or (!empty($entry->rating) and !$entry->rating)) {
+    if (!(empty($entry->entrycomment) || (!empty($entry->rating)) && !$entry->rating)) {
         $grades = make_grades_menu($journal->grade);
         echo $OUTPUT->heading(get_string('feedback'));
         journal_print_feedback($course, $entry, $grades);

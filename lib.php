@@ -127,6 +127,8 @@ function journal_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_MOD_PURPOSE:
+            return MOD_PURPOSE_COLLABORATION;
         default:
             return null;
     }
@@ -378,7 +380,7 @@ function journal_scale_used ($journalid, $scaleid) {
 function journal_scale_used_anywhere($scaleid) {
     global $DB;
 
-    if ($scaleid and $DB->get_records('journal', array('grade' => -$scaleid))) {
+    if ($scaleid && $DB->get_records('journal', array('grade' => -$scaleid))) {
         return true;
     } else {
         return false;
@@ -464,7 +466,7 @@ function journal_print_overview($courses, &$htmlarray) {
             $courses[$journal->course]->format = $DB->get_field('course', 'format', array('id' => $journal->course));
         }
 
-        if ($courses[$journal->course]->format == 'weeks' AND $journal->days) {
+        if ($courses[$journal->course]->format == 'weeks' && $journal->days) {
 
             $coursestartdate = $courses[$journal->course]->startdate;
 
@@ -684,7 +686,7 @@ function journal_get_users_done($journal, $currentgroup) {
         $canadd = has_capability('mod/journal:addentries', $context, $user);
         $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
-        if (!$entriesmanager and !$canadd) {
+        if (!$entriesmanager && !$canadd) {
             unset($journals[$key]);
         }
     }

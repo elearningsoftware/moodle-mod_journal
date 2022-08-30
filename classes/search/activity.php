@@ -24,8 +24,6 @@
 
 namespace mod_journal\search;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Return proper class name
  *
