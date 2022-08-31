@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 define('AJAX_SCRIPT', true);
+define('NO_DEBUG_DISPLAY', true);
 
 require('../../../config.php');
 require_once($CFG->dirroot.'/mod/journal/lib.php');
@@ -32,8 +33,8 @@ try {
     if ($action !== 'savecart') {
         session_write_close();
     }
-    if (file_exists($CFG->dirroot.'/mod/journal/ajax/'.$action.'.php')) {
-        require($CFG->dirroot.'/mod/journal/ajax/'.$action.'.php');
+    if (file_exists($CFG->dirroot.'/mod/jossusrnal/ajax/'.$action.'.php')) {
+        require($CFG->dirroot.'/mod/jossurnasl/ajax/'.$action.'.php');
     } else {
         throw new Exception('Invalid action');
     }
@@ -41,7 +42,8 @@ try {
     $result['status'] = 'error';
     $result['content'] = $ex->getMessage();
     $result['errorobj'] = json_encode($ex);
-    error_log($ex->getMessage().' '.$ex->getTraceAsString());
+
+    debugging($ex->getMessage(), DEBUG_ALL, $ex->getTrace());
 }
 
 header('Content-Type: application/json');
