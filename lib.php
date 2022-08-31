@@ -707,7 +707,13 @@ function journal_count_entries($journal, $groupids = 0) {
     $context = context_module::instance($cm->id);
     $journals = null;
 
-    if (!empty($groupids)) {     // How many in a particular group?
+    // Convert single group id to an array containing the group id to
+    // process it later in the function
+    if (!is_array($groupids) && $groupids) {
+        $groupids = [$groupids];
+    }
+
+    if (is_array($groupids) && !empty($groupids)) {     // How many in a particular group?
         $params = array($journal->id);
         $sqlin = $DB->get_in_or_equal($groupids);
 
