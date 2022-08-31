@@ -22,18 +22,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("../../config.php");
-require_once("lib.php");
-
+require_once('../../config.php');
+require_once('lib.php');
 
 $id = required_param('id', PARAM_INT);    // Course Module ID.
 
 if (! $cm = get_coursemodule_from_id('journal', $id)) {
-    throw new \moodle_exception(get_string("Course Module ID was incorrect"));
+    throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
 }
 
-if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-    throw new \moodle_exception(get_string("Course is misconfigured"));
+if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+    throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
 }
 
 $context = context_module::instance($cm->id);
@@ -50,12 +49,12 @@ if (!$entriesmanager && !$canadd) {
     throw new \moodle_exception(get_string('accessdenied', 'journal'));
 }
 
-if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-    throw new \moodle_exception(get_string("Course module is incorrect"));
+if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+    throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 
-if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
-    throw new \moodle_exception(get_string("Course module is incorrect"));
+if (! $cw = $DB->get_record('course_sections', array('id' => $cm->section))) {
+    throw new \moodle_exception(get_string('incorrectcoursesectionid', 'journal'));
 }
 
 $journalname = format_string($journal->name, true, array('context' => $context));
@@ -117,19 +116,19 @@ if ($timenow > $timestart) {
 
         if ($canadd) {
             echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit', 'journal'), 'get',
-                array("class" => "singlebutton journalstart mb-3", "primary" => 1));
+                array('class' => 'singlebutton journalstart mb-3', 'primary' => 1));
         }
     }
 
     // Display entry.
     if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
-        echo "<div>";
+        echo '<div>';
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry', 'journal').'</b></p>';
         } else {
             echo journal_format_entry_text($entry, $course, $cm);
         }
-        echo "</div>";
+        echo '</div>';
     } else {
         echo '<div><span class="warning">'.get_string('notstarted', 'journal').'</span></div>';
     }
@@ -142,11 +141,11 @@ if ($timenow > $timestart) {
             echo '<div class="lastedit"><strong>'.get_string('lastedited').': </strong> ';
             echo userdate($entry->modified);
             echo ' ('.get_string('numwords', '', count_words($entry->text)).')';
-            echo "</div>";
+            echo '</div>';
         }
         // Added three lines to mark entry as being dirty and needing regrade.
         if (!empty($entry->modified) && !empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
-            echo "<div class=\"lastedit\">".get_string("needsregrade", "journal"). "</div>";
+            echo '<div class="lastedit">'.get_string('needsregrade', 'journal'). '</div>';
         }
 
         if (!empty($journal->days)) {

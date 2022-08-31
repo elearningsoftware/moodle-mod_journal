@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once("$CFG->libdir/externallib.php");
+require_once('$CFG->libdir/externallib.php');
 
 /**
  * The mod_journal_external class.
@@ -81,15 +81,15 @@ class mod_journal_external extends external_api {
         $params = self::validate_parameters(self::get_entry_parameters(), array('journalid' => $journalid));
 
         if (! $cm = get_coursemodule_from_id('journal', $params['journalid'])) {
-            throw new invalid_parameter_exception('Course Module ID was incorrect');
+            throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
-        if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-            throw new invalid_parameter_exception("Course is misconfigured");
+        if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+            throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
         }
 
-        if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-            throw new invalid_parameter_exception("Course module is incorrect");
+        if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+            throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
         $context = context_module::instance($cm->id);
@@ -105,7 +105,7 @@ class mod_journal_external extends external_api {
                 'teacher' => $entry->teacher
             );
         } else {
-            return "";
+            return '';
         }
     }
 
@@ -151,15 +151,15 @@ class mod_journal_external extends external_api {
         );
 
         if (! $cm = get_coursemodule_from_id('journal', $params['journalid'])) {
-            throw new invalid_parameter_exception('Course Module ID was incorrect');
+            throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
-        if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-            throw new invalid_parameter_exception("Course is misconfigured");
+        if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+            throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
         }
 
-        if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-            throw new invalid_parameter_exception("Course module is incorrect");
+        if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+            throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
         $context = context_module::instance($cm->id);
@@ -176,11 +176,11 @@ class mod_journal_external extends external_api {
 
         if ($entry) {
             $newentry->id = $entry->id;
-            $DB->update_record("journal_entries", $newentry);
+            $DB->update_record('journal_entries', $newentry);
         } else {
             $newentry->userid = $USER->id;
             $newentry->journal = $journal->id;
-            $newentry->id = $DB->insert_record("journal_entries", $newentry);
+            $newentry->id = $DB->insert_record('journal_entries', $newentry);
         }
 
         if ($entry) {

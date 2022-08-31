@@ -15,12 +15,14 @@
 #page-mod-journal-view .journalstart,
 #page-mod-journal-report .feedbacksave {
     text-align: center;
+    margin: 1em 0;
 }
 #page-mod-journal-view .lastedit,
 #page-mod-journal-view .editend {
     font-size: 0.7em;
     margin: 5px;
     text-align: center;
+    font-style: italic;
 }
 #page-mod-journal-view .author {
     font-size: 1em;
@@ -42,6 +44,7 @@
 #page-mod-journal-view .feedbackbox .left,
 #page-mod-journal-view .feedbackbox .entryheader {
     background-color: #ddd;
+    padding: 6px 14px;
 }
 
 #page-mod-journal-view .feedbackbox {
@@ -57,8 +60,15 @@
     -moz-border-radius-bottomright: 15px;
 }
 
+#page-mod-journal-report .journaluserentrywrapper {
+    background-color: #fff;
+    border: 1px solid #dedede;
+    margin: 1em 0;
+    box-shadow: 0px 0px 10px #d2d2d2;
+    border-radius: 1em;
+}
+
 #page-mod-journal-report .journaluserentry {
-    border: 1px solid #dee2e6;
     border-collapse: collapse;
     border-spacing: 0;
 }
@@ -72,11 +82,33 @@
 }
 #page-mod-journal-report .journaluserentry td.userfullname {
     white-space: nowrap;
+    border-bottom: 1px solid #dedede;
 }
 #page-mod-journal-report .journaluserentry td .lastedit {
     font-size: 0.76em;
-    margin-left: 10px;
+    font-style: italic;
 }
 #page-mod-journal-report .mediaplugin {
     width: auto;
+}
+#page-mod-journal-report .divwrapper {
+    margin: 1em 0;
+}
+#page-mod-journal-report .journalheader {
+    margin-top: 1em;
+}
+#page-mod-journal-report textarea {
+    border-color: #cecece;
+    min-height: 100px;
+    max-width: calc(100vw - 120px);
+    width: 100%;
+}
+#page-mod-journal-report .lastedit,
+#page-mod-journal-report .lastedit + label {
+    display: block;
+    white-space: normal;
+}
+#page-mod-journal-report .custom-select {
+    width: auto;
+    margin-left: 0.5em;
 }

@@ -22,17 +22,28 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
-require_once("../../config.php");
-require_once("lib.php");
+require_once('../../config.php');
+require_once('lib.php');
 
 $id = required_param('id', PARAM_INT);   // Course module.
-
-if (! $cm = get_coursemodule_from_id('journal', $id)) {
-    throw new \moodle_exception(get_string("Course Module ID was incorrect"));
+$sortby = optional_param('sortby', 'dateasc', PARAM_ALPHA);
+if (!in_array($sortby, [
+    'dateasc',
+    'datedesc',
+    'firstnameasc',
+    'firstnamedesc',
+    'lastnameasc',
+    'lastnamedesc'
+])) {
+    $sortby = 'dateasc';
 }
 
-if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
-    throw new \moodle_exception(get_string("Course module is misconfigured"));
+if (! $cm = get_coursemodule_from_id('journal', $id)) {
+    throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
+}
+
+if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+    throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
 }
 
 require_login($course, false, $cm);
@@ -42,23 +53,24 @@ $context = context_module::instance($cm->id);
 require_capability('mod/journal:manageentries', $context);
 
 
-if (! $journal = $DB->get_record("journal", array("id" => $cm->instance))) {
-    throw new \moodle_exception(get_string("Course module is incorrect"));
+if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+    throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 
 // Header.
 $PAGE->set_url('/mod/journal/report.php', array('id' => $id));
 
-$PAGE->navbar->add(get_string("entries", "journal"));
-$PAGE->set_title(get_string("modulenameplural", "journal"));
+$PAGE->navbar->add(get_string('entries', 'journal'));
+$PAGE->set_title(get_string('modulenameplural', 'journal'));
 $PAGE->set_heading($course->fullname);
+$PAGE->requires->js_call_amd('mod_journal/report', 'init');
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string("entries", "journal"));
+echo $OUTPUT->heading(get_string('entries', 'journal'));
 
 
 // Make some easy ways to access the entries.
-if ( $eee = $DB->get_records("journal_entries", array("journal" => $journal->id))) {
+if ( $eee = $DB->get_records('journal_entries', array('journal' => $journal->id))) {
     foreach ($eee as $ee) {
         $entrybyuser[$ee->userid] = $ee;
         $entrybyentry[$ee->id]  = $ee;
@@ -117,8 +129,8 @@ if ($data = data_submitted()) {
             $newentry->timemarked   = $timenow;
             $newentry->mailed       = 0;           // Make sure mail goes out (again, even).
             $newentry->id           = $num;
-            if (!$DB->update_record("journal_entries", $newentry)) {
-                echo $OUTPUT->notification("Failed to update the journal feedback for user $entry->userid");
+            if (!$DB->update_record('journal_entries', $newentry)) {
+                echo $OUTPUT->notification(get_string('failedupdate', 'journal', $entry->userid));
             } else {
                 $count++;
             }
@@ -127,7 +139,7 @@ if ($data = data_submitted()) {
             $entrybyuser[$entry->userid]->teacher    = $USER->id;
             $entrybyuser[$entry->userid]->timemarked = $timenow;
 
-            $journal = $DB->get_record("journal", array("id" => $entrybyuser[$entry->userid]->journal));
+            $journal = $DB->get_record('journal', array('id' => $entrybyuser[$entry->userid]->journal));
             $journal->cmidnumber = $cm->idnumber;
 
             journal_update_grades($journal, $entry->userid);
@@ -144,7 +156,7 @@ if ($data = data_submitted()) {
     $event->add_record_snapshot('journal', $journal);
     $event->trigger();
 
-    echo $OUTPUT->notification(get_string("feedbackupdated", "journal", "$count"), "notifysuccess");
+    echo $OUTPUT->notification(get_string('feedbackupdated', 'journal', (string)$count), 'notifysuccess');
 
 } else {
 
@@ -169,36 +181,55 @@ if ($currentgroup) {
 $users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '', '', $groups);
 
 if (!$users) {
-    echo $OUTPUT->heading(get_string("nousersyet"));
-
+    echo $OUTPUT->heading(get_string('nousersyet'));
 } else {
-
     groups_print_activity_menu($cm, $CFG->wwwroot . "/mod/journal/report.php?id=$cm->id");
+
+    $options = [
+        'dateasc' => get_string('dateasc', 'journal'),
+        'datedesc' => get_string('datedesc', 'journal'),
+        'firstnameasc' => get_string('firstnameasc', 'journal'),
+        'firstnamedesc' => get_string('firstnamedesc', 'journal'),
+        'lastnameasc' => get_string('lastnameasc', 'journal'),
+        'lastnamedesc' => get_string('lastnamedesc', 'journal')
+    ];
+    $select = new single_select(
+        new moodle_url($CFG->wwwroot.'/mod/journal/report.php?id='.$id), 'sortby', $options, $sortby, null
+    );
+    $select->set_label(get_string('sortby'));
+    echo '<div class="divwrapper sortbyselect">'.$OUTPUT->render($select).'</div>';
 
     $grades = make_grades_menu($journal->grade);
     if (!$teachers = get_users_by_capability($context, 'mod/journal:manageentries')) {
         throw new \moodle_exception(get_string('noentriesmanagers', 'journal'));
     }
 
-    echo '<form action="report.php" method="post">';
+    echo '<form action="'.$CFG->wwwroot.'/mod/journal/report.php?id='.$id.'" method="post">';
 
     if ($usersdone = journal_get_users_done($journal, $currentgroup)) {
+        mod_journal_sort_users($usersdone, $sortby, $entrybyuser);
+        echo '<h3 class="journalheader">'.get_string('userswhocompletedthejournal', 'journal').'</h3>';
         foreach ($usersdone as $user) {
-            journal_print_user_entry($course, $user, $entrybyuser[$user->id], $teachers, $grades);
+            journal_print_user_entry($course, $user, $entrybyuser[$user->id], $teachers, $grades, $cm->id);
             unset($users[$user->id]);
         }
     }
 
-    foreach ($users as $user) {       // Remaining users.
-        journal_print_user_entry($course, $user, null, $teachers, $grades);
+    if ($users) {
+        mod_journal_sort_users($users, $sortby, $entrybyuser);
+        echo '<h3 class="journalheader">'.get_string('userswhodidnotcompletedthejournal', 'journal').'</h3>';
+        foreach ($users as $user) {       // Remaining users.
+            journal_print_user_entry($course, $user, null, $teachers, $grades, $cm->id);
+        }
     }
 
-    echo "<p class=\"feedbacksave\">";
-    echo "<input type=\"hidden\" name=\"id\" value=\"$cm->id\" />";
-    echo "<input type=\"hidden\" name=\"sesskey\" value=\"" . sesskey() . "\" />";
-    echo "<input type=\"submit\" value=\"".get_string("saveallfeedback", "journal")."\" class=\"btn btn-secondary m-t-1\"/>";
-    echo "</p>";
-    echo "</form>";
+    echo '<p class="feedbacksave">';
+    echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
+    echo '<input type="hidden" name="sesskey" value="' . sesskey() . '" />';
+    echo '<input type="hidden" name="sortby" value="' . $sortby . '" />';
+    echo '<input type="submit" value="'.get_string('saveallfeedback', 'journal').'" class="btn btn-secondary m-t-1"/>';
+    echo '</p>';
+    echo '</form>';
 }
 
 echo $OUTPUT->footer();
