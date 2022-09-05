@@ -577,7 +577,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
                 FROM {course_modules} cm
                 JOIN {modules} m ON m.id = cm.module
                 JOIN {journal} j ON cm.instance = j.id
-                WHERE m.name = "journal"';
+                WHERE m.name = \'journal\'';
         if ($recordset = $DB->get_records_sql($sql)) {
             foreach ($recordset as $journal) {
                 if ($journal->grade != false) {
@@ -793,7 +793,7 @@ function journal_get_coursemodule($journalid) {
 
     return $DB->get_record_sql('SELECT cm.id FROM {course_modules} cm
                                 JOIN {modules} m ON m.id = cm.module
-                                WHERE cm.instance = ? AND m.name = "journal"', array($journalid));
+                                WHERE cm.instance = ? AND m.name = \'journal\'', array($journalid));
 }
 
 
