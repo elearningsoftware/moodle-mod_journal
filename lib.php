@@ -106,6 +106,11 @@ function journal_delete_instance($id) {
  * @return bool|null True if feature is supported, falsy if it is not
  */
 function journal_supports($feature) {
+    if (defined('FEATURE_MOD_PURPOSE')
+        && defined('MOD_PURPOSE_COLLABORATION') 
+        && $feature === FEATURE_MOD_PURPOSE) {
+        return MOD_PURPOSE_COLLABORATION;
+    }
     switch($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -127,8 +132,6 @@ function journal_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
-        case FEATURE_MOD_PURPOSE:
-            return MOD_PURPOSE_COLLABORATION;
         default:
             return null;
     }
