@@ -107,7 +107,7 @@ function journal_delete_instance($id) {
  */
 function journal_supports($feature) {
     if (defined('FEATURE_MOD_PURPOSE')
-        && defined('MOD_PURPOSE_COLLABORATION') 
+        && defined('MOD_PURPOSE_COLLABORATION')
         && $feature === FEATURE_MOD_PURPOSE) {
         return MOD_PURPOSE_COLLABORATION;
     }
