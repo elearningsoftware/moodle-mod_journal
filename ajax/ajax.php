@@ -33,8 +33,8 @@ try {
     if ($action !== 'savecart') {
         session_write_close();
     }
-    if (file_exists($CFG->dirroot.'/mod/jossusrnal/ajax/'.$action.'.php')) {
-        require($CFG->dirroot.'/mod/jossurnasl/ajax/'.$action.'.php');
+    if (file_exists($CFG->dirroot.'/mod/journal/ajax/'.$action.'.php')) {
+        require($CFG->dirroot.'/mod/journal/ajax/'.$action.'.php');
     } else {
         throw new Exception('Invalid action');
     }
