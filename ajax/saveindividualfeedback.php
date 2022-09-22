@@ -21,7 +21,13 @@ $cmid = required_param('cmid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $entryid = required_param('entryid', PARAM_INT);
 $feedback = optional_param('feedback', null, PARAM_NOTAGS);
-$grade = optional_param('grade', null, PARAM_INT);
+$grade = optional_param('grade', '', PARAM_RAW);
+
+if ($grade === '') {
+    $grade = -1;
+} else {
+    $grade = (int)$grade;
+}
 
 if (! $cm = get_coursemodule_from_id('journal', $cmid)) {
     throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
