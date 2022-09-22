@@ -1098,7 +1098,13 @@ function mod_journal_core_calendar_provide_event_action(calendar_event $event,
     );
 }
 
-
+/**
+ * Sort the users in regards to the sort criterion
+ *
+ * @param array $users The user's array
+ * @param string $sortby The sort criterion
+ * @param array $entrybyuser The sorted array
+ */
 function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
     uasort($users, function($a, $b) use ($sortby, $entrybyuser) {
         switch ($sortby){
