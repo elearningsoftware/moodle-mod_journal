@@ -66,7 +66,9 @@ $PAGE->set_heading($course->fullname);
 $PAGE->force_settings_menu();
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading($journalname);
+if ($CFG->branch < 400) {
+    echo $OUTPUT->heading($journalname);
+}
 
 // Check to see if groups are being used here.
 $groupmode = groups_get_activity_groupmode($cm);
@@ -86,7 +88,7 @@ if ($entriesmanager) {
 }
 
 $journal->intro = trim($journal->intro);
-if (!empty($journal->intro)) {
+if (!empty($journal->intro) && $CFG->branch < 400) {
     $intro = format_module_intro('journal', $journal, $cm->id);
     echo $OUTPUT->box($intro, 'generalbox', 'intro');
 }
