@@ -142,7 +142,9 @@ if ($form->is_cancelled()) {
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($journal->name));
 
-$intro = format_module_intro('journal', $journal, $cm->id);
-echo $OUTPUT->box($intro);
+if ($CFG->branch < 400) {
+    $intro = format_module_intro('journal', $journal, $cm->id);
+    echo $OUTPUT->box($intro);
+}
 $form->display();
 echo $OUTPUT->footer();
