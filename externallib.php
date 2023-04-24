@@ -92,7 +92,7 @@ class mod_journal_external extends external_api {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
-        $context = context_module::instance($cm->id);
+        $context = \context_module::instance($cm->id);
         self::validate_context($context);;
         require_capability('mod/journal:addentries', $context);
 
@@ -162,14 +162,14 @@ class mod_journal_external extends external_api {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
-        $context = context_module::instance($cm->id);
+        $context = \context_module::instance($cm->id);
         self::validate_context($context);;
         require_capability('mod/journal:addentries', $context);
 
         $entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id));
 
         $timenow = time();
-        $newentry = new stdClass();
+        $newentry = new \stdClass();
         $newentry->text = $params['text'];
         $newentry->format = $params['format'];
         $newentry->modified = $timenow;

@@ -173,7 +173,7 @@ function journal_user_outline($course, $user, $mod, $journal) {
 
         $numwords = count(preg_split('/\w\b/', $entry->text)) - 1;
 
-        $result = new stdClass();
+        $result = new \stdClass();
         $result->info = get_string('numwords', '', $numwords);
         $result->time = $entry->modified;
         return $result;
@@ -266,7 +266,7 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
             $show[] = $anentry;
             continue;
         }
-        $context = context_module::instance($anentry->cmid);
+        $context = \context_module::instance($anentry->cmid);
 
         // Only teachers can see other students entries.
         if (!has_capability('mod/journal:manageentries', $context)) {
@@ -306,7 +306,7 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
 
     foreach ($show as $submission) {
         $cm = $modinfo->get_cm($submission->cmid);
-        $context = context_module::instance($submission->cmid);
+        $context = \context_module::instance($submission->cmid);
         if (has_capability('mod/journal:manageentries', $context)) {
             $link = $CFG->wwwroot.'/mod/journal/report.php?id='.$cm->id;
         } else {
@@ -568,7 +568,7 @@ function journal_update_grades($journal=null, $userid=0, $nullifnone=true) {
         if ($grades = journal_get_user_grades($journal, $userid)) {
             journal_grade_item_update($journal, $grades);
         } else if ($userid && $nullifnone) {
-            $grade = new stdClass();
+            $grade = new \stdClass();
             $grade->userid   = $userid;
             $grade->rawgrade = null;
             journal_grade_item_update($journal, $grade);
@@ -684,7 +684,7 @@ function journal_get_users_done($journal, $currentgroup) {
     // Remove unenrolled participants.
     foreach ($journals as $key => $user) {
 
-        $context = context_module::instance($cm->id);
+        $context = \context_module::instance($cm->id);
 
         $canadd = has_capability('mod/journal:addentries', $context, $user);
         $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
@@ -707,7 +707,7 @@ function journal_count_entries($journal, $groupids = 0) {
     global $DB;
 
     $cm = journal_get_coursemodule($journal->id);
-    $context = context_module::instance($cm->id);
+    $context = \context_module::instance($cm->id);
     $journals = null;
 
     // Convert single group id to an array containing the group id to
@@ -1037,7 +1037,7 @@ function journal_format_entry_text($entry, $course = false, $cm = false) {
         $cm = get_coursemodule_from_instance('journal', $entry->journal, $courseid);
     }
 
-    $context = context_module::instance($cm->id);
+    $context = \context_module::instance($cm->id);
     $entrytext = file_rewrite_pluginfile_urls($entry->text, 'pluginfile.php', $context->id, 'mod_journal', 'entry', $entry->id);
 
     $formatoptions = array(
@@ -1076,7 +1076,7 @@ function mod_journal_core_calendar_provide_event_action(calendar_event $event,
         return null;
     }
 
-    $context = context_module::instance($cm->id);
+    $context = \context_module::instance($cm->id);
 
     if (!has_capability('mod/journal:addentries', $context, $userid)) {
         return null;
