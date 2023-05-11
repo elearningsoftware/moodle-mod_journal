@@ -69,14 +69,4 @@ class feedback_updated extends \core\event\base {
     public function get_url() {
         return new \moodle_url('/mod/journal/report.php', array('id' => $this->contextinstanceid));
     }
-
-    /**
-     * replace add_to_log() statement.
-     *
-     * @return array of parameters to be passed to legacy add_to_log() function.
-     */
-    protected function get_legacy_logdata() {
-        $url = new \moodle_url('report.php', array('id' => $this->contextinstanceid));
-        return array($this->courseid, 'journal', 'report', $url->out(), $this->objectid, $this->contextinstanceid);
-    }
 }
