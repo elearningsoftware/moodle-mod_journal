@@ -91,6 +91,7 @@ $string['privacy:metadata:journal_entries:modified'] = 'The start time of the jo
 $string['privacy:metadata:journal_entries:text'] = 'The text written by user';
 $string['privacy:metadata:journal_entries:rating'] = 'The rating received by user to journl';
 $string['privacy:metadata:journal_entries:entrycomment'] = 'The comment received by user to journal';
+$string['privacy:metadata:journal_entries:teacher'] = 'The teacher that has given feedback to user on journal';
 $string['crontask'] = 'Background processing for journal module';
 $string['dateasc'] = 'Date Ascending';
 $string['datedesc'] = 'Date Descending';
