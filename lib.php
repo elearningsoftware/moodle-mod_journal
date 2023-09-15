@@ -1121,18 +1121,18 @@ function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
                 return $a->lastname < $b->lastname ? -1 :
                     ($a->lastname > $b->lastname ? 1 : 0);
             case 'datedesc':
-                if (!isset($entrybyuser[$a->id]->timemarked) || !isset($entrybyuser[$b->id]->timemarked)) {
-                    return -1;
+                if (!isset($entrybyuser[$a->id]->modified) || !isset($entrybyuser[$b->id]->modified)) {
+                    return 1;
                 }
-                return $entrybyuser[$a->id]->timemarked < $entrybyuser[$b->id]->timemarked ? 1 :
-                    ($entrybyuser[$a->id]->timemarked > $entrybyuser[$b->id]->timemarked ? -1 : 0);
+                return $entrybyuser[$a->id]->modified < $entrybyuser[$b->id]->modified ? 1 :
+                    ($entrybyuser[$a->id]->modified > $entrybyuser[$b->id]->modified ? -1 : 0);
             case 'dateasc':
             default:
-                if (!isset($entrybyuser[$a->id]->timemarked) || !isset($entrybyuser[$b->id]->timemarked)) {
+                if (!isset($entrybyuser[$a->id]->modified) || !isset($entrybyuser[$b->id]->modified)) {
                     return -1;
                 }
-                return $entrybyuser[$a->id]->timemarked < $entrybyuser[$b->id]->timemarked ? -1 :
-                    ($entrybyuser[$a->id]->timemarked > $entrybyuser[$b->id]->timemarked ? 1 : 0);
+                return $entrybyuser[$a->id]->modified < $entrybyuser[$b->id]->modified ? -1 :
+                    ($entrybyuser[$a->id]->modified > $entrybyuser[$b->id]->modified ? 1 : 0);
         }
     });
 }
