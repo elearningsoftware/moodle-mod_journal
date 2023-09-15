@@ -118,7 +118,7 @@ if ($timenow > $timestart) {
 
         if ($canadd) {
             echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit', 'journal'), 'get',
-                array('class' => 'singlebutton journalstart mb-3', 'primary' => 1));
+                array('class' => 'singlebutton journalstart mb-3', 'type' => 'primary'));
         }
     }
 
