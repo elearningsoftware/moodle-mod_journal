@@ -119,17 +119,17 @@ class provider implements
 
         // Find users with journal entries.
         $sql = "
-            SELECT j.userid
-              FROM {journal} j
-              JOIN {modules} m
-                ON m.name = :journal
-              JOIN {course_modules} cm
-                ON cm.instance = j.id
-               AND cm.module = m.id
-              JOIN {context} ctx
-                ON ctx.instanceid = cm.id
-               AND ctx.contextlevel = :modulelevel
-             WHERE ctx.id = :contextid";
+            SELECT je.userid
+                FROM {journal_entries} je
+                JOIN {modules} m
+                    ON m.name = :journal
+                JOIN {course_modules} cm
+                    ON cm.instance = je.id
+                AND cm.module = m.id
+                JOIN {context} ctx
+                    ON ctx.instanceid = cm.id
+                AND ctx.contextlevel = :modulelevel
+                WHERE ctx.id = :contextid";
         $params = ['journal' => 'journal', 'modulelevel' => CONTEXT_MODULE, 'contextid' => $context->id];
 
         $userlist->add_from_sql('userid', $sql, $params);
