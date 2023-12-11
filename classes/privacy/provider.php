@@ -119,8 +119,10 @@ class provider implements
 
         // Find users with journal entries.
         $sql = "
-            SELECT j.userid
+            SELECT je.userid
               FROM {journal} j
+              JOIN {journal_entries} je
+                ON je.journal = j.id
               JOIN {modules} m
                 ON m.name = :journal
               JOIN {course_modules} cm
