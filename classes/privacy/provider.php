@@ -93,7 +93,7 @@ class provider implements
               JOIN {context} ctx
                 ON ctx.instanceid = cm.id
                AND ctx.contextlevel = :modulelevel
-         LEFT JOIN {journal_entries} je
+              JOIN {journal_entries} je
                 ON je.journal = j.id
                AND je.userid = :userid";
 
