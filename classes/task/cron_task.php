@@ -64,8 +64,8 @@ class cron_task extends \core\task\scheduled_task {
                     .implode(', ', $usernamefields);
 
             // To save some db queries.
-            $users = array();
-            $courses = array();
+            $users = [];
+            $courses = [];
 
             foreach ($entries as $entry) {
 
@@ -74,7 +74,7 @@ class cron_task extends \core\task\scheduled_task {
                 if (!empty($users[$entry->userid])) {
                     $user = $users[$entry->userid];
                 } else {
-                    if (!$user = $DB->get_record("user", array("id" => $entry->userid), $requireduserfields)) {
+                    if (!$user = $DB->get_record("user", ["id" => $entry->userid], $requireduserfields)) {
                         echo "Could not find user $entry->userid\n";
                         continue;
                     }
@@ -86,7 +86,7 @@ class cron_task extends \core\task\scheduled_task {
                 if (!empty($courses[$entry->course])) {
                     $course = $courses[$entry->course];
                 } else {
-                    if (!$course = $DB->get_record('course', array('id' => $entry->course), 'id, shortname')) {
+                    if (!$course = $DB->get_record('course', ['id' => $entry->course], 'id, shortname')) {
                         echo "Could not find course $entry->course\n";
                         continue;
                     }
@@ -96,7 +96,7 @@ class cron_task extends \core\task\scheduled_task {
                 if (!empty($users[$entry->teacher])) {
                     $teacher = $users[$entry->teacher];
                 } else {
-                    if (!$teacher = $DB->get_record("user", array("id" => $entry->teacher), $requireduserfields)) {
+                    if (!$teacher = $DB->get_record("user", ["id" => $entry->teacher], $requireduserfields)) {
                         echo "Could not find teacher $entry->teacher\n";
                         continue;
                     }
@@ -150,7 +150,7 @@ class cron_task extends \core\task\scheduled_task {
                     echo "Error: Journal cron: Could not send out mail for "
                         . "id $entry->id to user $user->id ($user->email)\n";
                 }
-                if (!$DB->set_field("journal_entries", "mailed", "1", array("id" => $entry->id))) {
+                if (!$DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id])) {
                     echo "Could not update the mailed field for id $entry->id\n";
                 }
             }

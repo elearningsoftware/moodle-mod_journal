@@ -38,7 +38,7 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      */
     protected function define_structure() {
 
-        $paths = array();
+        $paths = [];
         $paths[] = new restore_path_element('journal', '/activity/journal');
 
         if ($this->get_setting_value('userinfo')) {

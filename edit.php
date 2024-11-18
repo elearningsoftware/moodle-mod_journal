@@ -31,7 +31,7 @@ if (!$cm = get_coursemodule_from_id('journal', $id)) {
     throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
 }
 
-if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
+if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
     throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
 }
 
@@ -41,12 +41,12 @@ require_login($course, false, $cm);
 
 require_capability('mod/journal:addentries', $context);
 
-if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
     throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 
 // Header.
-$PAGE->set_url('/mod/journal/edit.php', array('id' => $id));
+$PAGE->set_url('/mod/journal/edit.php', ['id' => $id]);
 $PAGE->navbar->add(get_string('edit'));
 $PAGE->set_title(format_string($journal->name));
 $PAGE->set_heading($course->fullname);
@@ -54,7 +54,7 @@ $PAGE->set_activity_record($journal);
 
 $data = new stdClass();
 
-$entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id));
+$entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
 if ($entry) {
     $data->entryid = $entry->id;
     $data->text = $entry->text;
@@ -67,16 +67,16 @@ if ($entry) {
 
 $data->id = $cm->id;
 
-$editoroptions = array(
+$editoroptions = [
     'maxfiles' => EDITOR_UNLIMITED_FILES,
     'context' => $context,
     'subdirs' => false,
-    'enable_filemanagement' => true
-);
+    'enable_filemanagement' => true,
+];
 
 $data = file_prepare_standard_editor($data, 'text', $editoroptions, $context, 'mod_journal', 'entry', $data->entryid);
 
-$form = new mod_journal_entry_form(null, array('entryid' => $data->entryid, 'editoroptions' => $editoroptions));
+$form = new mod_journal_entry_form(null, ['entryid' => $data->entryid, 'editoroptions' => $editoroptions]);
 $form->set_data($data);
 
 if ($form->is_cancelled()) {
@@ -118,16 +118,16 @@ if ($form->is_cancelled()) {
 
     if ($entry) {
         // Trigger module entry updated event.
-        $event = \mod_journal\event\entry_updated::create(array(
+        $event = \mod_journal\event\entry_updated::create([
             'objectid' => $journal->id,
-            'context' => $context
-        ));
+            'context' => $context,
+        ]);
     } else {
         // Trigger module entry created event.
-        $event = \mod_journal\event\entry_created::create(array(
+        $event = \mod_journal\event\entry_created::create([
             'objectid' => $journal->id,
-            'context' => $context
-        ));
+            'context' => $context,
+        ]);
 
     }
     $event->add_record_snapshot('course_modules', $cm);

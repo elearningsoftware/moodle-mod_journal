@@ -31,7 +31,7 @@ if (! $cm = get_coursemodule_from_id('journal', $id)) {
     throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
 }
 
-if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
     throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
 }
 
@@ -49,18 +49,18 @@ if (!$entriesmanager && !$canadd) {
     throw new \moodle_exception(get_string('accessdenied', 'journal'));
 }
 
-if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
     throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 
-if (! $cw = $DB->get_record('course_sections', array('id' => $cm->section))) {
+if (! $cw = $DB->get_record('course_sections', ['id' => $cm->section])) {
     throw new \moodle_exception(get_string('incorrectcoursesectionid', 'journal'));
 }
 
-$journalname = format_string($journal->name, true, array('context' => $context));
+$journalname = format_string($journal->name, true, ['context' => $context]);
 
 // Header.
-$PAGE->set_url('/mod/journal/view.php', array('id' => $id));
+$PAGE->set_url('/mod/journal/view.php', ['id' => $id]);
 $PAGE->set_title($journalname);
 $PAGE->set_heading($course->fullname);
 $PAGE->force_settings_menu();
@@ -118,12 +118,12 @@ if ($timenow > $timestart) {
 
         if ($canadd) {
             echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit', 'journal'), 'get',
-                array('class' => 'singlebutton journalstart mb-3', 'type' => 'primary'));
+                ['class' => 'singlebutton journalstart mb-3', 'type' => 'primary']);
         }
     }
 
     // Display entry.
-    if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
+    if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
         echo '<div>';
         if (empty($entry->text)) {
             echo '<p align="center"><b>'.get_string('blankentry', 'journal').'</b></p>';
@@ -174,10 +174,10 @@ if ($timenow > $timestart) {
 
 
 // Trigger module viewed event.
-$event = \mod_journal\event\course_module_viewed::create(array(
+$event = \mod_journal\event\course_module_viewed::create([
    'objectid' => $journal->id,
-   'context' => $context
-));
+   'context' => $context,
+]);
 $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('journal', $journal);

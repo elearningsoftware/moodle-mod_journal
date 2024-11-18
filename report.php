@@ -33,7 +33,7 @@ if (!in_array($sortby, [
     'firstnameasc',
     'firstnamedesc',
     'lastnameasc',
-    'lastnamedesc'
+    'lastnamedesc',
 ])) {
     $sortby = 'dateasc';
 }
@@ -42,7 +42,7 @@ if (! $cm = get_coursemodule_from_id('journal', $id)) {
     throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
 }
 
-if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
     throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
 }
 
@@ -53,12 +53,12 @@ $context = context_module::instance($cm->id);
 require_capability('mod/journal:manageentries', $context);
 
 
-if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
     throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 
 // Header.
-$PAGE->set_url('/mod/journal/report.php', array('id' => $id));
+$PAGE->set_url('/mod/journal/report.php', ['id' => $id]);
 
 $PAGE->navbar->add(get_string('entries', 'journal'));
 $PAGE->set_title(get_string('modulenameplural', 'journal'));
@@ -70,15 +70,15 @@ echo $OUTPUT->heading(get_string('entries', 'journal'));
 
 
 // Make some easy ways to access the entries.
-if ( $eee = $DB->get_records('journal_entries', array('journal' => $journal->id))) {
+if ( $eee = $DB->get_records('journal_entries', ['journal' => $journal->id])) {
     foreach ($eee as $ee) {
         $entrybyuser[$ee->userid] = $ee;
         $entrybyentry[$ee->id]  = $ee;
     }
 
 } else {
-    $entrybyuser  = array ();
-    $entrybyentry = array ();
+    $entrybyuser  = [];
+    $entrybyentry = [];
 }
 
 // Group mode.
@@ -91,7 +91,7 @@ if ($data = data_submitted()) {
 
     confirm_sesskey();
 
-    $feedback = array();
+    $feedback = [];
     $data = (array)$data;
 
     // Peel out all the data from variable names.
@@ -139,7 +139,7 @@ if ($data = data_submitted()) {
             $entrybyuser[$entry->userid]->teacher    = $USER->id;
             $entrybyuser[$entry->userid]->timemarked = $timenow;
 
-            $journal = $DB->get_record('journal', array('id' => $entrybyuser[$entry->userid]->journal));
+            $journal = $DB->get_record('journal', ['id' => $entrybyuser[$entry->userid]->journal]);
             $journal->cmidnumber = $cm->idnumber;
 
             journal_update_grades($journal, $entry->userid);
@@ -147,10 +147,10 @@ if ($data = data_submitted()) {
     }
 
     // Trigger module feedback updated event.
-    $event = \mod_journal\event\feedback_updated::create(array(
+    $event = \mod_journal\event\feedback_updated::create([
         'objectid' => $journal->id,
-        'context' => $context
-    ));
+        'context' => $context,
+    ]);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('journal', $journal);
@@ -161,10 +161,10 @@ if ($data = data_submitted()) {
 } else {
 
     // Trigger module viewed event.
-    $event = \mod_journal\event\entries_viewed::create(array(
+    $event = \mod_journal\event\entries_viewed::create([
         'objectid' => $journal->id,
-        'context' => $context
-    ));
+        'context' => $context,
+    ]);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('journal', $journal);
@@ -191,7 +191,7 @@ if (!$users) {
         'firstnameasc' => get_string('firstnameasc', 'journal'),
         'firstnamedesc' => get_string('firstnamedesc', 'journal'),
         'lastnameasc' => get_string('lastnameasc', 'journal'),
-        'lastnamedesc' => get_string('lastnamedesc', 'journal')
+        'lastnamedesc' => get_string('lastnamedesc', 'journal'),
     ];
     $select = new single_select(
         new moodle_url($CFG->wwwroot.'/mod/journal/report.php?id='.$id), 'sortby', $options, $sortby, null
