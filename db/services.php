@@ -24,23 +24,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = array(
-    'mod_journal_get_entry' => array(
+$functions = [
+    'mod_journal_get_entry' => [
         'classname'   => 'mod_journal_external',
         'methodname'  => 'get_entry',
         'classpath'   => 'mod/journal/externallib.php',
         'description' => 'Gets the user\'s journal.',
         'type'        => 'read',
         'ajax' => true,
-        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
-    ),
-    'mod_journal_set_text' => array(
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_journal_set_text' => [
         'classname'   => 'mod_journal_external',
         'methodname'  => 'set_text',
         'classpath'   => 'mod/journal/externallib.php',
         'description' => 'Sets the journal text.',
         'type'        => 'write',
         'ajax' => true,
-        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
-    ),
-);
+        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+];
