@@ -70,7 +70,7 @@ function xmldb_journal_upgrade($oldversion=0) {
         $dbman->change_field_default($table, $field);
 
         // Updating the non-marked entries with rating = NULL.
-        $entries = $DB->get_records('journal_entries', array('timemarked' => 0));
+        $entries = $DB->get_records('journal_entries', ['timemarked' => 0]);
         if ($entries) {
             foreach ($entries as $entry) {
                 $entry->rating = null;
@@ -94,7 +94,7 @@ function xmldb_journal_upgrade($oldversion=0) {
         $dbman->change_field_default($table, $field);
 
         // Updating the non-marked entries with rating = -1.
-        $entries = $DB->get_records('journal_entries', array('timemarked' => 0));
+        $entries = $DB->get_records('journal_entries', ['timemarked' => 0]);
         if ($entries) {
             foreach ($entries as $entry) {
                 $entry->rating = -1;

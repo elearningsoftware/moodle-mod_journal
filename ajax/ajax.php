@@ -31,10 +31,10 @@ require_once($CFG->dirroot.'/mod/journal/lib.php');
 require_login();
 $PAGE->set_context(context_system::instance());
 
-$result = array(
+$result = [
     'status' => '',
-    'content' => ''
-);
+    'content' => '',
+];
 
 try {
     $action = required_param('action', PARAM_ALPHA);

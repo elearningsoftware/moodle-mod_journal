@@ -52,10 +52,10 @@ class mod_journal_generator extends testing_module_generator {
      * Create instance of mod_journal
      *
      * @param [type] $record Jounal record
-     * @param array|null $options Options array
+     * @param ?array $options Options array
      * @return void
      */
-    public function create_instance($record = null, array $options = null) {
+    public function create_instance($record = null, ?array $options = null) {
         $record = (object)(array)$record;
 
         if (!isset($record->name)) {

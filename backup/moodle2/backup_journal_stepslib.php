@@ -38,24 +38,24 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
      */
     protected function define_structure() {
 
-        $journal = new backup_nested_element('journal', array('id'), array(
-            'name', 'intro', 'introformat', 'days', 'grade', 'timemodified'));
+        $journal = new backup_nested_element('journal', ['id'], [
+            'name', 'intro', 'introformat', 'days', 'grade', 'timemodified', ]);
 
         $entries = new backup_nested_element('entries');
 
-        $entry = new backup_nested_element('entry', array('id'), array(
+        $entry = new backup_nested_element('entry', ['id'], [
             'userid', 'modified', 'text', 'format', 'rating',
-            'entrycomment', 'teacher', 'timemarked', 'mailed'));
+            'entrycomment', 'teacher', 'timemarked', 'mailed', ]);
 
         // Journal -> entries -> entry.
         $journal->add_child($entries);
         $entries->add_child($entry);
 
         // Sources.
-        $journal->set_source_table('journal', array('id' => backup::VAR_ACTIVITYID));
+        $journal->set_source_table('journal', ['id' => backup::VAR_ACTIVITYID]);
 
         if ($this->get_setting_value('userinfo')) {
-            $entry->set_source_table('journal_entries', array('journal' => backup::VAR_PARENTID));
+            $entry->set_source_table('journal_entries', ['journal' => backup::VAR_PARENTID]);
         }
 
         // Define id annotations.

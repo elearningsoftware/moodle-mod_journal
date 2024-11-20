@@ -45,13 +45,13 @@ class mod_journal_mod_form extends moodleform_mod {
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-        $mform->addElement('text', 'name', get_string('journalname', 'journal'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('journalname', 'journal'), ['size' => '64']);
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required', null, 'client');
 
         $this->standard_intro_elements(get_string('journalquestion', 'journal'));
 
-        $options = array();
+        $options = [];
         $options[0] = get_string('alwaysopen', 'journal');
         for ($i = 1; $i <= 13; $i++) {
             $options[$i] = get_string('numdays', '', $i);

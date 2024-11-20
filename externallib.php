@@ -43,9 +43,9 @@ class mod_journal_external extends external_api {
      */
     public static function get_entry_parameters() {
         return new external_function_parameters(
-            array(
-                'journalid' => new external_value(PARAM_INT, 'id of journal')
-            )
+            [
+                'journalid' => new external_value(PARAM_INT, 'id of journal'),
+            ]
         );
     }
 
@@ -57,13 +57,13 @@ class mod_journal_external extends external_api {
      */
     public static function get_entry_returns() {
         return new external_single_structure(
-            array(
+            [
                 'text' => new external_value(PARAM_RAW, 'journal text'),
                 'modified' => new external_value(PARAM_INT, 'last modified time'),
                 'rating' => new external_value(PARAM_FLOAT, 'teacher rating'),
                 'comment' => new external_value(PARAM_RAW, 'teacher comment'),
-                'teacher' => new external_value(PARAM_INT, 'id of teacher')
-            )
+                'teacher' => new external_value(PARAM_INT, 'id of teacher'),
+            ]
         );
     }
 
@@ -78,17 +78,17 @@ class mod_journal_external extends external_api {
     public static function get_entry($journalid) {
         global $DB, $USER;
 
-        $params = self::validate_parameters(self::get_entry_parameters(), array('journalid' => $journalid));
+        $params = self::validate_parameters(self::get_entry_parameters(), ['journalid' => $journalid]);
 
         if (! $cm = get_coursemodule_from_id('journal', $params['journalid'])) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
-        if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+        if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
             throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
         }
 
-        if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+        if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
@@ -96,14 +96,14 @@ class mod_journal_external extends external_api {
         self::validate_context($context);;
         require_capability('mod/journal:addentries', $context);
 
-        if ($entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id))) {
-            return array(
+        if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
+            return [
                 'text' => $entry->text,
                 'modified' => $entry->modified,
                 'rating' => $entry->rating,
                 'comment' => $entry->entrycomment,
-                'teacher' => $entry->teacher
-            );
+                'teacher' => $entry->teacher,
+            ];
         } else {
             return '';
         }
@@ -117,11 +117,11 @@ class mod_journal_external extends external_api {
      */
     public static function set_text_parameters() {
         return new external_function_parameters(
-            array(
+            [
                 'journalid' => new external_value(PARAM_INT, 'id of journal'),
                 'text' => new external_value(PARAM_RAW, 'text to set'),
-                'format' => new external_value(PARAM_INT, 'format of text')
-            )
+                'format' => new external_value(PARAM_INT, 'format of text'),
+            ]
         );
     }
 
@@ -147,18 +147,18 @@ class mod_journal_external extends external_api {
 
         $params = self::validate_parameters(
             self::set_text_parameters(),
-            array('journalid' => $journalid, 'text' => $text, 'format' => $format)
+            ['journalid' => $journalid, 'text' => $text, 'format' => $format]
         );
 
         if (! $cm = get_coursemodule_from_id('journal', $params['journalid'])) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
-        if (! $course = $DB->get_record('course', array('id' => $cm->course))) {
+        if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
             throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
         }
 
-        if (! $journal = $DB->get_record('journal', array('id' => $cm->instance))) {
+        if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
@@ -166,7 +166,7 @@ class mod_journal_external extends external_api {
         self::validate_context($context);;
         require_capability('mod/journal:addentries', $context);
 
-        $entry = $DB->get_record('journal_entries', array('userid' => $USER->id, 'journal' => $journal->id));
+        $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
 
         $timenow = time();
         $newentry = new \stdClass();
@@ -185,16 +185,16 @@ class mod_journal_external extends external_api {
 
         if ($entry) {
             // Trigger module entry updated event.
-            $event = \mod_journal\event\entry_updated::create(array(
+            $event = \mod_journal\event\entry_updated::create([
                 'objectid' => $journal->id,
-                'context' => $context
-            ));
+                'context' => $context,
+            ]);
         } else {
             // Trigger module entry created event.
-            $event = \mod_journal\event\entry_created::create(array(
+            $event = \mod_journal\event\entry_created::create([
                 'objectid' => $journal->id,
-                'context' => $context
-            ));
+                'context' => $context,
+            ]);
 
         }
         $event->add_record_snapshot('course_modules', $cm);
