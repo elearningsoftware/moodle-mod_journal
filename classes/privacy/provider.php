@@ -95,9 +95,9 @@ class provider implements
                AND ctx.contextlevel = :modulelevel
               JOIN {journal_entries} je
                 ON je.journal = j.id
-               AND je.userid = :userid";
+             WHERE je.userid = :userid OR je.teacher = :teacher";
 
-        $params = ['journal' => 'journal', 'modulelevel' => CONTEXT_MODULE, 'userid' => $userid];
+        $params = ['journal' => 'journal', 'modulelevel' => CONTEXT_MODULE, 'userid' => $userid, 'teacher' => $userid];
         $contextlist = new contextlist();
         $contextlist->add_from_sql($sql, $params);
 
@@ -117,11 +117,12 @@ class provider implements
             return;
         }
 
-        // Find users with journal entries.
+        // Find users with journal entries and teachers who gave feedback on them.
         $sql = "
-            SELECT je.userid
+            SELECT je.userid, je.teacher
               FROM {journal} j
-              JOIN {journal_entries} je ON je.journal = j.id
+              JOIN {journal_entries} je
+                ON je.journal = j.id
               JOIN {modules} m
                 ON m.name = :journal
               JOIN {course_modules} cm
@@ -134,6 +135,7 @@ class provider implements
         $params = ['journal' => 'journal', 'modulelevel' => CONTEXT_MODULE, 'contextid' => $context->id];
 
         $userlist->add_from_sql('userid', $sql, $params);
+        $userlist->add_from_sql('teacher', $sql, $params);
     }
 
     /**
@@ -169,14 +171,15 @@ class provider implements
 
         // Prepare the common SQL fragments.
         list($injournalsql, $injournalparams) = $DB->get_in_or_equal(array_keys($journalidstocmids), SQL_PARAMS_NAMED);
-        $sqluserjournal = "userid = :userid AND journal $injournalsql";
-        $paramsuserjournal = array_merge($injournalparams, ['userid' => $userid]);
+        $sqluserjournal = "(userid = :userid OR teacher = :teacher) AND journal $injournalsql";
+        $paramsuserjournal = array_merge($injournalparams, ['userid' => $userid, 'teacher' => $userid]);
 
         // Export the entries.
         $recordset = $DB->get_recordset_select('journal_entries', $sqluserjournal, $paramsuserjournal);
-        static::recordset_loop_and_export($recordset, 'journal', null, function($carry, $record) {
-            // We know that there is only one row per journal, so no need to use $carry.
-            return (object) [
+        static::recordset_loop_and_export($recordset, 'journal', [], function($carry, $record) {
+            // There might be more than one row per journal if the user is a teacher, so we need to use $carry.
+            $carry[] = [
+                'userid' => $record->userid,
                 'modified' => $record->modified !== null ? transform::datetime($record->modified) : null,
                 'text' => $record->text,
                 'rating' => $record->rating,
@@ -184,6 +187,7 @@ class provider implements
                 'teacher' => $record->teacher,
                 'timemarked' => $record->timemarked !== null ? transform::datetime($record->timemarked) : null,
             ];
+            return $carry;
         }, function($journalid, $data) use ($journalidstocmids) {
             $context = context_module::instance($journalidstocmids[$journalid]);
             writer::with_context($context)->export_related_data([], 'entries', $data);
