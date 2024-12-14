@@ -94,13 +94,7 @@ function xmldb_journal_upgrade($oldversion=0) {
         $dbman->change_field_default($table, $field);
 
         // Updating the non-marked entries with rating = -1.
-        $entries = $DB->get_records('journal_entries', ['timemarked' => 0]);
-        if ($entries) {
-            foreach ($entries as $entry) {
-                $entry->rating = -1;
-                $DB->update_record('journal_entries', $entry);
-            }
-        }
+        $DB->set_field_select('journal_entries', 'rating', '-1', 'timemarked = 0');
 
         // Journal savepoint reached.
         upgrade_mod_savepoint(true, 2022041100, 'journal');
