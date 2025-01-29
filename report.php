@@ -35,7 +35,7 @@ if (!in_array($sortby, [
     'firstnameasc',
     'firstnamedesc',
     'lastnameasc',
-    'lastnamedesc'
+    'lastnamedesc',
 ])) {
     $sortby = 'dateasc';
 }
@@ -101,7 +101,7 @@ $options = [
     'firstnameasc' => get_string('firstnameasc', 'journal'),
     'firstnamedesc' => get_string('firstnamedesc', 'journal'),
     'lastnameasc' => get_string('lastnameasc', 'journal'),
-    'lastnamedesc' => get_string('lastnamedesc', 'journal')
+    'lastnamedesc' => get_string('lastnamedesc', 'journal'),
 ];
 $select = new single_select(
     new moodle_url($CFG->wwwroot.'/mod/journal/report.php?id='.$id), 'sortby', $options, $sortby, null
@@ -187,7 +187,7 @@ if ($data = data_submitted()) {
     // Trigger module feedback updated event.
     $event = \mod_journal\event\feedback_updated::create([
         'objectid' => $journal->id,
-        'context' => $context
+        'context' => $context,
     ]);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
@@ -200,7 +200,7 @@ if ($data = data_submitted()) {
     // Trigger module viewed event.
     $event = \mod_journal\event\entries_viewed::create([
         'objectid' => $journal->id,
-        'context' => $context
+        'context' => $context,
     ]);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
