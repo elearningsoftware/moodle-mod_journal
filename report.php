@@ -115,7 +115,8 @@ if ($data = data_submitted()) {
         $ratingchanged = false;
 
         $studentrating = clean_param($vals['r'], PARAM_INT);
-        $studentcomment = clean_text($vals['c'], FORMAT_PLAIN);
+        $studentcomment = clean_text($vals['c']['text'], FORMAT_HTML);
+        $studentcomment = file_save_draft_area_files($vals['c']['itemid'], $context->id, 'mod_journal', 'feedback', $num, [], $studentcomment);
 
         if ($studentrating != $entry->rating) {
             $ratingchanged = true;

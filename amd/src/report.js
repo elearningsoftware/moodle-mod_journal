@@ -22,20 +22,23 @@
  */
 
 import Notification from 'core/notification';
-import { get_string as getString } from 'core/str';
-import { add as addToast } from 'core/toast';
+import {get_string as getString} from 'core/str';
+import {add as addToast} from 'core/toast';
 import $ from 'jquery';
 
 export const init = () => {
     $('.saveindividualfeedback').on('click', event => {
         event.preventDefault();
+        const editorupdated = new CustomEvent('form:editorUpdated');
+        event.target.dispatchEvent(editorupdated);
         const element = $(event.currentTarget);
         const sesskey = M.cfg.sesskey;
         const cmid = element.attr('data-cmid');
         const userid = element.attr('data-userid');
         const entryid = element.attr('data-entryid');
-        const feedback = $('#c' + entryid).val();
+        const feedback = $('[name="c' + entryid + '[text]"]').val();
         const grade = $('#r' + entryid).val();
+        const itemid = element.attr('data-itemid');
 
         $.ajax(M.cfg.wwwroot + '/mod/journal/ajax/ajax.php', {
             data: {
@@ -45,7 +48,8 @@ export const init = () => {
                 userid,
                 entryid,
                 feedback,
-                grade
+                grade,
+                itemid
             },
             dataType: 'json',
             method: 'post',
