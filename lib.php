@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\output\html_writer;
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod.html) this function
@@ -422,13 +424,22 @@ function journal_reset_userdata($data) {
 
     $status = [];
     if (!empty($data->reset_journal)) {
+        $module = $DB->get_record('modules', ['name' => 'journal']);
+        $fs = get_file_storage();
 
         $sql = 'SELECT j.id
                 FROM {journal} j
                 WHERE j.course = ?';
         $params = [$data->courseid];
 
+        $cmids = $DB->get_fieldset_select('course_modules', 'id', 'module = ? AND instance IN (' . $sql . ')', $params, '', $module->id);
         $DB->delete_records_select('journal_entries', "journal IN ($sql)", $params);
+
+        foreach ($cmids as $cmid) {
+            $context = \context_module::instance($cmid);
+            $fs->delete_area_files($context->id, 'mod_journal', 'feedback');
+            $fs->delete_area_files($context->id, 'mod_journal', 'entry');
+        }
 
         $status[] = ['component' => get_string('modulenameplural', 'journal'),
                      'item' => get_string('removeentries', 'journal'),
@@ -816,6 +827,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
     require_once($CFG->dirroot.'/lib/gradelib.php');
 
+    $context = context_module::instance($cmid);
+
     echo '<div class="journaluserentrywrapper">';
     echo '<table class="journaluserentry m-b-1" id="entry-' . $user->id . '">';
 
@@ -889,9 +902,75 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
         // Feedback text.
         echo html_writer::label(fullname($user).' '.get_string('feedback'), 'c'.$entry->id, true, ['class' => 'accesshide']);
-        echo "<p><textarea id=\"c$entry->id\" name=\"c$entry->id\" rows=\"7\" $feedbackdisabledstr>";
+
+        $draftitemid = 0;
+        $feedbacktext = file_prepare_draft_area(
+            $draftitemid,
+            $context->id,
+            'mod_journal',
+            'feedback',
+            $entry->id,
+            [],
+            $feedbacktext
+        );
+
+        $options = [
+            'text' => $feedbacktext,
+            'context' => $context,
+            'format' => FORMAT_HTML,
+            'autosave' => false,
+            'enable_filemanagement' => true,
+            'draftitemid' => $draftitemid,
+            'return_types' => FILE_INTERNAL | FILE_EXTERNAL | FILE_REFERENCE,
+            'maxbytes' => 0,
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'areamaxbytes' => -1,
+        ];
+
+        $args = new stdClass();
+        $args->accepted_types = array('image');
+        $args->return_types = (FILE_INTERNAL | FILE_EXTERNAL);
+        $args->context = $options['context'];
+        $args->env = 'filepicker';
+
+        $imageoptions = initialise_filepicker($args);
+        $imageoptions->context = $options['context'];
+        $imageoptions->client_id = uniqid();
+        $imageoptions->maxbytes = $options['maxfiles'];
+        $imageoptions->env = 'editor';
+        $imageoptions->itemid = $draftitemid;
+
+        $args->accepted_types = array('video', 'audio');
+        $mediaoptions = initialise_filepicker($args);
+        $mediaoptions->context = $options['context'];
+        $mediaoptions->client_id = uniqid();
+        $mediaoptions->maxbytes  = $options['maxfiles'];
+        $mediaoptions->env = 'editor';
+        $mediaoptions->itemid = $draftitemid;
+
+        $args->accepted_types = '*';
+        $linkoptions = initialise_filepicker($args);
+        $linkoptions->context = $options['context'];
+        $linkoptions->client_id = uniqid();
+        $linkoptions->maxbytes  = $options['maxfiles'];
+        $linkoptions->env = 'editor';
+        $linkoptions->itemid = $draftitemid;
+
+        $fpoptions['image'] = $imageoptions;
+        $fpoptions['media'] = $mediaoptions;
+        $fpoptions['link'] = $linkoptions;
+
+        $editor = editors_get_preferred_editor(FORMAT_HTML);
+        $editor->use_editor(
+            'c' . $entry->id . '[text]',
+            $options,
+            $fpoptions
+        );
+        echo "<p><textarea id=\"c$entry->id[text]\" name=\"c$entry->id[text]\" rows=\"7\" $feedbackdisabledstr>";
         p($feedbacktext);
         echo '</textarea></p>';
+
+        echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'c' . $entry->id . '[itemid]', 'value' => $draftitemid]);
 
         if ($feedbackdisabledstr != '') {
             echo '<input type="hidden" name="c'.$entry->id.'" value="'.$feedbacktext.'"/>';
@@ -902,7 +981,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
     if ($entry) {
         echo '<p class="feedbacksave" style="margin-top: -16px;">';
-        echo '<input type="button" data-cmid="'.$cmid.'" data-entryid="'.$entry->id.'" data-userid="'.$user->id.'"';
+        echo '<input type="button" data-cmid="'.$cmid.'" data-entryid="'.$entry->id.'" data-userid="'.$user->id.'" data-itemid="'.$draftitemid.'" ';
         echo 'value="'.get_string('savefeedback', 'journal').'" class="saveindividualfeedback btn btn-secondary m-t-1"/>';
         echo '</p>';
     }
@@ -928,6 +1007,10 @@ function journal_print_feedback($course, $entry, $grades) {
     if (! $teacher = $DB->get_record('user', ['id' => $entry->teacher])) {
         throw new \moodle_exception(get_string('Weird journal error'));
     }
+
+    $module = $DB->get_record('modules', ['name' => 'journal']);
+    $cmid = $DB->get_field('course_modules', 'id', ['module' => $module->id, 'instance' => $entry->journal]);
+    $context = \context_module::instance($cmid);
 
     echo '<table class="feedbackbox">';
 
@@ -958,8 +1041,10 @@ function journal_print_feedback($course, $entry, $grades) {
     }
     echo '</div>';
 
+    $entry->entrycomment = file_rewrite_pluginfile_urls($entry->entrycomment, 'pluginfile.php', $context->id, 'mod_journal', 'feedback', $entry->id);
+
     // Feedback text.
-    echo format_text($entry->entrycomment, FORMAT_PLAIN);
+    echo format_text($entry->entrycomment, FORMAT_HTML);
     echo '</td></tr></table>';
 }
 
@@ -1005,7 +1090,7 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
         return false;
     }
 
-    if ($filearea !== 'entry') {
+    if ($filearea !== 'entry' && $filearea !== 'feedback') {
         return false;
     }
 
