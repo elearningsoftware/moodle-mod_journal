@@ -105,6 +105,11 @@ if ($form->is_cancelled()) {
         if (!$newentry->id = $DB->insert_record('journal_entries', $newentry)) {
             throw new \moodle_exception(get_string('countnotinsertjournalentry', 'journal'));
         }
+        // Update completion state.
+        $completion = new completion_info($course);
+        if ($completion->is_enabled($cm) && $journal->completion_create_entry) {
+            $completion->update_state($cm, COMPLETION_COMPLETE);
+        }
     }
 
     // Relink using the proper entryid.

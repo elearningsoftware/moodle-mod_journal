@@ -128,6 +128,8 @@ function journal_supports($feature) {
             return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS:
             return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
         case FEATURE_BACKUP_MOODLE2:
             return true;
         case FEATURE_SHOW_DESCRIPTION:
@@ -1135,4 +1137,26 @@ function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
                     ($entrybyuser[$a->id]->modified > $entrybyuser[$b->id]->modified ? 1 : 0);
         }
     });
+}
+
+/**
+ * Adds custom completion info to the course module info
+ *
+ * @param cm_info $cm
+ * @return cached_cm_info|null
+ */
+function journal_get_coursemodule_info($cm): cached_cm_info {
+    global $DB;
+
+    if (!$journal = $DB->get_record('journal', ['id' => $cm->instance], 'completion_create_entry')) {
+        return null;
+    }
+
+    $result = new cached_cm_info();
+
+    if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
+        $result->customdata['customcompletionrules']['completion_create_entry'] = $journal->completion_create_entry;
+    }
+
+    return $result;
 }
