@@ -14,6 +14,7 @@
         <FIELD NAME="days" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="7" SEQUENCE="false" PREVIOUS="introformat" NEXT="grade"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="days" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grade"/>
+        <FIELD NAME="completion_create_entry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

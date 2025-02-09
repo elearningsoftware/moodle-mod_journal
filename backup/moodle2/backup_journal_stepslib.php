@@ -39,7 +39,7 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
     protected function define_structure() {
 
         $journal = new backup_nested_element('journal', ['id'], [
-            'name', 'intro', 'introformat', 'days', 'grade', 'timemodified', ]);
+            'name', 'intro', 'introformat', 'days', 'grade', 'timemodified', 'completion_create_entry',]);
 
         $entries = new backup_nested_element('entries');
 

@@ -26,6 +26,7 @@
 $string['accessdenied'] = 'Access denied';
 $string['alwaysopen'] = 'Always open';
 $string['blankentry'] = 'Blank entry';
+$string['completiondetail:completion_create_entry'] = 'Create a journal entry';
 $string['couldnotupdatejournal'] = 'Could not update your journal';
 $string['countnotinsertjournalentry'] = 'Could not insert a new journal entry';
 $string['crontask'] = 'Background processing for journal module';
