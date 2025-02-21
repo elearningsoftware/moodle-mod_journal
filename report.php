@@ -91,7 +91,7 @@ foreach ($users as $user) {
 echo '<div class="d-flex justify-content-between align-items-center">';
 echo '<form method="get" action="report.php" class="d-flex align-items-center">';
 echo '<input type="hidden" name="id" value="'.$id.'">';
-echo html_writer::select($useroptions, 'selecteduser', $selecteduser, ['' => get_string('allusers', 'journal')], ['class' => 'mr-2']);
+echo html_writer::select($useroptions, 'selecteduser', $selecteduser, ['' => get_string('allusers', 'search')], ['class' => 'mr-2']);
 echo '<input type="submit" value="'.get_string('filter').'" class="btn btn-secondary mr-2">';
 echo '</form>';
 
