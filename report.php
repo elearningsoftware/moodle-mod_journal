@@ -95,6 +95,8 @@ echo html_writer::select($useroptions, 'selecteduser', $selecteduser, ['' => get
 echo '<input type="submit" value="'.get_string('filter').'" class="btn btn-secondary mr-2">';
 echo '</form>';
 
+groups_print_activity_menu($cm, $CFG->wwwroot . "/mod/journal/report.php?id=$cm->id");
+
 $options = [
     'dateasc' => get_string('dateasc', 'journal'),
     'datedesc' => get_string('datedesc', 'journal'),
