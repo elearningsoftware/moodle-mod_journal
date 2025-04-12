@@ -883,10 +883,10 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     // Feedback row if entry exists.
     if ($entry) {
         $content .= html_writer::start_tag('tr');
-        $teacher = $teachers[$entry->teacher] ?? $DB->get_record('user', ['id' => $entry->teacher]);
+        $teacher = $teachers[$entry->teacher] ?? $DB->get_record('user', ['id' => empty($entry->teacher) ? $USER->id : $entry->teacher]);
         $content .= html_writer::tag(
             'td',
-            $OUTPUT->user_picture($teacher, ['courseid' => $course->id, 'alttext' => true]),
+            empty($teacher) ? '' : $OUTPUT->user_picture($teacher, ['courseid' => $course->id, 'alttext' => true]),
             ['class' => 'userpix', 'style' => 'border-top: 1px solid #dedede;']
         );
 
