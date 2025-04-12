@@ -64,8 +64,8 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
 
         // Define file annotations.
         $journal->annotate_files('mod_journal', 'intro', null); // This file areas haven't itemid.
-        $entry->annotate_files('mod_journal_entries', 'text', null); // This file areas haven't itemid.
-        $entry->annotate_files('mod_journal_entries', 'entrycomment', null); // This file areas haven't itemid.
+        $entry->annotate_files('mod_journal_entries', 'text', 'journal_entry');
+        $entry->annotate_files('mod_journal_entries', 'entrycomment', 'journal_entry');
 
         return $this->prepare_activity_structure($journal);
     }

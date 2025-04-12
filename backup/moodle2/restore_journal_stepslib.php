@@ -101,7 +101,7 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      */
     protected function after_execute() {
         $this->add_related_files('mod_journal', 'intro', null);
-        $this->add_related_files('mod_journal_entries', 'text', null);
-        $this->add_related_files('mod_journal_entries', 'entrycomment', null);
+        $this->add_related_files('mod_journal_entries', 'text', 'journal_entry');
+        $this->add_related_files('mod_journal_entries', 'entrycomment', 'journal_entry');
     }
 }
