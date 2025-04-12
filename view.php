@@ -25,18 +25,17 @@
 require_once('../../config.php');
 require_once('lib.php');
 
-$id = required_param('id', PARAM_INT);    // Course Module ID.
+$id = required_param('id', PARAM_INT); // Course Module ID.
 
-if (! $cm = get_coursemodule_from_id('journal', $id)) {
-    throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
-}
+$cm = get_coursemodule_from_id('journal', $id, 0, false, MUST_EXIST);
+$course = get_course($cm->course);
+$journal = $DB->get_record('journal', ['id' => $cm->instance], '*', MUST_EXIST);
 
-if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
-    throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
+if (!$cw = $DB->get_record('course_sections', ['id' => $cm->section])) {
+    throw new moodle_exception(get_string('incorrectcoursesectionid', 'journal'));
 }
 
 $context = context_module::instance($cm->id);
-
 require_login($course, true, $cm);
 
 $completion = new completion_info($course);
@@ -46,35 +45,34 @@ $entriesmanager = has_capability('mod/journal:manageentries', $context);
 $canadd = has_capability('mod/journal:addentries', $context);
 
 if (!$entriesmanager && !$canadd) {
-    throw new \moodle_exception(get_string('accessdenied', 'journal'));
-}
-
-if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
-    throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
-}
-
-if (! $cw = $DB->get_record('course_sections', ['id' => $cm->section])) {
-    throw new \moodle_exception(get_string('incorrectcoursesectionid', 'journal'));
+    throw new moodle_exception(get_string('accessdenied', 'journal'));
 }
 
 $journalname = format_string($journal->name, true, ['context' => $context]);
 
-// Header.
 $PAGE->set_url('/mod/journal/view.php', ['id' => $id]);
 $PAGE->set_title($journalname);
 $PAGE->set_heading($course->fullname);
-$PAGE->force_settings_menu();
+$PAGE->force_settings_menu(); // Ensure settings menu is displayed.
 
+// Display the page header.
 echo $OUTPUT->header();
+
 if ($CFG->branch < 400) {
     echo $OUTPUT->heading($journalname);
 }
 
-// Check to see if groups are being used here.
+// Display journal introduction if available.
+if (!empty($journal->intro)) {
+    echo $OUTPUT->box(format_module_intro('journal', $journal, $cm->id), 'generalbox', 'intro');
+}
+
+// Handle groups and group restrictions.
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 $allowedgroups = groups_get_activity_allowed_groups($cm);
-groups_print_activity_menu($cm, $CFG->wwwroot . "/mod/journal/view.php?id=$cm->id");
+
+groups_print_activity_menu($cm, $PAGE->url);
 
 if ($entriesmanager) {
     if ($currentgroup === 0 && $groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context)) {
@@ -82,105 +80,100 @@ if ($entriesmanager) {
     }
     if (!$currentgroup || array_key_exists($currentgroup, $allowedgroups)) {
         $entrycount = journal_count_entries($journal, $currentgroup);
-        echo '<div class="reportlink"><a href="report.php?id='.$cm->id.'">'.
-            get_string('viewallentries', 'journal', $entrycount).'</a></div>';
+        $managerlink = new moodle_url('/mod/journal/report.php', ['id' => $cm->id]);
+        echo html_writer::div(
+            html_writer::link($managerlink, get_string('viewallentries', 'journal', $entrycount)),
+            'reportlink'
+        );
     }
 }
 
-$journal->intro = trim($journal->intro);
-if (!empty($journal->intro) && $CFG->branch < 400) {
-    $intro = format_module_intro('journal', $journal, $cm->id);
-    echo $OUTPUT->box($intro, 'generalbox', 'intro');
-}
-
-echo '<br />';
-
+// Determine time constraints for journal editing.
 $timenow = time();
 if ($course->format == 'weeks' && $journal->days) {
-    $timestart = $course->startdate + (($cw->section - 1) * 604800);
-    if ($journal->days) {
-        $timefinish = $timestart + (3600 * 24 * $journal->days);
-    } else {
-        $timefinish = $course->enddate;
-    }
-} else {  // Have no time limits on the journals.
-
+    $timestart = $course->startdate + (($cm->section - 1) * 604800);
+    $timefinish = $timestart + (3600 * 24 * $journal->days);
+} else {
     $timestart = $timenow - 1;
     $timefinish = $timenow + 1;
     $journal->days = 0;
 }
-if ($timenow > $timestart) {
 
+// Display journal entry form or message.
+if ($timenow > $timestart) {
     echo $OUTPUT->box_start();
 
-    // Edit button.
-    if ($timenow < $timefinish) {
-
-        if ($canadd) {
-            echo $OUTPUT->single_button('edit.php?id='.$cm->id, get_string('startoredit', 'journal'), 'get',
-                ['class' => 'singlebutton journalstart mb-3', 'type' => 'primary']);
-        }
+    // Render "Add/Edit Entry" button if within time constraints.
+    if ($timenow < $timefinish && $canadd) {
+        echo $OUTPUT->single_button(
+            new moodle_url('/mod/journal/edit.php', ['id' => $cm->id]),
+            get_string('startoredit', 'journal'),
+            'get',
+            ['class' => 'singlebutton journalstart mb-3', 'type' => 'primary']
+        );
     }
 
-    // Display entry.
-    if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
+    // Display existing journal entry.
+    $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
+    if ($entry) {
         echo '<div>';
         if (empty($entry->text)) {
-            echo '<p align="center"><b>'.get_string('blankentry', 'journal').'</b></p>';
+            echo $OUTPUT->notification(get_string('blankentry', 'journal'), \core\output\notification::NOTIFY_INFO);
         } else {
             echo journal_format_entry_text($entry, $course, $cm);
         }
         echo '</div>';
     } else {
-        echo '<div><span class="warning">'.get_string('notstarted', 'journal').'</span></div>';
+        echo $OUTPUT->notification(get_string('notstarted', 'journal'), \core\output\notification::NOTIFY_WARNING);
     }
 
     echo $OUTPUT->box_end();
 
-    // Info.
+    // Display entry information and feedback.
     if ($timenow < $timefinish) {
         if (!empty($entry->modified)) {
-            echo '<div class="lastedit"><strong>'.get_string('lastedited').': </strong> ';
-            echo userdate($entry->modified);
-            echo ' ('.get_string('numwords', '', count_words($entry->text)).')';
-            echo '</div>';
+            echo html_writer::div(
+                '<strong>' . get_string('lastedited') . ':</strong> ' . userdate($entry->modified) . ' (' .
+                get_string('numwords', '', count_words($entry->text)) . ')',
+                'lastedit'
+            );
         }
-        // Added three lines to mark entry as being dirty and needing regrade.
         if (!empty($entry->modified) && !empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
-            echo '<div class="lastedit">'.get_string('needsregrade', 'journal'). '</div>';
+            echo $OUTPUT->notification(get_string('needsregrade', 'journal'), \core\output\notification::NOTIFY_WARNING);
         }
-
         if (!empty($journal->days)) {
-            echo '<div class="editend"><strong>'.get_string('editingends', 'journal').': </strong> ';
-            echo userdate($timefinish).'</div>';
+            echo html_writer::div(
+                '<strong>' . get_string('editingends', 'journal') . ':</strong> ' . userdate($timefinish),
+                'editend'
+            );
         }
-
     } else {
-        echo '<div class="editend"><strong>'.get_string('editingended', 'journal').': </strong> ';
-        echo userdate($timefinish).'</div>';
+        echo $OUTPUT->notification(
+            '<strong>' . get_string('editingended', 'journal') . ':</strong> ' . userdate($timefinish),
+            \core\output\notification::NOTIFY_WARNING
+        );
     }
 
     // Feedback.
-    if (!(empty($entry->entrycomment) || (!empty($entry->rating)) && !$entry->rating)) {
+    if (!(empty($entry->entrycomment) || (!empty($entry->rating) && !$entry->rating))) {
         $grades = make_grades_menu($journal->grade);
         echo $OUTPUT->heading(get_string('feedback'));
         journal_print_feedback($course, $entry, $grades);
     }
-
 } else {
-    echo '<div class="warning">'.get_string('notopenuntil', 'journal').': ';
-    echo userdate($timestart).'</div>';
+    echo $OUTPUT->notification(get_string('notopenuntil', 'journal')
+        . ': ' . userdate($timestart), \core\output\notification::NOTIFY_WARNING);
 }
 
-
-// Trigger module viewed event.
+// Trigger the module viewed event.
 $event = \mod_journal\event\course_module_viewed::create([
-   'objectid' => $journal->id,
-   'context' => $context,
+    'objectid' => $journal->id,
+    'context' => $context,
 ]);
 $event->add_record_snapshot('course_modules', $cm);
 $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('journal', $journal);
 $event->trigger();
 
+// Display footer.
 echo $OUTPUT->footer();
