@@ -33,14 +33,12 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_journal_mod_form extends moodleform_mod
-{
+class mod_journal_mod_form extends moodleform_mod {
 
     /**
      * Set up the form definition.
      */
-    public function definition()
-    {
+    public function definition() {
         global $COURSE;
 
         $mform = &$this->_form;
