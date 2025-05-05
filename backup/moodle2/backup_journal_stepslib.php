@@ -56,16 +56,15 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
 
         if ($this->get_setting_value('userinfo')) {
             $entry->set_source_table('journal_entries', ['journal' => backup::VAR_PARENTID]);
+            // Define id annotations.
+            $entry->annotate_ids('user', 'userid');
+            $entry->annotate_ids('user', 'teacher');
+            $entry->annotate_files('mod_journal', 'entry', 'id');
+            $entry->annotate_files('mod_journal', 'feedback', 'id');
         }
-
-        // Define id annotations.
-        $entry->annotate_ids('user', 'userid');
-        $entry->annotate_ids('user', 'teacher');
 
         // Define file annotations.
         $journal->annotate_files('mod_journal', 'intro', null); // This file areas haven't itemid.
-        $entry->annotate_files('mod_journal_entries', 'text', 'journal_entry');
-        $entry->annotate_files('mod_journal_entries', 'entrycomment', 'journal_entry');
 
         return $this->prepare_activity_structure($journal);
     }
