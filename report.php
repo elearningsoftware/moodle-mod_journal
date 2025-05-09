@@ -27,6 +27,7 @@ require_once('lib.php');
 
 $id = required_param('id', PARAM_INT);   // Course module.
 $sortby = optional_param('sortby', 'dateasc', PARAM_ALPHA);
+$selecteduser = optional_param('selecteduser', 0, PARAM_INT);
 
 $valid_sort_options = [
     'dateasc',
@@ -66,9 +67,51 @@ foreach ($entries as $entry) {
     $entrybyentry[$entry->id] = $entry;
 }
 
+$userswithentries = array_map(function($entry) {
+    return $entry->userid;
+}, $entries);
+
 // Group mode.
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
+
+$users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '', '', $currentgroup, '', false, true);
+
+$useroptions = [];
+foreach ($users as $user) {
+    if (in_array($user->id, $userswithentries)) {
+        $useroptions[$user->id] = fullname($user);
+    }
+}
+
+echo '<div class="d-flex justify-content-between align-items-center">';
+echo '<form method="get" action="report.php" class="d-flex align-items-center">';
+echo '<input type="hidden" name="id" value="'.$id.'">';
+echo html_writer::select($useroptions, 'selecteduser', $selecteduser, ['' => get_string('allusers', 'search')], ['class' => 'mr-2']);
+echo '<input type="submit" value="'.get_string('filter').'" class="btn btn-secondary mr-2">';
+echo '</form>';
+// Render group activity menu.
+groups_print_activity_menu($cm, $PAGE->url);
+
+// Sorting dropdown.
+$options = [
+    'dateasc' => get_string('dateasc', 'journal'),
+    'datedesc' => get_string('datedesc', 'journal'),
+    'firstnameasc' => get_string('firstnameasc', 'journal'),
+    'firstnamedesc' => get_string('firstnamedesc', 'journal'),
+    'lastnameasc' => get_string('lastnameasc', 'journal'),
+    'lastnamedesc' => get_string('lastnamedesc', 'journal'),
+];
+$select = new single_select(
+    new moodle_url($PAGE->url),
+    'sortby',
+    $options,
+    $sortby,
+    null
+);
+$select->set_label(get_string('sortby'));
+echo html_writer::div($OUTPUT->render($select), 'divwrapper sortbyselect');
+echo '</div>';
 
 // Process incoming data if there is any.
 if ($data = data_submitted()) {
@@ -155,28 +198,6 @@ $users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '',
 if (!$users) {
     echo $OUTPUT->notification(get_string('nousersyet', 'journal'), \core\output\notification::NOTIFY_INFO);
 } else {
-    // Render group activity menu.
-    groups_print_activity_menu($cm, $PAGE->url);
-
-    // Sorting dropdown.
-    $options = [
-        'dateasc' => get_string('dateasc', 'journal'),
-        'datedesc' => get_string('datedesc', 'journal'),
-        'firstnameasc' => get_string('firstnameasc', 'journal'),
-        'firstnamedesc' => get_string('firstnamedesc', 'journal'),
-        'lastnameasc' => get_string('lastnameasc', 'journal'),
-        'lastnamedesc' => get_string('lastnamedesc', 'journal'),
-    ];
-    $select = new single_select(
-        new moodle_url($PAGE->url),
-        'sortby',
-        $options,
-        $sortby,
-        null
-    );
-    $select->set_label(get_string('sortby'));
-    echo html_writer::div($OUTPUT->render($select), 'divwrapper sortbyselect');
-
     $grades = make_grades_menu($journal->grade);
     if (!$teachers = get_users_by_capability($context, 'mod/journal:manageentries')) {
         throw new \moodle_exception(get_string('noentriesmanagers', 'journal'));
@@ -192,7 +213,9 @@ if (!$users) {
         mod_journal_sort_users($usersdone, $sortby, $entrybyuser);
         echo html_writer::tag('h3', get_string('userswhocompletedthejournal', 'journal'), ['class' => 'journalheader']);
         foreach ($usersdone as $user) {
-            journal_print_user_entry($course, $user, $entrybyuser[$user->id], $teachers, $grades, $cm->id);
+            if ($selecteduser == 0 || $selecteduser == $user->id) {
+                journal_print_user_entry($course, $user, $entrybyuser[$user->id], $teachers, $grades, $cm->id);
+            }
             unset($users[$user->id]);
         }
     }
@@ -201,7 +224,9 @@ if (!$users) {
         mod_journal_sort_users($users, $sortby, $entrybyuser);
         echo html_writer::tag('h3', get_string('userswhodidnotcompletedthejournal', 'journal'), ['class' => 'journalheader']);
         foreach ($users as $user) {
-            journal_print_user_entry($course, $user, null, $teachers, $grades, $cm->id);
+            if ($selecteduser == 0 || $selecteduser == $user->id) {
+                journal_print_user_entry($course, $user, null, $teachers, $grades, $cm->id);
+            }
         }
     }
 
