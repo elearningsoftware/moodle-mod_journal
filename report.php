@@ -112,17 +112,6 @@ $select = new single_select(
 $select->set_label(get_string('sortby'));
 echo html_writer::div($OUTPUT->render($select), 'divwrapper sortbyselect');
 echo '</div>';
-/*
-$select = new single_select(
-    new moodle_url($PAGE->url),
-    'filter',
-    $useroptions,
-    $selecteduser,
-    ['' => get_string('allusers', 'search')]
-);
-$select->set_label(get_string('filter'));
-echo html_writer::div($OUTPUT->render($select), 'divwrapper filteruserselect');
-*/
 
 // Process incoming data if there is any.
 if ($data = data_submitted()) {
