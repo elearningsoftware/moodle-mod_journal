@@ -450,10 +450,15 @@ function journal_reset_userdata($data)
 
         $sql = 'SELECT j.id
                 FROM {journal} j
-                WHERE j.course = ?';
-        $params = [$data->courseid];
+                WHERE j.course = :courseid';
+        $params = ['courseid' => $data->courseid];
 
-        $cmids = $DB->get_fieldset_select('course_modules', 'id', 'module = ? AND instance IN (' . $sql . ')', $params, '', $module->id);
+        $cmids = $DB->get_fieldset_select(
+            'course_modules',
+            'id',
+            'module = :moduleid AND instance IN (' . $sql . ')',
+            array_merge($params, ['moduleid' => $module->id])
+        );
         $DB->delete_records_select('journal_entries', "journal IN ($sql)", $params);
 
         foreach ($cmids as $cmid) {
