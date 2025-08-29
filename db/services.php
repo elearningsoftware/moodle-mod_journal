@@ -33,12 +33,10 @@ $functions = [
         'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_journal_set_text' => [
-        'classname'   => 'mod_journal_external',
-        'methodname'  => 'set_text',
-        'classpath'   => 'mod/journal/externallib.php',
+        'classname'   => 'mod_journal\external\set_text',
         'description' => 'Sets the journal text.',
         'type'        => 'write',
-        'ajax' => true,
-        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
 ];
