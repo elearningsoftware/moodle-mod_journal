@@ -26,13 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 
 $functions = [
     'mod_journal_get_entry' => [
-        'classname'   => 'mod_journal_external',
-        'methodname'  => 'get_entry',
-        'classpath'   => 'mod/journal/externallib.php',
+        'classname'   => 'mod_journal\external\get_entry',
         'description' => 'Gets the user\'s journal.',
         'type'        => 'read',
-        'ajax' => true,
-        'services' => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
     'mod_journal_set_text' => [
         'classname'   => 'mod_journal_external',
