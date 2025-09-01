@@ -24,6 +24,9 @@
 
 namespace mod_journal\search;
 
+use dml_exception;
+use moodle_recordset;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
@@ -57,13 +60,16 @@ class entry extends \mod_journal\search\DynamicParentEntry {
      *
      * @param int $modifiedfrom timestamp
      * @return moodle_recordset
+     * @throws dml_exception
      */
-    public function get_recordset_by_timestamp($modifiedfrom = 0) {
+    public function get_recordset_by_timestamp($modifiedfrom = 0): moodle_recordset {
         global $DB;
 
-        $sql = "SELECT je.*, j.course FROM {journal_entries} je
-                JOIN {journal} j ON j.id = je.journal
-                WHERE je.modified >= ? ORDER BY je.modified ASC";
+        $sql = "SELECT je.*, j.course
+                  FROM {journal_entries} je
+                  JOIN {journal} j ON j.id = je.journal
+                 WHERE je.modified >= ?
+              ORDER BY je.modified ASC";
         return $DB->get_recordset_sql($sql, [$modifiedfrom]);
     }
 
