@@ -62,11 +62,6 @@ if ($CFG->branch < 400) {
     echo $OUTPUT->heading($journalname);
 }
 
-// Display journal introduction if available.
-if (!empty($journal->intro)) {
-    echo $OUTPUT->box(format_module_intro('journal', $journal, $cm->id), 'generalbox', 'intro');
-}
-
 // Handle groups and group restrictions.
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
