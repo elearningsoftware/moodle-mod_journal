@@ -91,7 +91,7 @@ if ($entriesmanager) {
 // Determine time constraints for journal editing.
 $timenow = time();
 if ($course->format == 'weeks' && $journal->days) {
-    $timestart = $course->startdate + (($cm->section - 1) * 604800);
+    $timestart = $course->startdate + (($cw->section - 1) * 604800);
     $timefinish = $timestart + (3600 * 24 * $journal->days);
 } else {
     $timestart = $timenow - 1;
