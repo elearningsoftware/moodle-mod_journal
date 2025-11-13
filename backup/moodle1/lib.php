@@ -27,7 +27,6 @@
  * Journal conversion handler
  */
 class moodle1_mod_journal_handler extends moodle1_mod_handler {
-
     /**
      * Declare the paths in moodle.xml we are able to convert
      *
@@ -40,7 +39,8 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
     public function get_paths() {
         return [
             new convert_path(
-                'journal', '/MOODLE_BACKUP/COURSE/MODULES/MOD/JOURNAL',
+                'journal',
+                '/MOODLE_BACKUP/COURSE/MODULES/MOD/JOURNAL',
                 [
                     'renamefields' => [
                         'assessed' => 'grade',

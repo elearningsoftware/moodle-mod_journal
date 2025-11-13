@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/lib/formslib.php');
+require_once($CFG->dirroot . '/lib/formslib.php');
 
 /**
  * The mod_journal_entry_form class.
@@ -34,13 +34,17 @@ require_once($CFG->dirroot.'/lib/formslib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_journal_entry_form extends moodleform {
-
     /**
      * Set up the form definition.
      */
     public function definition() {
-        $this->_form->addElement('editor', 'text_editor', get_string('entry', 'mod_journal'),
-                null, $this->_customdata['editoroptions']);
+        $this->_form->addElement(
+            'editor',
+            'text_editor',
+            get_string('entry', 'mod_journal'),
+            null,
+            $this->_customdata['editoroptions']
+        );
         $this->_form->setType('text_editor', PARAM_RAW);
         $this->_form->addRule('text_editor', null, 'required', null, 'client');
         $this->_form->addElement('hidden', 'id');

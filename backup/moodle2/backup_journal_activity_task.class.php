@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/journal/backup/moodle2/backup_journal_stepslib.php');
+require_once($CFG->dirroot . '/mod/journal/backup/moodle2/backup_journal_stepslib.php');
 
 /**
  * The backup_journal_activity_task class.
@@ -34,7 +34,6 @@ require_once($CFG->dirroot.'/mod/journal/backup/moodle2/backup_journal_stepslib.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_journal_activity_task extends backup_activity_task {
-
     /**
      * Define the settings for the backup process
      *
@@ -61,18 +60,18 @@ class backup_journal_activity_task extends backup_activity_task {
     public static function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot.'/mod/journal', '#');
+        $base = preg_quote($CFG->wwwroot . '/mod/journal', '#');
 
-        $pattern = "#(".$base."\/index.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/index.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@JOURNALINDEX*$2@$', $content);
 
-        $pattern = "#(".$base."\/view.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/view.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@JOURNALVIEWBYID*$2@$', $content);
 
-        $pattern = "#(".$base."\/report.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/report.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@JOURNALREPORT*$2@$', $content);
 
-        $pattern = "#(".$base."\/edit.php\?id\=)([0-9]+)#";
+        $pattern = "#(" . $base . "\/edit.php\?id\=)([0-9]+)#";
         $content = preg_replace($pattern, '$@JOURNALEDIT*$2@$', $content);
 
         return $content;

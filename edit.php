@@ -109,8 +109,15 @@ if ($form->is_cancelled()) {
 
     // Relink using the proper entryid.
     // We need to do this as draft area didn't have an itemid associated when creating the entry.
-    $fromform = file_postupdate_standard_editor($fromform, 'text', $editoroptions,
-        $editoroptions['context'], 'mod_journal', 'entry', $newentry->id);
+    $fromform = file_postupdate_standard_editor(
+        $fromform,
+        'text',
+        $editoroptions,
+        $editoroptions['context'],
+        'mod_journal',
+        'entry',
+        $newentry->id
+    );
     $newentry->text = $fromform->text;
     $newentry->format = $fromform->textformat;
 
@@ -128,14 +135,13 @@ if ($form->is_cancelled()) {
             'objectid' => $journal->id,
             'context' => $context,
         ]);
-
     }
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
     $event->add_record_snapshot('journal', $journal);
     $event->trigger();
 
-    redirect(new moodle_url('/mod/journal/view.php?id='.$cm->id));
+    redirect(new moodle_url('/mod/journal/view.php?id=' . $cm->id));
     die;
 }
 

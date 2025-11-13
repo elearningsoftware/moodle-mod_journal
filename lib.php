@@ -174,7 +174,6 @@ function journal_user_outline($course, $user, $mod, $journal) {
     global $DB;
 
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
-
         $numwords = count(preg_split('/\w\b/', $entry->text)) - 1;
 
         $result = new \stdClass();
@@ -199,7 +198,6 @@ function journal_user_complete($course, $user, $mod, $journal) {
     global $DB, $OUTPUT;
 
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
-
         echo $OUTPUT->box_start();
 
         if ($entry->modified) {
@@ -214,7 +212,6 @@ function journal_user_complete($course, $user, $mod, $journal) {
         }
 
         echo $OUTPUT->box_end();
-
     } else {
         print_string('noentry', 'journal');
     }
@@ -257,7 +254,6 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     $show = [];
 
     foreach ($newentries as $anentry) {
-
         if (!array_key_exists($anentry->cmid, $modinfo->get_cms())) {
             continue;
         }
@@ -438,8 +434,14 @@ function journal_reset_userdata($data) {
                 WHERE j.course = ?';
         $params = [$data->courseid];
 
-        $cmids = $DB->get_fieldset_select('course_modules', 'id', 'module = ? AND instance IN (' . $sql . ')',
-            $params, '', $module->id);
+        $cmids = $DB->get_fieldset_select(
+            'course_modules',
+            'id',
+            'module = ? AND instance IN (' . $sql . ')',
+            $params,
+            '',
+            $module->id
+        );
         $DB->delete_records_select('journal_entries', "journal IN ($sql)", $params);
 
         foreach ($cmids as $cmid) {
@@ -484,13 +486,11 @@ function journal_print_overview($courses, &$htmlarray) {
 
     $timenow = time();
     foreach ($journals as $journal) {
-
         if (empty($courses[$journal->course]->format)) {
             $courses[$journal->course]->format = $DB->get_field('course', 'format', ['id' => $journal->course]);
         }
 
         if ($courses[$journal->course]->format == 'weeks' && $journal->days) {
-
             $coursestartdate = $courses[$journal->course]->startdate;
 
             $journal->timestart = $coursestartdate + (($journal->section - 1) * 608400);
@@ -500,7 +500,6 @@ function journal_print_overview($courses, &$htmlarray) {
                 $journal->timefinish = 9999999999;
             }
             $journalopen = ($journal->timestart < $timenow && $timenow < $journal->timefinish);
-
         } else {
             $journalopen = true;
         }
@@ -541,9 +540,7 @@ function journal_get_user_grades($journal, $userid = 0) {
 
     if (!$journal) {
         return false;
-
     } else {
-
         $sql = 'SELECT userid, modified as datesubmitted, format as feedbackformat,
                 rating as rawgrade, entrycomment as feedback, teacher as usermodifier, timemarked as dategraded
                 FROM {journal_entries}
@@ -565,7 +562,6 @@ function journal_get_user_grades($journal, $userid = 0) {
 
         return $grades;
     }
-
 }
 
 
@@ -638,11 +634,9 @@ function journal_grade_item_update($journal, $grades = null) {
         $params['grademax'] = $journal->grade;
         $params['grademin'] = 0;
         $params['multfactor'] = 1.0;
-
     } else if ($journal->grade < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
         $params['scaleid'] = -$journal->grade;
-
     } else {
         $params['gradetype'] = GRADE_TYPE_NONE;
         $params['multfactor'] = 1.0;
@@ -703,7 +697,6 @@ function journal_get_users_done($journal, $currentgroup) {
 
     // Remove unenrolled participants.
     foreach ($journals as $key => $user) {
-
         $context = \context_module::instance($cm->id);
 
         $canadd = has_capability('mod/journal:addentries', $context, $user);
@@ -745,7 +738,6 @@ function journal_count_entries($journal, $groupids = 0) {
                 JOIN {user} u ON u.id = g.userid
                 WHERE j.journal = ? AND g.groupid $sqlin[0]";
         $journals = $DB->get_records_sql($sql, array_merge($params, $sqlin[1]));
-
     } else if ($groupids === 0 || $groupids === false) { // Count all the entries from the whole course.
         $sql = 'SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
@@ -762,7 +754,6 @@ function journal_count_entries($journal, $groupids = 0) {
 
     // Remove unenrolled participants.
     foreach ($journals as $userid => $notused) {
-
         if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
             unset($journals[$userid]);
         }
@@ -912,8 +903,12 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         // Grade selector.
         $attrs['id'] = 'r' . $entry->id;
         $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ? get_string('gradenoun') : get_string('grade');
-        $feedbacksection .= \html_writer::label(fullname($user) . ' ' . $gradestring, 'r' . $entry->id, true,
-            ['class' => 'accesshide']);
+        $feedbacksection .= \html_writer::label(
+            fullname($user) . ' ' . $gradestring,
+            'r' . $entry->id,
+            true,
+            ['class' => 'accesshide']
+        );
         $feedbacksection .= \html_writer::select($grades, 'r' . $entry->id, $entry->rating, get_string('nograde') . '...', $attrs);
         $feedbacksection .= $hiddengradestr;
 
@@ -1072,8 +1067,14 @@ function journal_print_feedback($course, $entry, $grades) {
     }
     echo '</div>';
 
-    $entry->entrycomment = file_rewrite_pluginfile_urls($entry->entrycomment, 'pluginfile.php', $context->id, 'mod_journal',
-        'feedback', $entry->id);
+    $entry->entrycomment = file_rewrite_pluginfile_urls(
+        $entry->entrycomment,
+        'pluginfile.php',
+        $context->id,
+        'mod_journal',
+        'feedback',
+        $entry->id
+    );
 
     // Feedback text.
     echo format_text($entry->entrycomment, FORMAT_HTML);

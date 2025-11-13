@@ -61,14 +61,13 @@ class cron_task extends \core\task\scheduled_task {
                 $usernamefields = get_all_user_name_fields();
             }
             $requireduserfields = 'id, auth, mnethostid, email, mailformat, maildisplay, lang, deleted, suspended, '
-                    .implode(', ', $usernamefields);
+                    . implode(', ', $usernamefields);
 
             // To save some db queries.
             $users = [];
             $courses = [];
 
             foreach ($entries as $entry) {
-
                 echo "Processing journal entry $entry->id\n";
 
                 if (!empty($users[$entry->userid])) {
@@ -124,23 +123,23 @@ class cron_task extends \core\task\scheduled_task {
                 $journalinfo->teacher = fullname($teacher);
                 $journalinfo->journal = format_string($entry->name, true);
                 $journalinfo->url = "$CFG->wwwroot/mod/journal/view.php?id=$mod->id";
-                $modnamepl = get_string( 'modulenameplural', 'journal' );
-                $msubject = get_string( 'mailsubject', 'journal' );
+                $modnamepl = get_string('modulenameplural', 'journal');
+                $msubject = get_string('mailsubject', 'journal');
 
-                $postsubject = "$course->shortname: $msubject: ".format_string($entry->name, true);
-                $posttext  = "$course->shortname -> $modnamepl -> ".format_string($entry->name, true)."\n";
+                $postsubject = "$course->shortname: $msubject: " . format_string($entry->name, true);
+                $posttext  = "$course->shortname -> $modnamepl -> " . format_string($entry->name, true) . "\n";
                 $posttext .= "---------------------------------------------------------------------\n";
-                $posttext .= get_string("journalmail", "journal", $journalinfo)."\n";
+                $posttext .= get_string("journalmail", "journal", $journalinfo) . "\n";
                 $posttext .= "---------------------------------------------------------------------\n";
                 if ($user->mailformat == 1) {  // HTML.
-                    $posthtml = "<p><font face=\"sans-serif\">".
-                    "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->".
-                    "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->".
+                    $posthtml = "<p><font face=\"sans-serif\">" .
+                    "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->" .
+                    "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->" .
                     "<a href=\"$CFG->wwwroot/mod/journal/view.php?id=$mod->id\">"
-                        .format_string($entry->name, true)
-                    ."</a></font></p>";
+                    . format_string($entry->name, true)
+                    . "</a></font></p>";
                     $posthtml .= "<hr /><font face=\"sans-serif\">";
-                    $posthtml .= "<p>".get_string("journalmailhtml", "journal", $journalinfo)."</p>";
+                    $posthtml .= "<p>" . get_string("journalmailhtml", "journal", $journalinfo) . "</p>";
                     $posthtml .= "</font><hr />";
                 } else {
                     $posthtml = "";

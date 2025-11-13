@@ -48,6 +48,4 @@ class_alias(get_dynamic_parent_activity(), '\mod_journal\search\DynamicParentAct
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class activity extends \mod_journal\search\DynamicParentActivity {
-
 }
-

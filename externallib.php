@@ -34,7 +34,6 @@ require_once("$CFG->libdir/externallib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_journal_external extends external_api {
-
     /**
      * Returns description of method parameters
      *
@@ -93,7 +92,7 @@ class mod_journal_external extends external_api {
         }
 
         $context = \context_module::instance($cm->id);
-        self::validate_context($context);;
+        self::validate_context($context);
         require_capability('mod/journal:addentries', $context);
 
         if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
@@ -163,7 +162,7 @@ class mod_journal_external extends external_api {
         }
 
         $context = \context_module::instance($cm->id);
-        self::validate_context($context);;
+        self::validate_context($context);
         require_capability('mod/journal:addentries', $context);
 
         $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
@@ -195,7 +194,6 @@ class mod_journal_external extends external_api {
                 'objectid' => $journal->id,
                 'context' => $context,
             ]);
-
         }
         $event->add_record_snapshot('course_modules', $cm);
         $event->add_record_snapshot('course', $course);

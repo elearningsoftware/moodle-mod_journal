@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/journal/backup/moodle2/restore_journal_stepslib.php');
+require_once($CFG->dirroot . '/mod/journal/backup/moodle2/restore_journal_stepslib.php');
 
 /**
  * The restore_journal_activity_task class.
@@ -34,7 +34,6 @@ require_once($CFG->dirroot.'/mod/journal/backup/moodle2/restore_journal_stepslib
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_journal_activity_task extends restore_activity_task {
-
     /**
      * Define the settings for the restore process
      *
@@ -80,7 +79,6 @@ class restore_journal_activity_task extends restore_activity_task {
         $rules[] = new restore_decode_rule('JOURNALEDIT', '/mod/journal/edit.php?id=$1', 'course_module');
 
         return $rules;
-
     }
 
     /**
