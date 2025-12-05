@@ -49,7 +49,8 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
 class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\request\plugin\provider {
+    \core_privacy\local\request\plugin\provider
+{
 
     /**
      * Returns metadata.
@@ -57,17 +58,18 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection): collection {
+    public static function get_metadata(collection $collection): collection
+    {
         $collection->add_database_table(
             'journal_entries',
-             [
+            [
                 'userid' => 'privacy:metadata:journal_entries:userid',
                 'modified' => 'privacy:metadata:journal_entries:modified',
                 'text' => 'privacy:metadata:journal_entries:text',
                 'rating' => 'privacy:metadata:journal_entries:rating',
                 'entrycomment' => 'privacy:metadata:journal_entries:entrycomment',
                 'teacher' => 'privacy:metadata:journal_entries:teacher',
-             ],
+            ],
             'privacy:metadata:journal_entries'
         );
 
@@ -80,7 +82,8 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid): contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist
+    {
 
         $sql = "
             SELECT DISTINCT ctx.id
@@ -110,7 +113,8 @@ class provider implements
      * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
      *
      */
-    public static function get_users_in_context(userlist $userlist) {
+    public static function get_users_in_context(userlist $userlist)
+    {
         $context = $userlist->get_context();
 
         if (!is_a($context, \context_module::class)) {
@@ -143,12 +147,13 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
-    public static function export_user_data(approved_contextlist $contextlist) {
+    public static function export_user_data(approved_contextlist $contextlist)
+    {
         global $DB;
 
         $user = $contextlist->get_user();
         $userid = $user->id;
-        $cmids = array_reduce($contextlist->get_contexts(), function($carry, $context) {
+        $cmids = array_reduce($contextlist->get_contexts(), function ($carry, $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
                 $carry[] = $context->instanceid;
             }
@@ -176,7 +181,7 @@ class provider implements
 
         // Export the entries.
         $recordset = $DB->get_recordset_select('journal_entries', $sqluserjournal, $paramsuserjournal);
-        static::recordset_loop_and_export($recordset, 'journal', [], function($carry, $record) {
+        static::recordset_loop_and_export($recordset, 'journal', [], function ($carry, $record) {
             // There might be more than one row per journal if the user is a teacher, so we need to use $carry.
             $carry[] = [
                 'userid' => $record->userid,
@@ -188,7 +193,7 @@ class provider implements
                 'timemarked' => $record->timemarked !== null ? transform::datetime($record->timemarked) : null,
             ];
             return $carry;
-        }, function($journalid, $data) use ($journalidstocmids) {
+        }, function ($journalid, $data) use ($journalidstocmids) {
             $context = context_module::instance($journalidstocmids[$journalid]);
             writer::with_context($context)->export_related_data([], 'entries', $data);
         });
@@ -199,7 +204,8 @@ class provider implements
      *
      * @param context $context The specific context to delete data for.
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function delete_data_for_all_users_in_context(\context $context)
+    {
         global $DB;
 
         if ($context->contextlevel != CONTEXT_MODULE) {
@@ -218,11 +224,12 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist) {
+    public static function delete_data_for_user(approved_contextlist $contextlist)
+    {
         global $DB;
 
         $userid = $contextlist->get_user()->id;
-        $cmids = array_reduce($contextlist->get_contexts(), function($carry, $context) {
+        $cmids = array_reduce($contextlist->get_contexts(), function ($carry, $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
                 $carry[] = $context->instanceid;
             }
@@ -252,7 +259,8 @@ class provider implements
      *
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
-    public static function delete_data_for_users(approved_userlist $userlist) {
+    public static function delete_data_for_users(approved_userlist $userlist)
+    {
         global $DB;
 
         $context = $userlist->get_context();
@@ -277,7 +285,8 @@ class provider implements
      * @param context_module $context The module context.
      * @return int
      */
-    protected static function get_journal_id_from_context(context_module $context) {
+    protected static function get_journal_id_from_context(context_module $context)
+    {
         $cm = get_coursemodule_from_id('journal', $context->instanceid);
         return $cm ? (int) $cm->instance : 0;
     }
@@ -288,7 +297,8 @@ class provider implements
      * @param array $cmids The course module IDs.
      * @return array In the form of [$journalid => $cmid].
      */
-    protected static function get_journal_ids_to_cmids_from_cmids(array $cmids) {
+    protected static function get_journal_ids_to_cmids_from_cmids(array $cmids)
+    {
         global $DB;
         list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
         $sql = "
@@ -314,8 +324,13 @@ class provider implements
      * @param callable $export The function to export the dataset, receives the last value from $splitkey and the dataset.
      * @return void
      */
-    protected static function recordset_loop_and_export(\moodle_recordset $recordset, $splitkey, $initial,
-            callable $reducer, callable $export) {
+    protected static function recordset_loop_and_export(
+        \moodle_recordset $recordset,
+        $splitkey,
+        $initial,
+        callable $reducer,
+        callable $export
+    ) {
 
         $data = $initial;
         $lastid = null;

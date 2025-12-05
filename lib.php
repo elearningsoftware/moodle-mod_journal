@@ -181,7 +181,7 @@ function journal_user_outline($course, $user, $mod, $journal)
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
 
         // Cast to string to prevent PHP 8.1 null deprecation notice in preg_split.
-        $text = isset($entry->text) ? (string)$entry->text : '';
+        $text = isset($entry->text) ? (string) $entry->text : '';
         $numwords = count(preg_split('/\w\b/', $text)) - 1;
         if ($numwords < 0) {
             $numwords = 0;
@@ -919,7 +919,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $gradebookgradestr = '';
         $feedbackdisabledstr = '';
         // Cast to string for PHP 8.1 safety.
-        $feedbacktext = isset($entry->entrycomment) ? (string)$entry->entrycomment : '';
+        $feedbacktext = isset($entry->entrycomment) ? (string) $entry->entrycomment : '';
 
         // Handling gradebook integration.
         if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
@@ -1103,7 +1103,7 @@ function journal_print_feedback($course, $entry, $grades)
     echo '</div>';
 
     // Cast to string for PHP 8.1 safety.
-    $entry->entrycomment = isset($entry->entrycomment) ? (string)$entry->entrycomment : '';
+    $entry->entrycomment = isset($entry->entrycomment) ? (string) $entry->entrycomment : '';
     $entry->entrycomment = file_rewrite_pluginfile_urls($entry->entrycomment, 'pluginfile.php', $context->id, 'mod_journal', 'feedback', $entry->id);
 
     // Feedback text.
@@ -1191,9 +1191,9 @@ function journal_format_entry_text($entry, $course = false, $cm = false)
     }
 
     $context = \context_module::instance($cm->id);
-    
+
     // Cast to string for PHP 8.1 safety.
-    $entrytext = isset($entry->text) ? (string)$entry->text : '';
+    $entrytext = isset($entry->text) ? (string) $entry->text : '';
     $entrytext = file_rewrite_pluginfile_urls($entrytext, 'pluginfile.php', $context->id, 'mod_journal', 'entry', $entry->id);
 
     $formatoptions = [

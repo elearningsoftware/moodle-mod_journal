@@ -28,7 +28,7 @@ require_once('lib.php');
 
 $id = required_param('id', PARAM_INT);   // Course.
 
-if (! $course = $DB->get_record('course', ['id' => $id])) {
+if (!$course = $DB->get_record('course', ['id' => $id])) {
     throw new \moodle_exception(get_string('Course ID is incorrect'));
 }
 
@@ -45,7 +45,7 @@ $PAGE->set_heading($course->fullname);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($strjournals);
 
-if (! $journals = get_all_instances_in_course('journal', $course)) {
+if (!$journals = get_all_instances_in_course('journal', $course)) {
     notice(get_string('thereareno', 'moodle', get_string('modulenameplural', 'journal')), "../../course/view.php?id=$course->id");
     die;
 }
@@ -65,7 +65,7 @@ $table = new html_table();
 $table->head = [];
 $table->align = [];
 if ($usesections) {
-    $table->head[] = get_string('sectionname', 'format_'.$course->format);
+    $table->head[] = get_string('sectionname', 'format_' . $course->format);
     $table->align[] = 'center';
 }
 
@@ -101,14 +101,14 @@ foreach ($journals as $journal) {
     $journalname = format_string($journal->name, true, ['context' => $context]);
     if (!$journal->visible) {
         // Show dimmed if the mod is hidden.
-        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
+        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$journal->coursemodule\">" . $journalname . "</a>";
     } else {
         // Show normal if the mod is visible.
-        $table->data[$i][] = "<a href=\"view.php?id=$journal->coursemodule\">".$journalname."</a>";
+        $table->data[$i][] = "<a href=\"view.php?id=$journal->coursemodule\">" . $journalname . "</a>";
     }
 
     // Description.
-    $table->data[$i][] = format_text($journal->intro,  $journal->introformat, ['context' => $context]);
+    $table->data[$i][] = format_text($journal->intro, $journal->introformat, ['context' => $context]);
 
     // Entries info.
     if ($entriesmanager) {
@@ -136,8 +136,8 @@ foreach ($journals as $journal) {
         }
 
         $entrycount = journal_count_entries($journal, $groupids);
-        $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">".
-            get_string("viewallentries", "journal", $entrycount)."</a>";
+        $table->data[$i][] = "<a href=\"report.php?id=$journal->coursemodule\">" .
+            get_string("viewallentries", "journal", $entrycount) . "</a>";
     } else if (!empty($managersomewhere)) {
         $table->data[$i][] = '';
     }

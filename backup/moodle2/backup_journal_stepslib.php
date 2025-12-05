@@ -29,23 +29,39 @@
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_journal_activity_structure_step extends backup_activity_structure_step {
+class backup_journal_activity_structure_step extends backup_activity_structure_step
+{
 
     /**
      * Define the structure
      *
      * @return void
      */
-    protected function define_structure() {
+    protected function define_structure()
+    {
 
         $journal = new backup_nested_element('journal', ['id'], [
-            'name', 'intro', 'introformat', 'days', 'grade', 'timemodified', ]);
+            'name',
+            'intro',
+            'introformat',
+            'days',
+            'grade',
+            'timemodified',
+        ]);
 
         $entries = new backup_nested_element('entries');
 
         $entry = new backup_nested_element('entry', ['id'], [
-            'userid', 'modified', 'text', 'format', 'rating',
-            'entrycomment', 'teacher', 'timemarked', 'mailed', ]);
+            'userid',
+            'modified',
+            'text',
+            'format',
+            'rating',
+            'entrycomment',
+            'teacher',
+            'timemarked',
+            'mailed',
+        ]);
 
         // Journal -> entries -> entry.
         $journal->add_child($entries);

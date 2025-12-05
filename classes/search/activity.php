@@ -29,7 +29,8 @@ namespace mod_journal\search;
  *
  * @return void
  */
-function get_dynamic_parent_activity() {
+function get_dynamic_parent_activity()
+{
     global $CFG;
     if (class_exists('\core_search\area\base_activity')) {
         return '\core_search\area\base_activity';
@@ -47,7 +48,8 @@ class_alias(get_dynamic_parent_activity(), '\mod_journal\search\DynamicParentAct
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activity extends \mod_journal\search\DynamicParentActivity {
+class activity extends \mod_journal\search\DynamicParentActivity
+{
 
 }
 

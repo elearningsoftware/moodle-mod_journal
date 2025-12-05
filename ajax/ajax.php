@@ -26,7 +26,7 @@ define('AJAX_SCRIPT', true);
 define('NO_DEBUG_DISPLAY', true);
 
 require('../../../config.php');
-require_once($CFG->dirroot.'/mod/journal/lib.php');
+require_once($CFG->dirroot . '/mod/journal/lib.php');
 
 require_login();
 $PAGE->set_context(context_system::instance());
@@ -41,8 +41,8 @@ try {
     if ($action !== 'savecart') {
         session_write_close();
     }
-    if (file_exists($CFG->dirroot.'/mod/journal/ajax/'.$action.'.php')) {
-        require($CFG->dirroot.'/mod/journal/ajax/'.$action.'.php');
+    if (file_exists($CFG->dirroot . '/mod/journal/ajax/' . $action . '.php')) {
+        require($CFG->dirroot . '/mod/journal/ajax/' . $action . '.php');
     } else {
         throw new Exception('Invalid action');
     }

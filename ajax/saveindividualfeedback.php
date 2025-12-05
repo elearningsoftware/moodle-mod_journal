@@ -35,18 +35,18 @@ $itemid = required_param('itemid', PARAM_INT);
 if ($grade === '') {
     $grade = -1;
 } else {
-    $grade = (int)$grade;
+    $grade = (int) $grade;
 }
 
-if (! $cm = get_coursemodule_from_id('journal', $cmid)) {
+if (!$cm = get_coursemodule_from_id('journal', $cmid)) {
     throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
 }
 
-if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
+if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
     throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
 }
 
-if (! $user = $DB->get_record('user', ['id' => $userid])) {
+if (!$user = $DB->get_record('user', ['id' => $userid])) {
     throw new \moodle_exception(get_string('incorrectuserid', 'journal'));
 }
 
@@ -55,12 +55,12 @@ require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/journal:manageentries', $context);
 
-if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
+if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
     throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 $journal->cmidnumber = $cm->idnumber;
 
-if (! $entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'id' => $entryid])) {
+if (!$entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'id' => $entryid])) {
     throw new \moodle_exception(get_string('incorrectjournalentry', 'journal'));
 }
 
@@ -68,7 +68,7 @@ confirm_sesskey($sesskey);
 
 // Only update entries where feedback has actually changed.
 $ratingchanged = false;
-if ($grade !== null && $grade !== (int)$entry->rating) {
+if ($grade !== null && $grade !== (int) $entry->rating) {
     $ratingchanged = true;
 }
 
@@ -80,12 +80,12 @@ if ($ratingchanged || $feedback !== $entry->entrycomment) {
     try {
         $transaction = $DB->start_delegated_transaction();
         $newentry = new stdClass();
-        $newentry->rating       = $grade;
+        $newentry->rating = $grade;
         $newentry->entrycomment = $feedback;
-        $newentry->teacher      = $USER->id;
-        $newentry->timemarked   = time();
-        $newentry->mailed       = 0;           // Make sure mail goes out (again, even).
-        $newentry->id           = $entry->id;
+        $newentry->teacher = $USER->id;
+        $newentry->timemarked = time();
+        $newentry->mailed = 0;           // Make sure mail goes out (again, even).
+        $newentry->id = $entry->id;
         if (!$DB->update_record('journal_entries', $newentry)) {
             throw new Exception(get_string('failedupdate', 'journal', $entry->userid));
         }

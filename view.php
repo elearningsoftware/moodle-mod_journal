@@ -59,7 +59,7 @@ $PAGE->set_heading($course->fullname);
 if (method_exists($PAGE, 'set_activity_record')) {
     $PAGE->set_activity_record($journal);
 }
-    
+
 // Fix for duplicate description in Moodle 4.0+.
 // In Moodle 4.0+, the activity header automatically displays the description (intro).
 // However, this page also manually displays the intro in a box below (see $OUTPUT->box call).
@@ -67,8 +67,8 @@ if (method_exists($PAGE, 'set_activity_record')) {
 // We use a branch check ($CFG->branch >= 400) because accessing $PAGE->activityheader 
 // in Moodle 3.9 triggers a coding error (magic getter fails).
 if ($CFG->branch >= 400) {
-        $PAGE->activityheader->set_description('');
-    }
+    $PAGE->activityheader->set_description('');
+}
 
 $PAGE->force_settings_menu(); // Ensure settings menu is displayed.
 
@@ -110,7 +110,7 @@ if ($entriesmanager) {
 $timenow = time();
 if ($course->format == 'weeks' && $journal->days) {
     $timestart = $course->startdate + (($cm->section - 1) * 604800);
-    $timefinish = $timestart + (3600 * 24 * (int)$journal->days);
+    $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
 } else {
     $timestart = $timenow - 1;
     $timefinish = $timenow + 1;
@@ -151,7 +151,7 @@ if ($timenow > $timestart) {
     if ($timenow < $timefinish) {
         if (!empty($entry->modified)) {
             // Safe count_words for PHP 8.1.
-            $entrytext = isset($entry->text) ? (string)$entry->text : '';
+            $entrytext = isset($entry->text) ? (string) $entry->text : '';
             $wordcount = count_words($entrytext);
             echo html_writer::div(
                 '<strong>' . get_string('lastedited') . ':</strong> ' . userdate($entry->modified) . ' (' .

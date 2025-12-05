@@ -26,7 +26,8 @@
 /**
  * Journal conversion handler
  */
-class moodle1_mod_journal_handler extends moodle1_mod_handler {
+class moodle1_mod_journal_handler extends moodle1_mod_handler
+{
 
     /**
      * Declare the paths in moodle.xml we are able to convert
@@ -37,10 +38,12 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
      *
      * @return array of Journal instances
      */
-    public function get_paths() {
+    public function get_paths()
+    {
         return [
             new convert_path(
-                'journal', '/MOODLE_BACKUP/COURSE/MODULES/MOD/JOURNAL',
+                'journal',
+                '/MOODLE_BACKUP/COURSE/MODULES/MOD/JOURNAL',
                 [
                     'renamefields' => [
                         'assessed' => 'grade',
@@ -58,18 +61,23 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
      * @param array $data Journal data array
      * @return void
      */
-    public function process_journal($data) {
+    public function process_journal($data)
+    {
 
         // Get the course module id and context id.
         $instanceid = $data['id'];
-        $cminfo     = $this->get_cminfo($instanceid);
-        $moduleid   = $cminfo['id'];
-        $contextid  = $this->converter->get_contextid(CONTEXT_MODULE, $moduleid);
+        $cminfo = $this->get_cminfo($instanceid);
+        $moduleid = $cminfo['id'];
+        $contextid = $this->converter->get_contextid(CONTEXT_MODULE, $moduleid);
 
         // We now have all information needed to start writing into the file.
         $this->open_xml_writer("activities/journal_{$moduleid}/journal.xml");
-        $this->xmlwriter->begin_tag('activity', ['id' => $instanceid, 'moduleid' => $moduleid,
-            'modulename' => 'journal', 'contextid' => $contextid, ]);
+        $this->xmlwriter->begin_tag('activity', [
+            'id' => $instanceid,
+            'moduleid' => $moduleid,
+            'modulename' => 'journal',
+            'contextid' => $contextid,
+        ]);
         $this->xmlwriter->begin_tag('journal', ['id' => $instanceid]);
 
         unset($data['id']);
@@ -83,7 +91,8 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
     /**
      * This is executed when the parser reaches the <ENTRIES> opening element
      */
-    public function on_entries_start() {
+    public function on_entries_start()
+    {
         $this->xmlwriter->begin_tag('entries');
     }
 
@@ -92,21 +101,24 @@ class moodle1_mod_journal_handler extends moodle1_mod_handler {
      * data available
      * @param array $data Journal data array
      */
-    public function process_entry($data) {
+    public function process_entry($data)
+    {
         $this->write_xml('entry', $data, ['/entry/id']);
     }
 
     /**
      * This is executed when the parser reaches the closing </ENTRIES> element
      */
-    public function on_entries_end() {
+    public function on_entries_end()
+    {
         $this->xmlwriter->end_tag('entries');
     }
 
     /**
      * This is executed when we reach the closing </MOD> tag of our 'journal' path
      */
-    public function on_journal_end() {
+    public function on_journal_end()
+    {
 
         $this->xmlwriter->end_tag('journal');
         $this->xmlwriter->end_tag('activity');

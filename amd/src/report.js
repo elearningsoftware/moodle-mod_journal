@@ -22,8 +22,8 @@
  */
 
 import Notification from 'core/notification';
-import {get_string as getString} from 'core/str';
-import {add as addToast} from 'core/toast';
+import { get_string as getString } from 'core/str';
+import { add as addToast } from 'core/toast';
 import $ from 'jquery';
 
 export const init = () => {

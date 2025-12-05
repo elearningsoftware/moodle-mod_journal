@@ -41,7 +41,7 @@ require_login($course, false, $cm);
 
 require_capability('mod/journal:addentries', $context);
 
-if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
+if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
     throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
 }
 
@@ -53,7 +53,7 @@ $PAGE->set_heading($course->fullname);
 
 // Moodle 4.0+ Activity Header support. Checked for 3.9 compatibility.
 if (method_exists($PAGE, 'set_activity_record')) {
-$PAGE->set_activity_record($journal);
+    $PAGE->set_activity_record($journal);
 }
 
 $data = new stdClass();
@@ -113,8 +113,15 @@ if ($form->is_cancelled()) {
 
     // Relink using the proper entryid.
     // We need to do this as draft area didn't have an itemid associated when creating the entry.
-    $fromform = file_postupdate_standard_editor($fromform, 'text', $editoroptions,
-        $editoroptions['context'], 'mod_journal', 'entry', $newentry->id);
+    $fromform = file_postupdate_standard_editor(
+        $fromform,
+        'text',
+        $editoroptions,
+        $editoroptions['context'],
+        'mod_journal',
+        'entry',
+        $newentry->id
+    );
     $newentry->text = $fromform->text;
     $newentry->format = $fromform->textformat;
 
@@ -139,7 +146,7 @@ if ($form->is_cancelled()) {
     $event->add_record_snapshot('journal', $journal);
     $event->trigger();
 
-    redirect(new moodle_url('/mod/journal/view.php?id='.$cm->id));
+    redirect(new moodle_url('/mod/journal/view.php?id=' . $cm->id));
     die;
 }
 

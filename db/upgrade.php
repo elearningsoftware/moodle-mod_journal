@@ -23,7 +23,7 @@
  **/
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/mod/journal/lib.php');
+require_once($CFG->dirroot . '/mod/journal/lib.php');
 
 /**
  * Upgrade steps for mod_journal
@@ -31,7 +31,8 @@ require_once($CFG->dirroot.'/mod/journal/lib.php');
  * @param integer $oldversion Old plugin version
  * @return bool True if succesfull, false otherwise
  */
-function xmldb_journal_upgrade($oldversion=0) {
+function xmldb_journal_upgrade($oldversion = 0)
+{
     global $DB;
 
     $dbman = $DB->get_manager();

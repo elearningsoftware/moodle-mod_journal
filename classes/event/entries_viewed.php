@@ -32,12 +32,14 @@ namespace mod_journal\event;
  * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entries_viewed extends \core\event\base {
+class entries_viewed extends \core\event\base
+{
 
     /**
      * Init method.
      */
-    protected function init() {
+    protected function init()
+    {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
         $this->data['objecttable'] = 'journal';
@@ -48,7 +50,8 @@ class entries_viewed extends \core\event\base {
      *
      * @return string
      */
-    public static function get_name() {
+    public static function get_name()
+    {
         return get_string('evententriesviewed', 'mod_journal');
     }
 
@@ -57,7 +60,8 @@ class entries_viewed extends \core\event\base {
      *
      * @return string
      */
-    public function get_description() {
+    public function get_description()
+    {
         return "The user with id '$this->userid' has viewed the entries for the journal activity with the course module id
             '$this->contextinstanceid'";
     }
@@ -66,7 +70,8 @@ class entries_viewed extends \core\event\base {
      * Returns relevant URL.
      * @return \moodle_url
      */
-    public function get_url() {
+    public function get_url()
+    {
         return new \moodle_url('/mod/journal/report.php', ['id' => $this->contextinstanceid]);
     }
 }

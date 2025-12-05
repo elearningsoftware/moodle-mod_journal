@@ -32,6 +32,7 @@ namespace mod_journal\event;
  * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
+class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed
+{
     // No need for any code here as everything is handled by the parent class.
 }

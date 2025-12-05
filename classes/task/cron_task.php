@@ -34,20 +34,23 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cron_task extends \core\task\scheduled_task {
+class cron_task extends \core\task\scheduled_task
+{
     /**
      * Get a descriptive name for this task (shown to admins).
      *
      * @return string
      */
-    public function get_name() {
+    public function get_name()
+    {
         return get_string('crontask', 'mod_journal');
     }
 
     /**
      * Execute the scheduled task.
      */
-    public function execute() {
+    public function execute()
+    {
         global $CFG, $USER, $DB;
 
         $cutofftime = time() - $CFG->maxeditingtime;
@@ -61,7 +64,7 @@ class cron_task extends \core\task\scheduled_task {
                 $usernamefields = get_all_user_name_fields();
             }
             $requireduserfields = 'id, auth, mnethostid, email, mailformat, maildisplay, lang, deleted, suspended, '
-                    .implode(', ', $usernamefields);
+                . implode(', ', $usernamefields);
 
             // To save some db queries.
             $users = [];
@@ -124,29 +127,29 @@ class cron_task extends \core\task\scheduled_task {
                 $journalinfo->teacher = fullname($teacher);
                 $journalinfo->journal = format_string($entry->name, true);
                 $journalinfo->url = "$CFG->wwwroot/mod/journal/view.php?id=$mod->id";
-                $modnamepl = get_string( 'modulenameplural', 'journal' );
-                $msubject = get_string( 'mailsubject', 'journal' );
+                $modnamepl = get_string('modulenameplural', 'journal');
+                $msubject = get_string('mailsubject', 'journal');
 
-                $postsubject = "$course->shortname: $msubject: ".format_string($entry->name, true);
-                $posttext  = "$course->shortname -> $modnamepl -> ".format_string($entry->name, true)."\n";
+                $postsubject = "$course->shortname: $msubject: " . format_string($entry->name, true);
+                $posttext = "$course->shortname -> $modnamepl -> " . format_string($entry->name, true) . "\n";
                 $posttext .= "---------------------------------------------------------------------\n";
-                $posttext .= get_string("journalmail", "journal", $journalinfo)."\n";
+                $posttext .= get_string("journalmail", "journal", $journalinfo) . "\n";
                 $posttext .= "---------------------------------------------------------------------\n";
                 if ($user->mailformat == 1) {  // HTML.
-                    $posthtml = "<p><font face=\"sans-serif\">".
-                    "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->".
-                    "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->".
-                    "<a href=\"$CFG->wwwroot/mod/journal/view.php?id=$mod->id\">"
-                        .format_string($entry->name, true)
-                    ."</a></font></p>";
+                    $posthtml = "<p><font face=\"sans-serif\">" .
+                        "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->" .
+                        "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->" .
+                        "<a href=\"$CFG->wwwroot/mod/journal/view.php?id=$mod->id\">"
+                        . format_string($entry->name, true)
+                        . "</a></font></p>";
                     $posthtml .= "<hr /><font face=\"sans-serif\">";
-                    $posthtml .= "<p>".get_string("journalmailhtml", "journal", $journalinfo)."</p>";
+                    $posthtml .= "<p>" . get_string("journalmailhtml", "journal", $journalinfo) . "</p>";
                     $posthtml .= "</font><hr />";
                 } else {
                     $posthtml = "";
                 }
 
-                if (! email_to_user($user, $teacher, $postsubject, $posttext, $posthtml)) {
+                if (!email_to_user($user, $teacher, $postsubject, $posttext, $posthtml)) {
                     echo "Error: Journal cron: Could not send out mail for "
                         . "id $entry->id to user $user->id ($user->email)\n";
                 }

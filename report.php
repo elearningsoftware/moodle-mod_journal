@@ -17,9 +17,9 @@
 /**
  * The report page for the mod_journal plugin
  *
- * @package mod_journal
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_journal
+ * @copyright   1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
 require_once('../../config.php');
@@ -102,7 +102,7 @@ if ($data = data_submitted()) {
 
         $studentrating = clean_param($vals['r'], PARAM_INT);
         // Ensure text is a string to satisfy PHP 8.1 strict typing.
-        $rawtext = isset($vals['c']['text']) ? (string)$vals['c']['text'] : '';
+        $rawtext = isset($vals['c']['text']) ? (string) $vals['c']['text'] : '';
         $studentcomment = clean_text($rawtext, FORMAT_HTML);
         $studentcomment = file_save_draft_area_files($vals['c']['itemid'], $context->id, 'mod_journal', 'feedback', $num, [], $studentcomment);
 
