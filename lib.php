@@ -956,7 +956,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $feedbackSection .= $gradebookgradestr;
 
         // Feedback text.
-        echo html_writer::label(fullname($user) . ' ' . get_string('feedback'), 'c' . $entry->id, true, ['class' => 'accesshide']);
+        echo html_writer::label(fullname($user) . ' ' . get_string('feedback'), 'c' . $entry->id . '[text]', true, ['class' => 'accesshide']);
 
         $draftitemid = 0;
         $feedbacktext = file_prepare_draft_area(
