@@ -50,7 +50,11 @@ $PAGE->set_url('/mod/journal/edit.php', ['id' => $id]);
 $PAGE->navbar->add(get_string('edit'));
 $PAGE->set_title(format_string($journal->name));
 $PAGE->set_heading($course->fullname);
+
+// Moodle 4.0+ Activity Header support. Checked for 3.9 compatibility.
+if (method_exists($PAGE, 'set_activity_record')) {
 $PAGE->set_activity_record($journal);
+}
 
 $data = new stdClass();
 

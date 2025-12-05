@@ -28,7 +28,7 @@ $sesskey = required_param('sesskey', PARAM_ALPHANUM);
 $cmid = required_param('cmid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 $entryid = required_param('entryid', PARAM_INT);
-$feedback = optional_param('feedback', null, PARAM_RAW);
+$feedback = optional_param('feedback', '', PARAM_RAW);
 $grade = optional_param('grade', '', PARAM_RAW);
 $itemid = required_param('itemid', PARAM_INT);
 

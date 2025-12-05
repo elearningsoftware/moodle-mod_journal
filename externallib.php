@@ -98,10 +98,10 @@ class mod_journal_external extends external_api {
 
         if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
             return [
-                'text' => $entry->text,
+                'text' => isset($entry->text) ? (string)$entry->text : '',
                 'modified' => $entry->modified,
                 'rating' => $entry->rating,
-                'comment' => $entry->entrycomment,
+                'comment' => isset($entry->entrycomment) ? (string)$entry->entrycomment : '',
                 'teacher' => $entry->teacher,
             ];
         } else {

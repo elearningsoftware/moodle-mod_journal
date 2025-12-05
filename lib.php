@@ -22,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\output\html_writer;
-
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod.html) this function
@@ -182,7 +180,12 @@ function journal_user_outline($course, $user, $mod, $journal)
 
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
 
-        $numwords = count(preg_split('/\w\b/', $entry->text)) - 1;
+        // Cast to string to prevent PHP 8.1 null deprecation notice in preg_split.
+        $text = isset($entry->text) ? (string)$entry->text : '';
+        $numwords = count(preg_split('/\w\b/', $text)) - 1;
+        if ($numwords < 0) {
+            $numwords = 0;
+        }
 
         $result = new \stdClass();
         $result->info = get_string('numwords', '', $numwords);
@@ -261,6 +264,10 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart)
     ";
 
     $newentries = $DB->get_records_sql($sql, $dbparams);
+
+    if (empty($newentries)) {
+        return false;
+    }
 
     $modinfo = get_fast_modinfo($course);
     $show = [];
@@ -349,18 +356,19 @@ function journal_get_participants($journalid)
 {
     global $DB;
 
-    // Get students.
-    $students = $DB->get_records_sql('SELECT DISTINCT u.id
-                                      FROM {user} u,
-                                      {journal_entries} j
-                                      WHERE j.journal=? and
-                                      u.id = j.userid', [$journalid]);
-    // Get teachers.
-    $teachers = $DB->get_records_sql('SELECT DISTINCT u.id
-                                      FROM {user} u,
-                                      {journal_entries} j
-                                      WHERE j.journal=? and
-                                      u.id = j.teacher', [$journalid]);
+    // Get students using explicit JOINs.
+    $sqlstudents = "SELECT DISTINCT u.id
+                    FROM {user} u
+                    JOIN {journal_entries} j ON u.id = j.userid
+                   WHERE j.journal = ?";
+    $students = $DB->get_records_sql($sqlstudents, [$journalid]);
+
+    // Get teachers using explicit JOINs.
+    $sqlteachers = "SELECT DISTINCT u.id
+                    FROM {user} u
+                    JOIN {journal_entries} j ON u.id = j.teacher
+                   WHERE j.journal = ?";
+    $teachers = $DB->get_records_sql($sqlteachers, [$journalid]);
 
     // Add teachers to students.
     if ($teachers) {
@@ -910,7 +918,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $hiddengradestr = '';
         $gradebookgradestr = '';
         $feedbackdisabledstr = '';
-        $feedbacktext = $entry->entrycomment;
+        // Cast to string for PHP 8.1 safety.
+        $feedbacktext = isset($entry->entrycomment) ? (string)$entry->entrycomment : '';
 
         // Handling gradebook integration.
         if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
@@ -1093,6 +1102,8 @@ function journal_print_feedback($course, $entry, $grades)
     }
     echo '</div>';
 
+    // Cast to string for PHP 8.1 safety.
+    $entry->entrycomment = isset($entry->entrycomment) ? (string)$entry->entrycomment : '';
     $entry->entrycomment = file_rewrite_pluginfile_urls($entry->entrycomment, 'pluginfile.php', $context->id, 'mod_journal', 'feedback', $entry->id);
 
     // Feedback text.
@@ -1130,6 +1141,9 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
 
     // Args[0] should be the entry id.
     $entryid = intval(array_shift($args));
+    if (!$entryid) {
+        return false;
+    }
     $entry = $DB->get_record('journal_entries', ['id' => $entryid], 'id, userid', MUST_EXIST);
 
     $canmanage = has_capability('mod/journal:manageentries', $context);
@@ -1177,7 +1191,10 @@ function journal_format_entry_text($entry, $course = false, $cm = false)
     }
 
     $context = \context_module::instance($cm->id);
-    $entrytext = file_rewrite_pluginfile_urls($entry->text, 'pluginfile.php', $context->id, 'mod_journal', 'entry', $entry->id);
+    
+    // Cast to string for PHP 8.1 safety.
+    $entrytext = isset($entry->text) ? (string)$entry->text : '';
+    $entrytext = file_rewrite_pluginfile_urls($entrytext, 'pluginfile.php', $context->id, 'mod_journal', 'entry', $entry->id);
 
     $formatoptions = [
         'context' => $context,
@@ -1203,7 +1220,7 @@ function mod_journal_core_calendar_provide_event_action(
     calendar_event $event,
     \core_calendar\action_factory $factory,
     int $userid = 0
-) {
+): ?\core_calendar\local\event\entities\action_interface {
     global $USER;
 
     if (empty($userid)) {

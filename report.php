@@ -52,6 +52,12 @@ $PAGE->set_url('/mod/journal/report.php', ['id' => $id]);
 $PAGE->navbar->add(get_string('entries', 'journal'));
 $PAGE->set_title(get_string('modulenameplural', 'journal'));
 $PAGE->set_heading($course->fullname);
+
+// Moodle 4.0+ Activity Header support. Checked for 3.9 compatibility.
+if (method_exists($PAGE, 'set_activity_record')) {
+    $PAGE->set_activity_record($journal);
+}
+
 $PAGE->requires->js_call_amd('mod_journal/report', 'init');
 
 echo $OUTPUT->header();
@@ -88,11 +94,16 @@ if ($data = data_submitted()) {
     $timenow = time();
     $count = 0;
     foreach ($feedback as $num => $vals) {
+        if (!isset($entrybyentry[$num])) {
+            continue;
+        }
         $entry = $entrybyentry[$num];
         $ratingchanged = false;
 
         $studentrating = clean_param($vals['r'], PARAM_INT);
-        $studentcomment = clean_text($vals['c']['text'], FORMAT_HTML);
+        // Ensure text is a string to satisfy PHP 8.1 strict typing.
+        $rawtext = isset($vals['c']['text']) ? (string)$vals['c']['text'] : '';
+        $studentcomment = clean_text($rawtext, FORMAT_HTML);
         $studentcomment = file_save_draft_area_files($vals['c']['itemid'], $context->id, 'mod_journal', 'feedback', $num, [], $studentcomment);
 
         if ($studentrating != $entry->rating || $studentcomment != $entry->entrycomment) {
