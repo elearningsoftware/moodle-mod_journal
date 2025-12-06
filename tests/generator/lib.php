@@ -74,4 +74,26 @@ class mod_journal_generator extends testing_module_generator {
 
         return parent::create_instance($record, (array) $options);
     }
+
+    /**
+     * Create a journal entry.
+     *
+     * @param object $record Journal entry record, needs at least the journal ID.
+     * @return int The ID of the created journal entry
+     */
+    public function create_entry(object $record): int {
+        global $DB, $USER;
+
+        if (!isset($record->journal)) {
+            throw new coding_exception('You must specify the journal ID in the record to create a journal entry.');
+        }
+        if (!isset($record->userid)) {
+            $record->userid = $USER->id;
+        }
+        if (!isset($record->text)) {
+            $record->text = 'The student\'s journal entry text.';
+        }
+
+        return $DB->insert_record('journal_entries', $record);
+    }
 }
