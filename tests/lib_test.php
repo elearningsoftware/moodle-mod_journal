@@ -28,8 +28,10 @@ namespace mod_journal;
 final class lib_test extends \advanced_testcase {
     /**
      * Test reset function.
+     *
+     * @covers ::journal_reset_userdata
      */
-    public function test_reset() {
+    public function test_reset(): void {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
