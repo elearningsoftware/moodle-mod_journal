@@ -194,9 +194,9 @@ if (!$users) {
         'sortby',
         $options,
         $sortby,
-        null
+        null,
     );
-    $select->set_label(get_string('sortby'));
+    $select->set_label(get_string('sortby'), ['class' => 'me-1']);
     echo html_writer::div($OUTPUT->render($select), 'divwrapper sortbyselect');
 
     $grades = make_grades_menu($journal->grade);
@@ -252,7 +252,7 @@ if (!$users) {
         html_writer::empty_tag('input', [
             'type' => 'submit',
             'value' => get_string('saveallfeedback', 'journal'),
-            'class' => 'btn btn-secondary m-t-1',
+            'class' => 'btn btn-secondary mt-1',
         ]),
         ['class' => 'feedbacksave']
     );

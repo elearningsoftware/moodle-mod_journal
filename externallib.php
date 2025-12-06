@@ -93,7 +93,6 @@ class mod_journal_external extends external_api {
 
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
-        ;
         require_capability('mod/journal:addentries', $context);
 
         if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
@@ -164,7 +163,6 @@ class mod_journal_external extends external_api {
 
         $context = \context_module::instance($cm->id);
         self::validate_context($context);
-        ;
         require_capability('mod/journal:addentries', $context);
 
         $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);

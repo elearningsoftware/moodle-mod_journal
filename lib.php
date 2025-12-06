@@ -860,15 +860,17 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
     $entryid = 'entry-' . $user->id;
     $content = html_writer::start_div('journaluserentrywrapper');
-    $content .= html_writer::start_tag('table', ['class' => 'journaluserentry m-b-1', 'id' => $entryid]);
+    // Use both classes to support Bootstrap 4 (Moodle 3.9) and Bootstrap 5 (Moodle 4.0+).
+    $content .= html_writer::start_tag('table', ['class' => 'journaluserentry m-b-1 mb-1', 'id' => $entryid]);
 
     // User picture and fullname row.
-    $content .= html_writer::start_tag('tr');
-    $content .= html_writer::tag(
+    $content .= \html_writer::start_tag('tr');
+    $content .= \html_writer::tag(
         'td',
         $OUTPUT->user_picture($user, ['courseid' => $course->id, 'alttext' => true]),
         ['class' => 'userpix', 'style' => 'border-bottom: 1px solid #dedede;']
     );
+
     $userfullname = html_writer::tag('strong', fullname($user));
     if ($entry) {
         $userfullname .= ' ' . html_writer::tag(
@@ -881,13 +883,13 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     $content .= html_writer::end_tag('tr');
 
     // Entry content row.
-    $content .= html_writer::start_tag('tr');
-    $content .= html_writer::tag(
+    $content .= \html_writer::start_tag('tr');
+    $content .= \html_writer::tag(
         'td',
         $entry ? journal_format_entry_text($entry, $course) : get_string('noentry', 'journal'),
         ['colspan' => '2']
     );
-    $content .= html_writer::end_tag('tr');
+    $content .= \html_writer::end_tag('tr');
 
     // Feedback row if entry exists.
     if ($entry) {
@@ -916,16 +918,16 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
                 || $gradinginfo->items[0]->grades[$user->id]->overridden;
             if ($gradingdisabled) {
                 $attrs['disabled'] = 'disabled';
-                $hiddengradestr = html_writer::empty_tag('input', [
+                $hiddengradestr = \html_writer::empty_tag('input', [
                     'type' => 'hidden',
                     'name' => 'r' . $entry->id,
                     'value' => $entry->rating,
                 ]);
-                $gradebooklink = html_writer::link(
+                $gradebooklink = \html_writer::link(
                     $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id,
                     $gradinginfo->items[0]->grades[$user->id]->str_long_grade
                 );
-                $gradebookgradestr = html_writer::tag('br') . get_string("gradeingradebook", "journal") . ': ' . $gradebooklink;
+                $gradebookgradestr = \html_writer::tag('br') . get_string("gradeingradebook", "journal") . ': ' . $gradebooklink;
                 $feedbackdisabledstr = 'disabled';
                 $feedbacktext = $gradinginfo->items[0]->grades[$user->id]->str_feedback;
             }
@@ -941,6 +943,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             true,
             ['class' => 'accesshide']
         );
+
         $feedbacksection .= html_writer::select(
             $grades,
             'r' . $entry->id,
@@ -1053,7 +1056,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $content .= html_writer::end_tag('tr');
     }
 
-    $content .= html_writer::end_tag('table');
+    $content .= \html_writer::end_tag('table');
 
     // Feedback save button.
     if ($entry) {
@@ -1065,7 +1068,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         echo '</p>';
     }
 
-    $content .= html_writer::end_div();
+    $content .= \html_writer::end_div();
 
     echo $content;
 }
