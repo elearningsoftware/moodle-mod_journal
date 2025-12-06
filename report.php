@@ -200,9 +200,7 @@ if (!$users) {
     echo html_writer::div($OUTPUT->render($select), 'divwrapper sortbyselect');
 
     $grades = make_grades_menu($journal->grade);
-    if (!$teachers = get_users_by_capability($context, 'mod/journal:manageentries')) {
-        throw new \moodle_exception(get_string('noentriesmanagers', 'journal'));
-    }
+    $teachers = get_users_by_capability($context, 'mod/journal:manageentries');
 
     // Start the form.
     echo html_writer::start_tag('form', [
