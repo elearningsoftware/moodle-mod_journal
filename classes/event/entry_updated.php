@@ -32,14 +32,12 @@ namespace mod_journal\event;
  * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry_updated extends \core\event\base
-{
+class entry_updated extends \core\event\base {
 
     /**
      * Init method.
      */
-    protected function init()
-    {
+    protected function init() {
         $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'journal';
@@ -50,8 +48,7 @@ class entry_updated extends \core\event\base
      *
      * @return string
      */
-    public static function get_name()
-    {
+    public static function get_name() {
         return get_string('evententryupdated', 'mod_journal');
     }
 
@@ -60,8 +57,7 @@ class entry_updated extends \core\event\base
      *
      * @return string
      */
-    public function get_description()
-    {
+    public function get_description() {
         return "The user with id '$this->userid' has updated an entry for the journal activity " .
             "with the course module id '$this->contextinstanceid'";
     }
@@ -70,8 +66,7 @@ class entry_updated extends \core\event\base
      * Returns relevant URL.
      * @return \moodle_url
      */
-    public function get_url()
-    {
+    public function get_url() {
         return new \moodle_url('/mod/journal/edit.php', ['id' => $this->contextinstanceid]);
     }
 }

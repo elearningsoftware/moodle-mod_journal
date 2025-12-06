@@ -34,23 +34,20 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cron_task extends \core\task\scheduled_task
-{
+class cron_task extends \core\task\scheduled_task {
     /**
      * Get a descriptive name for this task (shown to admins).
      *
      * @return string
      */
-    public function get_name()
-    {
+    public function get_name() {
         return get_string('crontask', 'mod_journal');
     }
 
     /**
      * Execute the scheduled task.
      */
-    public function execute()
-    {
+    public function execute() {
         global $CFG, $USER, $DB;
 
         $cutofftime = time() - $CFG->maxeditingtime;

@@ -33,16 +33,14 @@ require_once($CFG->dirroot . '/mod/journal/backup/moodle2/backup_journal_stepsli
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_journal_activity_task extends backup_activity_task
-{
+class backup_journal_activity_task extends backup_activity_task {
 
     /**
      * Define the settings for the backup process
      *
      * @return void
      */
-    protected function define_my_settings()
-    {
+    protected function define_my_settings() {
     }
 
     /**
@@ -50,8 +48,7 @@ class backup_journal_activity_task extends backup_activity_task
      *
      * @return void
      */
-    protected function define_my_steps()
-    {
+    protected function define_my_steps() {
         $this->add_step(new backup_journal_activity_structure_step('journal_structure', 'journal.xml'));
     }
 
@@ -61,8 +58,7 @@ class backup_journal_activity_task extends backup_activity_task
      * @param string $content Content
      * @return string $content with links encoded
      */
-    public static function encode_content_links($content)
-    {
+    public static function encode_content_links($content) {
         global $CFG;
 
         $base = preg_quote($CFG->wwwroot . '/mod/journal', '#');

@@ -33,8 +33,7 @@ require_once("$CFG->libdir/externallib.php");
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_journal_external extends external_api
-{
+class mod_journal_external extends external_api {
 
     /**
      * Returns description of method parameters
@@ -42,8 +41,7 @@ class mod_journal_external extends external_api
      * @return external_function_parameters
      * @since Moodle 3.3
      */
-    public static function get_entry_parameters()
-    {
+    public static function get_entry_parameters() {
         return new external_function_parameters(
             [
                 'journalid' => new external_value(PARAM_INT, 'id of journal'),
@@ -57,8 +55,7 @@ class mod_journal_external extends external_api
      * @return external_description
      * @since Moodle 3.3
      */
-    public static function get_entry_returns()
-    {
+    public static function get_entry_returns() {
         return new external_single_structure(
             [
                 'text' => new external_value(PARAM_RAW, 'journal text'),
@@ -78,8 +75,7 @@ class mod_journal_external extends external_api
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function get_entry($journalid)
-    {
+    public static function get_entry($journalid) {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::get_entry_parameters(), ['journalid' => $journalid]);
@@ -120,8 +116,7 @@ class mod_journal_external extends external_api
      * @since Moodle 3.3
      * @throws moodle_exception
      */
-    public static function set_text_parameters()
-    {
+    public static function set_text_parameters() {
         return new external_function_parameters(
             [
                 'journalid' => new external_value(PARAM_INT, 'id of journal'),
@@ -137,8 +132,7 @@ class mod_journal_external extends external_api
      * @return external_description
      * @since Moodle 3.3
      */
-    public static function set_text_returns()
-    {
+    public static function set_text_returns() {
         return new external_value(PARAM_RAW, 'new text');
     }
 
@@ -149,8 +143,7 @@ class mod_journal_external extends external_api
      * @param string $text Text parameter
      * @param string $format Format constant for the string
      */
-    public static function set_text($journalid, $text, $format)
-    {
+    public static function set_text($journalid, $text, $format) {
         global $DB, $USER;
 
         $params = self::validate_parameters(

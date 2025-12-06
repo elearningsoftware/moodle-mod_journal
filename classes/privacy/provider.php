@@ -49,8 +49,7 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
 class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\request\plugin\provider
-{
+    \core_privacy\local\request\plugin\provider {
 
     /**
      * Returns metadata.
@@ -58,8 +57,7 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection): collection
-    {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
             'journal_entries',
             [
@@ -82,8 +80,7 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid): contextlist
-    {
+    public static function get_contexts_for_userid(int $userid): contextlist {
 
         $sql = "
             SELECT DISTINCT ctx.id
@@ -113,8 +110,7 @@ class provider implements
      * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
      *
      */
-    public static function get_users_in_context(userlist $userlist)
-    {
+    public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
 
         if (!is_a($context, \context_module::class)) {
@@ -147,8 +143,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts to export information for.
      */
-    public static function export_user_data(approved_contextlist $contextlist)
-    {
+    public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
 
         $user = $contextlist->get_user();
@@ -175,7 +170,7 @@ class provider implements
         $journalidstocmids = static::get_journal_ids_to_cmids_from_cmids($cmids);
 
         // Prepare the common SQL fragments.
-        list($injournalsql, $injournalparams) = $DB->get_in_or_equal(array_keys($journalidstocmids), SQL_PARAMS_NAMED);
+        [$injournalsql, $injournalparams] = $DB->get_in_or_equal(array_keys($journalidstocmids), SQL_PARAMS_NAMED);
         $sqluserjournal = "(userid = :userid OR teacher = :teacher) AND journal $injournalsql";
         $paramsuserjournal = array_merge($injournalparams, ['userid' => $userid, 'teacher' => $userid]);
 
@@ -204,8 +199,7 @@ class provider implements
      *
      * @param context $context The specific context to delete data for.
      */
-    public static function delete_data_for_all_users_in_context(\context $context)
-    {
+    public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
 
         if ($context->contextlevel != CONTEXT_MODULE) {
@@ -224,8 +218,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist)
-    {
+    public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
 
         $userid = $contextlist->get_user()->id;
@@ -247,7 +240,7 @@ class provider implements
         }
 
         // Prepare the SQL we'll need below.
-        list($insql, $inparams) = $DB->get_in_or_equal($journalids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($journalids, SQL_PARAMS_NAMED);
         $sql = "journal $insql AND userid = :userid";
         $params = array_merge($inparams, ['userid' => $userid]);
 
@@ -259,8 +252,7 @@ class provider implements
      *
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
-    public static function delete_data_for_users(approved_userlist $userlist)
-    {
+    public static function delete_data_for_users(approved_userlist $userlist) {
         global $DB;
 
         $context = $userlist->get_context();
@@ -272,7 +264,7 @@ class provider implements
         }
 
         // Prepare the SQL we'll need below.
-        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         $sql = "journal = :journalid AND userid {$insql}";
         $params = array_merge($inparams, ['journalid' => $journalid]);
         $DB->delete_records_select('journal_entries', $sql, $params);
@@ -285,8 +277,7 @@ class provider implements
      * @param context_module $context The module context.
      * @return int
      */
-    protected static function get_journal_id_from_context(context_module $context)
-    {
+    protected static function get_journal_id_from_context(context_module $context) {
         $cm = get_coursemodule_from_id('journal', $context->instanceid);
         return $cm ? (int) $cm->instance : 0;
     }
@@ -297,10 +288,9 @@ class provider implements
      * @param array $cmids The course module IDs.
      * @return array In the form of [$journalid => $cmid].
      */
-    protected static function get_journal_ids_to_cmids_from_cmids(array $cmids)
-    {
+    protected static function get_journal_ids_to_cmids_from_cmids(array $cmids) {
         global $DB;
-        list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
         $sql = "
             SELECT j.id, cm.id AS cmid
               FROM {journal} j

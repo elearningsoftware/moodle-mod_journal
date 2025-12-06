@@ -31,8 +31,7 @@
  * @copyright  2014 David Monllao <david.monllao@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_journal_generator extends testing_module_generator
-{
+class mod_journal_generator extends testing_module_generator {
 
     /**
      * @var int keep track of how many journals have been created.
@@ -44,8 +43,7 @@ class mod_journal_generator extends testing_module_generator
      * do not use in tests.
      * @return void
      */
-    public function reset()
-    {
+    public function reset() {
         $this->journalcount = 0;
         parent::reset();
     }
@@ -57,8 +55,7 @@ class mod_journal_generator extends testing_module_generator
      * @param ?array $options Options array
      * @return void
      */
-    public function create_instance($record = null, ?array $options = null)
-    {
+    public function create_instance($record = null, ?array $options = null) {
         $record = (object) (array) $record;
 
         if (!isset($record->name)) {

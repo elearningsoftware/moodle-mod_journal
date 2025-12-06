@@ -33,8 +33,7 @@ require_once($CFG->dirroot . '/mod/journal/lib.php');
  *
  * @return void
  */
-function get_dynamic_parent_entry()
-{
+function get_dynamic_parent_entry() {
     global $CFG;
     if (class_exists('\core_search\area\base_mod')) {
         return '\core_search\area\base_mod';
@@ -51,8 +50,7 @@ class_alias(get_dynamic_parent_entry(), '\mod_journal\search\DynamicParentEntry'
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends \mod_journal\search\DynamicParentEntry
-{
+class entry extends \mod_journal\search\DynamicParentEntry {
 
     /**
      * Returns recordset containing required data for indexing journal entries.
@@ -60,8 +58,7 @@ class entry extends \mod_journal\search\DynamicParentEntry
      * @param int $modifiedfrom timestamp
      * @return moodle_recordset
      */
-    public function get_recordset_by_timestamp($modifiedfrom = 0)
-    {
+    public function get_recordset_by_timestamp($modifiedfrom = 0) {
         global $DB;
 
         $sql = "SELECT je.*, j.course FROM {journal_entries} je
@@ -77,8 +74,7 @@ class entry extends \mod_journal\search\DynamicParentEntry
      * @param array    $options
      * @return \core_search\document
      */
-    public function get_document($entry, $options = [])
-    {
+    public function get_document($entry, $options = []) {
 
         try {
             $cm = $this->get_cm('journal', $entry->journal, $entry->course);
@@ -126,8 +122,7 @@ class entry extends \mod_journal\search\DynamicParentEntry
      * @param int $id Glossary entry id
      * @return bool
      */
-    public function check_access($id)
-    {
+    public function check_access($id) {
         global $USER;
 
         try {
@@ -156,8 +151,7 @@ class entry extends \mod_journal\search\DynamicParentEntry
      * @param \core_search\document $doc
      * @return \moodle_url
      */
-    public function get_doc_url(\core_search\document $doc)
-    {
+    public function get_doc_url(\core_search\document $doc) {
         global $USER;
 
         $contextmodule = \context::instance_by_id($doc->get('contextid'));
@@ -178,8 +172,7 @@ class entry extends \mod_journal\search\DynamicParentEntry
      * @param \core_search\document $doc
      * @return \moodle_url
      */
-    public function get_context_url(\core_search\document $doc)
-    {
+    public function get_context_url(\core_search\document $doc) {
         $contextmodule = \context::instance_by_id($doc->get('contextid'));
         return new \moodle_url('/mod/journal/view.php', ['id' => $contextmodule->instanceid]);
     }
@@ -193,8 +186,7 @@ class entry extends \mod_journal\search\DynamicParentEntry
      * @param int $entryid
      * @return stdClass
      */
-    protected function get_entry($entryid)
-    {
+    protected function get_entry($entryid) {
         global $DB;
 
         return $DB->get_record_sql("SELECT je.*, j.course FROM {journal_entries} je

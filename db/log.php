@@ -17,9 +17,9 @@
 /**
  * Log entries for mod_journal
  *
- * @package mod_journal
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     mod_journal
+ * @copyright   1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 defined('MOODLE_INTERNAL') || die();
 

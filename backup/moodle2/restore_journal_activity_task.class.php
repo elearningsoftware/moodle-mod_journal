@@ -33,16 +33,14 @@ require_once($CFG->dirroot . '/mod/journal/backup/moodle2/restore_journal_stepsl
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_journal_activity_task extends restore_activity_task
-{
+class restore_journal_activity_task extends restore_activity_task {
 
     /**
      * Define the settings for the restore process
      *
      * @return void
      */
-    protected function define_my_settings()
-    {
+    protected function define_my_settings() {
     }
 
     /**
@@ -50,8 +48,7 @@ class restore_journal_activity_task extends restore_activity_task
      *
      * @return void
      */
-    protected function define_my_steps()
-    {
+    protected function define_my_steps() {
         $this->add_step(new restore_journal_activity_structure_step('journal_structure', 'journal.xml'));
     }
 
@@ -60,8 +57,7 @@ class restore_journal_activity_task extends restore_activity_task
      *
      * @return void
      */
-    public static function define_decode_contents()
-    {
+    public static function define_decode_contents() {
 
         $contents = [];
         $contents[] = new restore_decode_content('journal', ['intro'], 'journal');
@@ -75,8 +71,7 @@ class restore_journal_activity_task extends restore_activity_task
      *
      * @return void
      */
-    public static function define_decode_rules()
-    {
+    public static function define_decode_rules() {
 
         $rules = [];
         $rules[] = new restore_decode_rule('JOURNALINDEX', '/mod/journal/index.php?id=$1', 'course');
@@ -93,8 +88,7 @@ class restore_journal_activity_task extends restore_activity_task
      *
      * @return void
      */
-    public static function define_restore_log_rules()
-    {
+    public static function define_restore_log_rules() {
 
         $rules = [];
         $rules[] = new restore_log_rule('journal', 'view', 'view.php?id={course_module}', '{journal}');
@@ -111,8 +105,7 @@ class restore_journal_activity_task extends restore_activity_task
      *
      * @return void
      */
-    public static function define_restore_log_rules_for_course()
-    {
+    public static function define_restore_log_rules_for_course() {
 
         $rules = [];
         $rules[] = new restore_log_rule('journal', 'view all', 'index.php?id={course}', null);

@@ -29,16 +29,14 @@
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_journal_activity_structure_step extends restore_activity_structure_step
-{
+class restore_journal_activity_structure_step extends restore_activity_structure_step {
 
     /**
      * Define the structure of the backup
      *
      * @return void
      */
-    protected function define_structure()
-    {
+    protected function define_structure() {
 
         $paths = [];
         $paths[] = new restore_path_element('journal', '/activity/journal');
@@ -56,8 +54,7 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      * @param array $data Journal data array
      * @return void
      */
-    protected function process_journal($data)
-    {
+    protected function process_journal($data) {
 
         global $DB;
 
@@ -78,8 +75,7 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      * @param array $data Data array
      * @return void
      */
-    protected function process_journal_entry($data)
-    {
+    protected function process_journal_entry($data) {
 
         global $DB;
 
@@ -103,8 +99,7 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      *
      * @return void
      */
-    protected function after_execute()
-    {
+    protected function after_execute() {
         $this->add_related_files('mod_journal', 'intro', null);
         $this->add_related_files('mod_journal_entries', 'text', 'journal_entry');
         $this->add_related_files('mod_journal_entries', 'entrycomment', 'journal_entry');

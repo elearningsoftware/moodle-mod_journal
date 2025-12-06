@@ -33,14 +33,11 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  * @copyright  2022 Elearning Software SRL http://elearningsoftware.ro
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_journal_entry_form extends moodleform
-{
-
+class mod_journal_entry_form extends moodleform {
     /**
      * Set up the form definition.
      */
-    public function definition()
-    {
+    public function definition() {
         $this->_form->addElement(
             'editor',
             'text_editor',

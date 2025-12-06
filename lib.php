@@ -30,8 +30,7 @@
  * @param object $journal Object containing required journal properties
  * @return int Journal ID
  */
-function journal_add_instance($journal)
-{
+function journal_add_instance($journal) {
     global $DB;
 
     $journal->timemodified = time();
@@ -52,8 +51,7 @@ function journal_add_instance($journal)
  * @param object $journal Object containing required journal properties
  * @return boolean True if successful
  */
-function journal_update_instance($journal)
-{
+function journal_update_instance($journal) {
     global $DB;
 
     $journal->timemodified = time();
@@ -78,8 +76,7 @@ function journal_update_instance($journal)
  * @param int $id Journal ID
  * @return boolean True if successful
  */
-function journal_delete_instance($id)
-{
+function journal_delete_instance($id) {
     global $DB;
 
     $result = true;
@@ -108,8 +105,7 @@ function journal_delete_instance($id)
  * @param int $feature Feature constant
  * @return bool|null True if feature is supported, falsy if it is not
  */
-function journal_supports($feature)
-{
+function journal_supports($feature) {
     if (
         defined('FEATURE_MOD_PURPOSE')
         && defined('MOD_PURPOSE_COLLABORATION')
@@ -148,8 +144,7 @@ function journal_supports($feature)
  *
  * @return array Array of actions
  */
-function journal_get_view_actions()
-{
+function journal_get_view_actions() {
     return ['view', 'view all', 'view responses'];
 }
 
@@ -158,8 +153,7 @@ function journal_get_view_actions()
  *
  * @return array Array of actions
  */
-function journal_get_post_actions()
-{
+function journal_get_post_actions() {
     return ['add entry', 'update entry', 'update feedback'];
 }
 
@@ -173,8 +167,7 @@ function journal_get_post_actions()
  * @param stdClass $journal Journal object
  * @return stdClass|null User outline object or null
  */
-function journal_user_outline($course, $user, $mod, $journal)
-{
+function journal_user_outline($course, $user, $mod, $journal) {
 
     global $DB;
 
@@ -204,8 +197,7 @@ function journal_user_outline($course, $user, $mod, $journal)
  * @param stdClass $journal Journal object
  * @return void
  */
-function journal_user_complete($course, $user, $mod, $journal)
-{
+function journal_user_complete($course, $user, $mod, $journal) {
 
     global $DB, $OUTPUT;
 
@@ -241,8 +233,7 @@ function journal_user_complete($course, $user, $mod, $journal)
  * @param int $timestart
  * @return bool
  */
-function journal_print_recent_activity($course, $viewfullnames, $timestart)
-{
+function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $USER, $DB, $OUTPUT;
 
     if (!get_config('journal', 'showrecentactivity')) {
@@ -352,8 +343,7 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart)
  * @param int $journalid Journal ID
  * @return array Array of user ids
  */
-function journal_get_participants($journalid)
-{
+function journal_get_participants($journalid) {
     global $DB;
 
     // Get students using explicit JOINs.
@@ -386,8 +376,7 @@ function journal_get_participants($journalid)
  * @param int $scaleid Scale ID
  * @return boolean True if a scale is being used by one journal
  */
-function journal_scale_used($journalid, $scaleid)
-{
+function journal_scale_used($journalid, $scaleid) {
 
     global $DB;
     $return = false;
@@ -407,8 +396,7 @@ function journal_scale_used($journalid, $scaleid)
  * @param int $scaleid Scale id
  * @return boolean True if the scale is used by any journal
  */
-function journal_scale_used_anywhere($scaleid)
-{
+function journal_scale_used_anywhere($scaleid) {
     global $DB;
 
     if ($scaleid && $DB->get_records('journal', ['grade' => -$scaleid])) {
@@ -424,8 +412,7 @@ function journal_scale_used_anywhere($scaleid)
  *
  * @param object $mform form passed by reference
  */
-function journal_reset_course_form_definition(&$mform)
-{
+function journal_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'journalheader', get_string('modulenameplural', 'journal'));
     $mform->addElement('advcheckbox', 'reset_journal', get_string('removemessages', 'journal'));
 }
@@ -436,8 +423,7 @@ function journal_reset_course_form_definition(&$mform)
  * @param object $course Course object
  * @return array Array with defaults
  */
-function journal_reset_course_form_defaults($course)
-{
+function journal_reset_course_form_defaults($course) {
     return ['reset_journal' => 1];
 }
 
@@ -446,8 +432,7 @@ function journal_reset_course_form_defaults($course)
  *
  * @param object $data Data array
  */
-function journal_reset_userdata($data)
-{
+function journal_reset_userdata($data) {
 
     global $CFG, $DB;
 
@@ -487,8 +472,7 @@ function journal_reset_userdata($data)
  * @param array $htmlarray HTML array
  * @return void
  */
-function journal_print_overview($courses, &$htmlarray)
-{
+function journal_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
 
     if (!get_config('journal', 'overview')) {
@@ -550,8 +534,7 @@ function journal_print_overview($courses, &$htmlarray)
  * @param integer $userid User id
  * @return array Array of grades
  */
-function journal_get_user_grades($journal, $userid = 0)
-{
+function journal_get_user_grades($journal, $userid = 0) {
     global $DB;
 
     $params = [];
@@ -600,8 +583,7 @@ function journal_get_user_grades($journal, $userid = 0)
  * @param int      $userid       if is false al users
  * @param boolean  $nullifnone   return null if grade does not exist
  */
-function journal_update_grades($journal = null, $userid = 0, $nullifnone = true)
-{
+function journal_update_grades($journal = null, $userid = 0, $nullifnone = true) {
 
     global $CFG, $DB;
 
@@ -646,8 +628,7 @@ function journal_update_grades($journal = null, $userid = 0, $nullifnone = true)
  * @param mixed $grades optional array/object of grade(s); 'reset' means reset grades in gradebook
  * @return int 0 if ok, error code otherwise
  */
-function journal_grade_item_update($journal, $grades = null)
-{
+function journal_grade_item_update($journal, $grades = null) {
     global $CFG;
     if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
         require_once($CFG->libdir . '/gradelib.php');
@@ -689,8 +670,7 @@ function journal_grade_item_update($journal, $grades = null)
  * @param   object   $journal
  * @return  object   grade_item
  */
-function journal_grade_item_delete($journal)
-{
+function journal_grade_item_delete($journal) {
     global $CFG;
 
     require_once($CFG->libdir . '/gradelib.php');
@@ -705,8 +685,7 @@ function journal_grade_item_delete($journal)
  * @param int $currentgroup Group id
  * @return array Array of users
  */
-function journal_get_users_done($journal, $currentgroup)
-{
+function journal_get_users_done($journal, $currentgroup) {
     global $DB;
 
     $params = [];
@@ -751,8 +730,7 @@ function journal_get_users_done($journal, $currentgroup)
  * @param boolean|int|array $groupids Group id or array of ids. 0 or false = see all.
  * @return int Number of entries
  */
-function journal_count_entries($journal, $groupids = 0)
-{
+function journal_count_entries($journal, $groupids = 0) {
     global $DB;
 
     $cm = journal_get_coursemodule($journal->id);
@@ -806,8 +784,7 @@ function journal_count_entries($journal, $groupids = 0)
  * @param int $cutofftime Timestamp
  * @return array Array of users
  */
-function journal_get_unmailed_graded($cutofftime)
-{
+function journal_get_unmailed_graded($cutofftime) {
     global $DB;
 
     $sql = 'SELECT je.*, j.course, j.name FROM {journal_entries} je
@@ -823,8 +800,7 @@ function journal_get_unmailed_graded($cutofftime)
  * @param stdClass $log Log object
  * @return stdClass|null Log object
  */
-function journal_log_info($log)
-{
+function journal_log_info($log) {
     global $DB;
 
     $sql = 'SELECT j.*, u.firstname, u.lastname
@@ -841,8 +817,7 @@ function journal_log_info($log)
  * @param integer $journalid Journal id
  * @return object Course module object
  */
-function journal_get_coursemodule($journalid)
-{
+function journal_get_coursemodule($journalid) {
 
     global $DB;
 
@@ -862,8 +837,7 @@ function journal_get_coursemodule($journalid)
  * @param array $cmid Course module id for the specific journal
  * @return void
  */
-function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $cmid)
-{
+function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $cmid) {
     global $USER, $OUTPUT, $DB, $CFG;
 
     require_once($CFG->dirroot . '/lib/gradelib.php');
@@ -1058,8 +1032,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
  * @param array $grades Grades array
  * @return void
  */
-function journal_print_feedback($course, $entry, $grades)
-{
+function journal_print_feedback($course, $entry, $grades) {
 
     global $CFG, $DB, $OUTPUT;
 
@@ -1125,8 +1098,7 @@ function journal_print_feedback($course, $entry, $grades)
  * @param array $options additional options affecting the file serving
  * @return bool false if file not found, does not return if found - just send the file
  */
-function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = [])
-{
+function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     global $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -1178,8 +1150,7 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
  * @param object $cm Course module object
  * @return string Formatted text
  */
-function journal_format_entry_text($entry, $course = false, $cm = false)
-{
+function journal_format_entry_text($entry, $course = false, $cm = false) {
 
     if (!$cm) {
         if ($course) {
@@ -1263,8 +1234,7 @@ function mod_journal_core_calendar_provide_event_action(
  * @param string $sortby The sort criterion
  * @param array $entrybyuser The sorted array
  */
-function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser)
-{
+function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
     uasort($users, function ($a, $b) use ($sortby, $entrybyuser) {
         switch ($sortby) {
             case 'firstnamedesc':
