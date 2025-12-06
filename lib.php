@@ -509,14 +509,14 @@ function journal_print_overview($courses, &$htmlarray) {
             // $journal->section often contains the Section DB ID, not the sequence number.
             $modinfo = get_fast_modinfo($courses[$journal->course]);
             $sectionnum = 0;
-            
+
             // Check if the CM exists in modinfo to avoid errors.
             if (isset($modinfo->cms[$journal->coursemodule])) {
                 $sectionnum = $modinfo->cms[$journal->coursemodule]->sectionnum;
             }
 
             $journal->timestart = $coursestartdate + (($sectionnum - 1) * 604800);
-            
+
             if (!empty($journal->days)) {
                 $journal->timefinish = $journal->timestart + (3600 * 24 * (int) $journal->days);
             } else {
