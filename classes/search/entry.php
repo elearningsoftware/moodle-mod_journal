@@ -24,6 +24,9 @@
 
 namespace mod_journal\search;
 
+use dml_exception;
+use moodle_recordset;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
@@ -56,13 +59,16 @@ class entry extends \mod_journal\search\DynamicParentEntry {
      *
      * @param int $modifiedfrom timestamp
      * @return moodle_recordset
+     * @throws dml_exception
      */
-    public function get_recordset_by_timestamp($modifiedfrom = 0) {
+    public function get_recordset_by_timestamp($modifiedfrom = 0): moodle_recordset {
         global $DB;
 
-        $sql = "SELECT je.*, j.course FROM {journal_entries} je
-                JOIN {journal} j ON j.id = je.journal
-                WHERE je.modified >= ? ORDER BY je.modified ASC";
+        $sql = "SELECT je.*, j.course
+                  FROM {journal_entries} je
+                  JOIN {journal} j ON j.id = je.journal
+                 WHERE je.modified >= ?
+              ORDER BY je.modified ASC";
         return $DB->get_recordset_sql($sql, [$modifiedfrom]);
     }
 
@@ -83,7 +89,7 @@ class entry extends \mod_journal\search\DynamicParentEntry {
             debugging('Error retrieving mod_journal ' . $entry->id . ' document, not all required data is available: ' .
                 $ex->getMessage(), DEBUG_DEVELOPER);
             return false;
-        } catch (\dml_exception $ex) {
+        } catch (dml_exception $ex) {
             // Notify it as we run here as admin, we should see everything.
             debugging('Error retrieving mod_journal' . $entry->id . ' document: ' . $ex->getMessage(), DEBUG_DEVELOPER);
             return false;
@@ -117,7 +123,7 @@ class entry extends \mod_journal\search\DynamicParentEntry {
      * Whether the user can access the document or not.
      *
      * @throws \dml_missing_record_exception
-     * @throws \dml_exception
+     * @throws dml_exception
      * @param int $id Glossary entry id
      * @return bool
      */
@@ -129,7 +135,7 @@ class entry extends \mod_journal\search\DynamicParentEntry {
             $cminfo = $this->get_cm('journal', $entry->journal, $entry->course);
         } catch (\dml_missing_record_exception $ex) {
             return \core_search\manager::ACCESS_DELETED;
-        } catch (\dml_exception $ex) {
+        } catch (dml_exception $ex) {
             return \core_search\manager::ACCESS_DENIED;
         }
 
@@ -181,7 +187,7 @@ class entry extends \mod_journal\search\DynamicParentEntry {
      *
      * Store minimal information as this might grow.
      *
-     * @throws \dml_exception
+     * @throws dml_exception
      * @param int $entryid
      * @return stdClass
      */
