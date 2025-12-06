@@ -109,7 +109,9 @@ if ($entriesmanager) {
 // Determine time constraints for journal editing.
 $timenow = time();
 if ($course->format == 'weeks' && $journal->days) {
-    $timestart = $course->startdate + (($cm->section - 1) * 604800);
+    $modinfo = get_fast_modinfo($course);
+    $sectionnum = $modinfo->get_section_info_by_id($cm->section)->sectionnum;
+    $timestart = $course->startdate + (($sectionnum - 1) * 604800);
     $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
 } else {
     $timestart = $timenow - 1;

@@ -483,15 +483,15 @@ function journal_print_overview($courses, &$htmlarray) {
     global $USER, $CFG, $DB;
 
     if (!get_config('journal', 'overview')) {
-        return [];
+        return;
     }
 
     if (empty($courses) || !is_array($courses) || count($courses) == 0) {
-        return [];
+        return;
     }
 
     if (!$journals = get_all_instances_in_courses('journal', $courses)) {
-        return [];
+        return;
     }
 
     $strjournal = get_string('modulename', 'journal');
@@ -505,9 +505,20 @@ function journal_print_overview($courses, &$htmlarray) {
         if ($courses[$journal->course]->format == 'weeks' && $journal->days) {
             $coursestartdate = $courses[$journal->course]->startdate;
 
-            $journal->timestart = $coursestartdate + (($journal->section - 1) * 608400);
+            // Fix for MBS-10135: Use get_fast_modinfo to get the correct section number.
+            // $journal->section often contains the Section DB ID, not the sequence number.
+            $modinfo = get_fast_modinfo($courses[$journal->course]);
+            $sectionnum = 0;
+            
+            // Check if the CM exists in modinfo to avoid errors.
+            if (isset($modinfo->cms[$journal->coursemodule])) {
+                $sectionnum = $modinfo->cms[$journal->coursemodule]->sectionnum;
+            }
+
+            $journal->timestart = $coursestartdate + (($sectionnum - 1) * 604800);
+            
             if (!empty($journal->days)) {
-                $journal->timefinish = $journal->timestart + (3600 * 24 * $journal->days);
+                $journal->timefinish = $journal->timestart + (3600 * 24 * (int) $journal->days);
             } else {
                 $journal->timefinish = 9999999999;
             }
