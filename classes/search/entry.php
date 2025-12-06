@@ -51,7 +51,6 @@ class_alias(get_dynamic_parent_entry(), '\mod_journal\search\DynamicParentEntry'
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class entry extends \mod_journal\search\DynamicParentEntry {
-
     /**
      * Returns recordset containing required data for indexing journal entries.
      *

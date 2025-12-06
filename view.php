@@ -64,7 +64,7 @@ if (method_exists($PAGE, 'set_activity_record')) {
 // In Moodle 4.0+, the activity header automatically displays the description (intro).
 // However, this page also manually displays the intro in a box below (see $OUTPUT->box call).
 // To prevent the description from appearing twice, we hide it in the activity header.
-// We use a branch check ($CFG->branch >= 400) because accessing $PAGE->activityheader 
+// We use a branch check ($CFG->branch >= 400) because accessing $PAGE->activityheader
 // in Moodle 3.9 triggers a coding error (magic getter fails).
 if ($CFG->branch >= 400) {
     $PAGE->activityheader->set_description('');

@@ -30,14 +30,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_journal_activity_structure_step extends backup_activity_structure_step {
-
     /**
      * Define the structure
      *
      * @return void
      */
     protected function define_structure() {
-
         $journal = new backup_nested_element('journal', ['id'], [
             'name',
             'intro',

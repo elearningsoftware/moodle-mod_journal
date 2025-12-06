@@ -34,7 +34,6 @@ require_once($CFG->dirroot . '/mod/journal/backup/moodle2/restore_journal_stepsl
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_journal_activity_task extends restore_activity_task {
-
     /**
      * Define the settings for the restore process
      *
@@ -58,7 +57,6 @@ class restore_journal_activity_task extends restore_activity_task {
      * @return void
      */
     public static function define_decode_contents() {
-
         $contents = [];
         $contents[] = new restore_decode_content('journal', ['intro'], 'journal');
         $contents[] = new restore_decode_content('journal_entries', ['text', 'entrycomment'], 'journal_entry');
@@ -72,7 +70,6 @@ class restore_journal_activity_task extends restore_activity_task {
      * @return void
      */
     public static function define_decode_rules() {
-
         $rules = [];
         $rules[] = new restore_decode_rule('JOURNALINDEX', '/mod/journal/index.php?id=$1', 'course');
         $rules[] = new restore_decode_rule('JOURNALVIEWBYID', '/mod/journal/view.php?id=$1', 'course_module');
@@ -80,7 +77,6 @@ class restore_journal_activity_task extends restore_activity_task {
         $rules[] = new restore_decode_rule('JOURNALEDIT', '/mod/journal/edit.php?id=$1', 'course_module');
 
         return $rules;
-
     }
 
     /**
@@ -89,7 +85,6 @@ class restore_journal_activity_task extends restore_activity_task {
      * @return void
      */
     public static function define_restore_log_rules() {
-
         $rules = [];
         $rules[] = new restore_log_rule('journal', 'view', 'view.php?id={course_module}', '{journal}');
         $rules[] = new restore_log_rule('journal', 'view responses', 'report.php?id={course_module}', '{journal}');
@@ -106,7 +101,6 @@ class restore_journal_activity_task extends restore_activity_task {
      * @return void
      */
     public static function define_restore_log_rules_for_course() {
-
         $rules = [];
         $rules[] = new restore_log_rule('journal', 'view all', 'index.php?id={course}', null);
 

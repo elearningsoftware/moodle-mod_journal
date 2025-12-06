@@ -39,7 +39,12 @@ function journal_add_instance($journal) {
     journal_grade_item_update($journal);
 
     $completiontimeexpected = !empty($journal->completionexpected) ? $journal->completionexpected : null;
-    \core_completion\api::update_completion_date_event($journal->coursemodule, 'journal', $journal->id, $completiontimeexpected);
+    \core_completion\api::update_completion_date_event(
+        $journal->coursemodule,
+        'journal',
+        $journal->id,
+        $completiontimeexpected
+    );
 
     return $journal->id;
 }
@@ -64,7 +69,12 @@ function journal_update_instance($journal) {
     journal_update_grades($journal, 0, false);
 
     $completiontimeexpected = !empty($journal->completionexpected) ? $journal->completionexpected : null;
-    \core_completion\api::update_completion_date_event($journal->coursemodule, 'journal', $journal->id, $completiontimeexpected);
+    \core_completion\api::update_completion_date_event(
+        $journal->coursemodule,
+        'journal',
+        $journal->id,
+        $completiontimeexpected
+    );
 
     return $result;
 }
@@ -168,11 +178,9 @@ function journal_get_post_actions() {
  * @return stdClass|null User outline object or null
  */
 function journal_user_outline($course, $user, $mod, $journal) {
-
     global $DB;
 
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
-
         // Cast to string to prevent PHP 8.1 null deprecation notice in preg_split.
         $text = isset($entry->text) ? (string) $entry->text : '';
         $numwords = count(preg_split('/\w\b/', $text)) - 1;
@@ -198,11 +206,9 @@ function journal_user_outline($course, $user, $mod, $journal) {
  * @return void
  */
 function journal_user_complete($course, $user, $mod, $journal) {
-
     global $DB, $OUTPUT;
 
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
-
         echo $OUTPUT->box_start();
 
         if ($entry->modified) {
@@ -217,7 +223,6 @@ function journal_user_complete($course, $user, $mod, $journal) {
         }
 
         echo $OUTPUT->box_end();
-
     } else {
         print_string('noentry', 'journal');
     }
@@ -264,7 +269,6 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     $show = [];
 
     foreach ($newentries as $anentry) {
-
         if (!array_key_exists($anentry->cmid, $modinfo->get_cms())) {
             continue;
         }
@@ -377,7 +381,6 @@ function journal_get_participants($journalid) {
  * @return boolean True if a scale is being used by one journal
  */
 function journal_scale_used($journalid, $scaleid) {
-
     global $DB;
     $return = false;
 
@@ -433,7 +436,6 @@ function journal_reset_course_form_defaults($course) {
  * @param object $data Data array
  */
 function journal_reset_userdata($data) {
-
     global $CFG, $DB;
 
     $status = [];
@@ -446,7 +448,14 @@ function journal_reset_userdata($data) {
                 WHERE j.course = ?';
         $params = [$data->courseid];
 
-        $cmids = $DB->get_fieldset_select('course_modules', 'id', 'module = ? AND instance IN (' . $sql . ')', $params, '', $module->id);
+        $cmids = $DB->get_fieldset_select(
+            'course_modules',
+            'id',
+            'module = ? AND instance IN (' . $sql . ')',
+            $params,
+            '',
+            $module->id
+        );
         $DB->delete_records_select('journal_entries', "journal IN ($sql)", $params);
 
         foreach ($cmids as $cmid) {
@@ -491,7 +500,6 @@ function journal_print_overview($courses, &$htmlarray) {
 
     $timenow = time();
     foreach ($journals as $journal) {
-
         if (empty($courses[$journal->course]->format)) {
             $courses[$journal->course]->format = $DB->get_field('course', 'format', ['id' => $journal->course]);
         }
@@ -548,9 +556,7 @@ function journal_get_user_grades($journal, $userid = 0) {
 
     if (!$journal) {
         return false;
-
     } else {
-
         $sql = 'SELECT userid, modified as datesubmitted, format as feedbackformat,
                 rating as rawgrade, entrycomment as feedback, teacher as usermodifier, timemarked as dategraded
                 FROM {journal_entries}
@@ -572,7 +578,6 @@ function journal_get_user_grades($journal, $userid = 0) {
 
         return $grades;
     }
-
 }
 
 
@@ -584,7 +589,6 @@ function journal_get_user_grades($journal, $userid = 0) {
  * @param boolean  $nullifnone   return null if grade does not exist
  */
 function journal_update_grades($journal = null, $userid = 0, $nullifnone = true) {
-
     global $CFG, $DB;
 
     if (!function_exists('grade_update')) { // Workaround for buggy PHP versions.
@@ -660,7 +664,16 @@ function journal_grade_item_update($journal, $grades = null) {
         $grades = null;
     }
 
-    return grade_update('mod/journal', $journal->course, 'mod', 'journal', $journal->id, 0, $grades, $params);
+    return grade_update(
+        'mod/journal',
+        $journal->course,
+        'mod',
+        'journal',
+        $journal->id,
+        0,
+        $grades,
+        $params
+    );
 }
 
 
@@ -668,14 +681,23 @@ function journal_grade_item_update($journal, $grades = null) {
  * Delete grade item for given journal
  *
  * @param   object   $journal
- * @return  object   grade_item
+ * @return  int   Returns GRADE_UPDATE_OK, GRADE_UPDATE_FAILED, GRADE_UPDATE_MULTIPLE or GRADE_UPDATE_ITEM_LOCKE
  */
 function journal_grade_item_delete($journal) {
     global $CFG;
 
     require_once($CFG->libdir . '/gradelib.php');
 
-    return grade_update('mod/journal', $journal->course, 'mod', 'journal', $journal->id, 0, null, ['deleted' => 1]);
+    return grade_update(
+        'mod/journal',
+        $journal->course,
+        'mod',
+        'journal',
+        $journal->id,
+        0,
+        null,
+        ['deleted' => 1],
+    );
 }
 
 /**
@@ -769,7 +791,6 @@ function journal_count_entries($journal, $groupids = 0) {
 
     // Remove unenrolled participants.
     foreach ($journals as $userid => $notused) {
-
         if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
             unset($journals[$userid]);
         }
@@ -818,7 +839,6 @@ function journal_log_info($log) {
  * @return object Course module object
  */
 function journal_get_coursemodule($journalid) {
-
     global $DB;
 
     return $DB->get_record_sql('SELECT cm.id FROM {course_modules} cm
@@ -844,9 +864,9 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
     $context = context_module::instance($cmid);
 
-    $entryId = 'entry-' . $user->id;
+    $entryid = 'entry-' . $user->id;
     $content = html_writer::start_div('journaluserentrywrapper');
-    $content .= html_writer::start_tag('table', ['class' => 'journaluserentry m-b-1', 'id' => $entryId]);
+    $content .= html_writer::start_tag('table', ['class' => 'journaluserentry m-b-1', 'id' => $entryid]);
 
     // User picture and fullname row.
     $content .= html_writer::start_tag('tr');
@@ -855,15 +875,15 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $OUTPUT->user_picture($user, ['courseid' => $course->id, 'alttext' => true]),
         ['class' => 'userpix', 'style' => 'border-bottom: 1px solid #dedede;']
     );
-    $userFullname = html_writer::tag('strong', fullname($user));
+    $userfullname = html_writer::tag('strong', fullname($user));
     if ($entry) {
-        $userFullname .= ' ' . html_writer::tag(
+        $userfullname .= ' ' . html_writer::tag(
             'span',
             get_string('lastedited') . ': ' . userdate($entry->modified),
             ['class' => 'lastedit']
         );
     }
-    $content .= html_writer::tag('td', $userFullname, ['class' => 'userfullname']);
+    $content .= html_writer::tag('td', $userfullname, ['class' => 'userfullname']);
     $content .= html_writer::end_tag('tr');
 
     // Entry content row.
@@ -878,14 +898,15 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     // Feedback row if entry exists.
     if ($entry) {
         $content .= html_writer::start_tag('tr');
-        $teacher = $teachers[$entry->teacher] ?? $DB->get_record('user', ['id' => empty($entry->teacher) ? $USER->id : $entry->teacher]);
+        $teacher = $teachers[$entry->teacher] ??
+            $DB->get_record('user', ['id' => empty($entry->teacher) ? $USER->id : $entry->teacher]);
         $content .= html_writer::tag(
             'td',
             empty($teacher) ? '' : $OUTPUT->user_picture($teacher, ['courseid' => $course->id, 'alttext' => true]),
             ['class' => 'userpix', 'style' => 'border-top: 1px solid #dedede;']
         );
 
-        $feedbackSection = get_string('feedback') . ': ';
+        $feedbacksection = get_string('feedback') . ': ';
         $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, [$user->id]);
 
         $attrs = [];
@@ -897,8 +918,9 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
         // Handling gradebook integration.
         if (!empty($gradinginfo->items[0]->grades[$entry->userid]->str_long_grade)) {
-            $gradingDisabled = $gradinginfo->items[0]->grades[$user->id]->locked || $gradinginfo->items[0]->grades[$user->id]->overridden;
-            if ($gradingDisabled) {
+            $gradingdisabled = $gradinginfo->items[0]->grades[$user->id]->locked
+                || $gradinginfo->items[0]->grades[$user->id]->overridden;
+            if ($gradingdisabled) {
                 $attrs['disabled'] = 'disabled';
                 $hiddengradestr = html_writer::empty_tag('input', [
                     'type' => 'hidden',
@@ -917,20 +939,42 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
 
         // Grade selector.
         $attrs['id'] = 'r' . $entry->id;
-        $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ? get_string('gradenoun') : get_string('grade');
-        $feedbackSection .= html_writer::label(fullname($user) . ' ' . $gradestring, 'r' . $entry->id, true, ['class' => 'accesshide']);
-        $feedbackSection .= html_writer::select($grades, 'r' . $entry->id, $entry->rating, get_string('nograde') . '...', $attrs);
-        $feedbackSection .= $hiddengradestr;
+        $gradestring = get_string_manager()->string_exists('gradenoun', 'moodle') ?
+            get_string('gradenoun') : get_string('grade');
+        $feedbacksection .= html_writer::label(
+            fullname($user) . ' ' . $gradestring,
+            'r' . $entry->id,
+            true,
+            ['class' => 'accesshide']
+        );
+        $feedbacksection .= html_writer::select($grades,
+            'r' . $entry->id,
+            $entry->rating,
+            get_string('nograde') . '...',
+            $attrs
+        );
+        $feedbacksection .= $hiddengradestr;
 
         if (!empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
-            $feedbackSection .= ' ' . html_writer::tag('span', get_string('needsregrade', 'journal'), ['class' => 'lastedit']);
+            $feedbacksection .= ' ' . html_writer::tag('span',
+                get_string('needsregrade', 'journal'),
+                ['class' => 'lastedit']
+            );
         } else if ($entry->timemarked) {
-            $feedbackSection .= ' ' . html_writer::tag('span', userdate($entry->timemarked), ['class' => 'lastedit']);
+            $feedbacksection .= ' ' . html_writer::tag('span',
+                userdate($entry->timemarked),
+                ['class' => 'lastedit']
+            );
         }
-        $feedbackSection .= $gradebookgradestr;
+        $feedbacksection .= $gradebookgradestr;
 
         // Feedback text.
-        echo html_writer::label(fullname($user) . ' ' . get_string('feedback'), 'c' . $entry->id . '[text]', true, ['class' => 'accesshide']);
+        echo html_writer::label(
+            fullname($user) . ' ' . get_string('feedback'),
+            'c' . $entry->id . '[text]',
+            true,
+            ['class' => 'accesshide']
+        );
 
         $draftitemid = 0;
         $feedbacktext = file_prepare_draft_area(
@@ -999,13 +1043,16 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         p($feedbacktext);
         echo '</textarea></p>';
 
-        echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'c' . $entry->id . '[itemid]', 'value' => $draftitemid]);
+        echo html_writer::empty_tag(
+            'input',
+            ['type' => 'hidden', 'name' => 'c' . $entry->id . '[itemid]', 'value' => $draftitemid]
+        );
 
         if ($feedbackdisabledstr != '') {
             echo '<input type="hidden" name="c' . $entry->id . '" value="' . $feedbacktext . '"/>';
         }
 
-        $content .= html_writer::tag('td', $feedbackSection, ['style' => 'border-top: 1px solid #dedede;']);
+        $content .= html_writer::tag('td', $feedbacksection, ['style' => 'border-top: 1px solid #dedede;']);
         $content .= html_writer::end_tag('tr');
     }
 
@@ -1014,8 +1061,10 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     // Feedback save button.
     if ($entry) {
         echo '<p class="feedbacksave" style="margin-top: -16px;">';
-        echo '<input type="button" data-cmid="' . $cmid . '" data-entryid="' . $entry->id . '" data-userid="' . $user->id . '" data-itemid="' . $draftitemid . '" ';
-        echo 'value="' . get_string('savefeedback', 'journal') . '" class="saveindividualfeedback btn btn-secondary m-t-1"/>';
+        echo '<input type="button" data-cmid="' . $cmid . '" data-entryid="' . $entry->id . '" 
+            data-userid="' . $user->id . '" data-itemid="' . $draftitemid . '" ';
+        echo 'value="' . get_string('savefeedback', 'journal') . '" 
+            class="saveindividualfeedback btn btn-secondary m-t-1"/>';
         echo '</p>';
     }
 
@@ -1033,7 +1082,6 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
  * @return void
  */
 function journal_print_feedback($course, $entry, $grades) {
-
     global $CFG, $DB, $OUTPUT;
 
     require_once($CFG->dirroot . '/lib/gradelib.php');
@@ -1077,7 +1125,14 @@ function journal_print_feedback($course, $entry, $grades) {
 
     // Cast to string for PHP 8.1 safety.
     $entry->entrycomment = isset($entry->entrycomment) ? (string) $entry->entrycomment : '';
-    $entry->entrycomment = file_rewrite_pluginfile_urls($entry->entrycomment, 'pluginfile.php', $context->id, 'mod_journal', 'feedback', $entry->id);
+    $entry->entrycomment = file_rewrite_pluginfile_urls(
+        $entry->entrycomment,
+        'pluginfile.php',
+        $context->id,
+        'mod_journal',
+        'feedback',
+        $entry->id
+    );
 
     // Feedback text.
     echo format_text($entry->entrycomment, FORMAT_HTML);
@@ -1151,7 +1206,6 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
  * @return string Formatted text
  */
 function journal_format_entry_text($entry, $course = false, $cm = false) {
-
     if (!$cm) {
         if ($course) {
             $courseid = $course->id;
@@ -1165,7 +1219,14 @@ function journal_format_entry_text($entry, $course = false, $cm = false) {
 
     // Cast to string for PHP 8.1 safety.
     $entrytext = isset($entry->text) ? (string) $entry->text : '';
-    $entrytext = file_rewrite_pluginfile_urls($entrytext, 'pluginfile.php', $context->id, 'mod_journal', 'entry', $entry->id);
+    $entrytext = file_rewrite_pluginfile_urls(
+        $entrytext,
+        'pluginfile.php',
+        $context->id,
+        'mod_journal',
+        'entry',
+        $entry->id
+    );
 
     $formatoptions = [
         'context' => $context,

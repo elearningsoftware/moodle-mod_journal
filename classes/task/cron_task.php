@@ -68,7 +68,6 @@ class cron_task extends \core\task\scheduled_task {
             $courses = [];
 
             foreach ($entries as $entry) {
-
                 echo "Processing journal entry $entry->id\n";
 
                 if (!empty($users[$entry->userid])) {

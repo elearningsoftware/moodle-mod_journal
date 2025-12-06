@@ -77,7 +77,6 @@ $table->align[] = 'left';
 $currentsection = '';
 $i = 0;
 foreach ($journals as $journal) {
-
     $context = context_module::instance($journal->coursemodule);
     $entriesmanager = has_capability('mod/journal:manageentries', $context);
 
@@ -112,7 +111,6 @@ foreach ($journals as $journal) {
 
     // Entries info.
     if ($entriesmanager) {
-
         // Display the report.php col only if is a entries manager in some CONTEXT_MODULE.
         if (empty($managersomewhere)) {
             $table->head[] = get_string('viewentries', 'journal');

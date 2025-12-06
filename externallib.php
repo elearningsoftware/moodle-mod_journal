@@ -34,7 +34,6 @@ require_once("$CFG->libdir/externallib.php");
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_journal_external extends external_api {
-
     /**
      * Returns description of method parameters
      *
@@ -197,7 +196,6 @@ class mod_journal_external extends external_api {
                 'objectid' => $journal->id,
                 'context' => $context,
             ]);
-
         }
         $event->add_record_snapshot('course_modules', $cm);
         $event->add_record_snapshot('course', $course);

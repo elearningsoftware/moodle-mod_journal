@@ -28,7 +28,7 @@ require_once('lib.php');
 $id = required_param('id', PARAM_INT);   // Course module.
 $sortby = optional_param('sortby', 'dateasc', PARAM_ALPHA);
 
-$valid_sort_options = [
+$validsortoptions = [
     'dateasc',
     'datedesc',
     'firstnameasc',
@@ -36,7 +36,7 @@ $valid_sort_options = [
     'lastnameasc',
     'lastnamedesc',
 ];
-if (!in_array($sortby, $valid_sort_options)) {
+if (!in_array($sortby, $validsortoptions)) {
     $sortby = 'dateasc';
 }
 
@@ -104,7 +104,15 @@ if ($data = data_submitted()) {
         // Ensure text is a string to satisfy PHP 8.1 strict typing.
         $rawtext = isset($vals['c']['text']) ? (string) $vals['c']['text'] : '';
         $studentcomment = clean_text($rawtext, FORMAT_HTML);
-        $studentcomment = file_save_draft_area_files($vals['c']['itemid'], $context->id, 'mod_journal', 'feedback', $num, [], $studentcomment);
+        $studentcomment = file_save_draft_area_files(
+            $vals['c']['itemid'],
+            $context->id,
+            'mod_journal',
+            'feedback',
+            $num,
+            [],
+            $studentcomment
+        );
 
         if ($studentrating != $entry->rating || $studentcomment != $entry->entrycomment) {
             $ratingchanged = $studentrating != $entry->rating;
@@ -118,7 +126,10 @@ if ($data = data_submitted()) {
                 'mailed' => 0,
             ];
             if (!$DB->update_record('journal_entries', $newentry)) {
-                echo $OUTPUT->notification(get_string('failedupdate', 'journal', $entry->userid), \core\output\notification::NOTIFY_ERROR);
+                echo $OUTPUT->notification(
+                    get_string('failedupdate', 'journal', $entry->userid),
+                    \core\output\notification::NOTIFY_ERROR
+                );
             } else {
                 $count++;
                 $entrybyuser[$entry->userid]->rating = $studentrating;

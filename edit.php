@@ -139,7 +139,6 @@ if ($form->is_cancelled()) {
             'objectid' => $journal->id,
             'context' => $context,
         ]);
-
     }
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);

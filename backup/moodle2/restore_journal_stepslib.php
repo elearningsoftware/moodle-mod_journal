@@ -30,7 +30,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_journal_activity_structure_step extends restore_activity_structure_step {
-
     /**
      * Define the structure of the backup
      *
@@ -55,7 +54,6 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      * @return void
      */
     protected function process_journal($data) {
-
         global $DB;
 
         $data = (Object) $data;
@@ -76,7 +74,6 @@ class restore_journal_activity_structure_step extends restore_activity_structure
      * @return void
      */
     protected function process_journal_entry($data) {
-
         global $DB;
 
         $data = (Object) $data;
