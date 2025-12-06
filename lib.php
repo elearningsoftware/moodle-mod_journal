@@ -900,6 +900,9 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     );
     $content .= html_writer::end_tag('tr');
 
+    // Capture editor + button output here.
+    $feedbackhtml = '';
+
     // Feedback row if entry exists.
     if ($entry) {
         $content .= html_writer::start_tag('tr');
@@ -977,7 +980,14 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         }
         $feedbacksection .= $gradebookgradestr;
 
-        // Feedback text.
+        // Finish the Grade Selector table row.
+        $content .= html_writer::tag('td', $feedbacksection, ['style' => 'border-top: 1px solid #dedede;']);
+        $content .= html_writer::end_tag('tr');
+
+        // Start capturing the feedback editor + button output.
+        ob_start();
+
+        // Feedback text label.
         echo html_writer::label(
             fullname($user) . ' ' . get_string('feedback'),
             'c' . $entry->id . '[text]',
@@ -1061,22 +1071,26 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             echo '<input type="hidden" name="c' . $entry->id . '" value="' . $feedbacktext . '"/>';
         }
 
-        $content .= html_writer::tag('td', $feedbacksection, ['style' => 'border-top: 1px solid #dedede;']);
-        $content .= html_writer::end_tag('tr');
-    }
-
-    $content .= html_writer::end_tag('table');
-
-    // Feedback save button.
-    if ($entry) {
-        echo '<p class="feedbacksave" style="margin-top: -16px;">';
+        // Feedback save button.
+        echo '<p class="feedbacksave">';
         echo '<input type="button" data-cmid="' . $cmid . '" data-entryid="' . $entry->id . '"
             data-userid="' . $user->id . '" data-itemid="' . $draftitemid . '" ';
         echo 'value="' . get_string('savefeedback', 'journal') . '"
-            class="saveindividualfeedback btn btn-secondary m-t-1"/>';
+            class="saveindividualfeedback btn btn-secondary mt-1 m-t-1"/>';
         echo '</p>';
+
+        $feedbackhtml = ob_get_clean();
+
+        // Add the Feedback Editor as a NEW ROW inside the table.
+        if (!empty($feedbackhtml)) {
+            $content .= html_writer::start_tag('tr');
+            // We use padding class 'p-3' here on the TD to give the editor space.
+            $content .= html_writer::tag('td', $feedbackhtml, ['colspan' => '2', 'class' => 'p-3']);
+            $content .= html_writer::end_tag('tr');
+        }
     }
 
+    $content .= html_writer::end_tag('table');
     $content .= html_writer::end_div();
 
     echo $content;
