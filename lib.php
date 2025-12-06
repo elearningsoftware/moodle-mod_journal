@@ -505,7 +505,6 @@ function journal_print_overview($courses, &$htmlarray) {
         }
 
         if ($courses[$journal->course]->format == 'weeks' && $journal->days) {
-
             $coursestartdate = $courses[$journal->course]->startdate;
 
             $journal->timestart = $coursestartdate + (($journal->section - 1) * 608400);
@@ -515,7 +514,6 @@ function journal_print_overview($courses, &$htmlarray) {
                 $journal->timefinish = 9999999999;
             }
             $journalopen = ($journal->timestart < $timenow && $timenow < $journal->timefinish);
-
         } else {
             $journalopen = true;
         }
@@ -649,11 +647,9 @@ function journal_grade_item_update($journal, $grades = null) {
         $params['grademax'] = $journal->grade;
         $params['grademin'] = 0;
         $params['multfactor'] = 1.0;
-
     } else if ($journal->grade < 0) {
         $params['gradetype'] = GRADE_TYPE_SCALE;
         $params['scaleid'] = -$journal->grade;
-
     } else {
         $params['gradetype'] = GRADE_TYPE_NONE;
         $params['multfactor'] = 1.0;
@@ -732,7 +728,6 @@ function journal_get_users_done($journal, $currentgroup) {
 
     // Remove unenrolled participants.
     foreach ($journals as $key => $user) {
-
         $context = \context_module::instance($cm->id);
 
         $canadd = has_capability('mod/journal:addentries', $context, $user);
@@ -774,7 +769,6 @@ function journal_count_entries($journal, $groupids = 0) {
                 JOIN {user} u ON u.id = g.userid
                 WHERE j.journal = ? AND g.groupid $sqlin[0]";
         $journals = $DB->get_records_sql($sql, array_merge($params, $sqlin[1]));
-
     } else if ($groupids === 0 || $groupids === false) { // Count all the entries from the whole course.
         $sql = 'SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
@@ -925,7 +919,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
                 $hiddengradestr = html_writer::empty_tag('input', [
                     'type' => 'hidden',
                     'name' => 'r' . $entry->id,
-                    'value' => $entry->rating
+                    'value' => $entry->rating,
                 ]);
                 $gradebooklink = html_writer::link(
                     $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id,
@@ -947,7 +941,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             true,
             ['class' => 'accesshide']
         );
-        $feedbacksection .= html_writer::select($grades,
+        $feedbacksection .= html_writer::select(
+            $grades,
             'r' . $entry->id,
             $entry->rating,
             get_string('nograde') . '...',
@@ -956,12 +951,14 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $feedbacksection .= $hiddengradestr;
 
         if (!empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
-            $feedbacksection .= ' ' . html_writer::tag('span',
+            $feedbacksection .= ' ' . html_writer::tag(
+                'span',
                 get_string('needsregrade', 'journal'),
                 ['class' => 'lastedit']
             );
         } else if ($entry->timemarked) {
-            $feedbacksection .= ' ' . html_writer::tag('span',
+            $feedbacksection .= ' ' . html_writer::tag(
+                'span',
                 userdate($entry->timemarked),
                 ['class' => 'lastedit']
             );
@@ -1001,7 +998,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         ];
 
         $args = new stdClass();
-        $args->accepted_types = array('image');
+        $args->accepted_types = ['image'];
         $args->return_types = (FILE_INTERNAL | FILE_EXTERNAL);
         $args->context = $options['context'];
         $args->env = 'filepicker';
@@ -1013,7 +1010,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $imageoptions->env = 'editor';
         $imageoptions->itemid = $draftitemid;
 
-        $args->accepted_types = array('video', 'audio');
+        $args->accepted_types = ['video', 'audio'];
         $mediaoptions = initialise_filepicker($args);
         $mediaoptions->context = $options['context'];
         $mediaoptions->client_id = uniqid();
@@ -1061,9 +1058,9 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     // Feedback save button.
     if ($entry) {
         echo '<p class="feedbacksave" style="margin-top: -16px;">';
-        echo '<input type="button" data-cmid="' . $cmid . '" data-entryid="' . $entry->id . '" 
+        echo '<input type="button" data-cmid="' . $cmid . '" data-entryid="' . $entry->id . '"
             data-userid="' . $user->id . '" data-itemid="' . $draftitemid . '" ';
-        echo 'value="' . get_string('savefeedback', 'journal') . '" 
+        echo 'value="' . get_string('savefeedback', 'journal') . '"
             class="saveindividualfeedback btn btn-secondary m-t-1"/>';
         echo '</p>';
     }
