@@ -939,7 +939,9 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
                     $CFG->wwwroot . '/grade/report/grader/index.php?id=' . $course->id,
                     $gradinginfo->items[0]->grades[$user->id]->str_long_grade
                 );
-                $gradebookgradestr = html_writer::empty_tag('br') . get_string("gradeingradebook", "journal") . ': ' . $gradebooklink;
+                $gradebookgradestr = html_writer::empty_tag('br')
+                    . get_string("gradeingradebook", "journal")
+                    . ': ' . $gradebooklink;
                 $feedbackdisabledstr = 'disabled';
                 $feedbacktext = $gradinginfo->items[0]->grades[$user->id]->str_feedback;
             }
