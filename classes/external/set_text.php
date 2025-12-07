@@ -28,6 +28,10 @@ use mod_journal\event\entry_updated;
 use required_capability_exception;
 use stdClass;
 
+if ($CFG->branch < 400) {
+    require_once $CFG->dirroot.'/lib/externallib.php';
+}
+
 /**
  * External function to seta journal's text
  *

@@ -16,7 +16,6 @@
 
 namespace mod_journal\external;
 
-defined('MOODLE_INTERNAL') || die();
 
 use context_module;
 use external_api;
@@ -24,6 +23,10 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+
+if ($CFG->branch < 400) {
+    require_once $CFG->dirroot.'/lib/externallib.php';
+}
 
 /**
  * External function to get a journal entry.
