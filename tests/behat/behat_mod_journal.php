@@ -25,7 +25,7 @@
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 
-use Behat\Gherkin\Node\TableNode as TableNode;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Steps definitions for journal.
@@ -38,6 +38,9 @@ use Behat\Gherkin\Node\TableNode as TableNode;
 class behat_mod_journal extends behat_base {
     /**
      * Checks the completion state of the journal activity compatible with multiple Moodle versions.
+     *
+     * @param string $activityname The name of the activity.
+     * @param string $state The expected state (complete|not complete).
      *
      * @Then /^the journal activity "(?P<activityname>(?:[^"]|\\")*)" should be marked as (?P<state>complete|not complete)$/
      */
@@ -53,19 +56,19 @@ class behat_mod_journal extends behat_base {
             $conditionname = get_string('completiondetail:completion_create_entry', 'mod_journal');
 
             // We need to execute the step:
-            // the :conditionname completion condition of :activityname is displayed as :completionstatus
+            // the :conditionname completion condition of :activityname is displayed as :completionstatus.
             $this->execute('behat_completion::activity_completion_condition_displayed_as', [
-                $conditionname, $activityname, $completionstatus
+                $conditionname, $activityname, $completionstatus,
             ]);
         } else {
             // Moodle 3.9 (Old Icons).
             if ($state === 'complete') {
                 $this->execute('behat_completion::activity_marked_as_complete', [
-                    $activityname, 'journal', 'auto'
+                    $activityname, 'journal', 'auto',
                 ]);
             } else {
                 $this->execute('behat_completion::activity_marked_as_not_complete', [
-                    $activityname, 'journal', 'auto'
+                    $activityname, 'journal', 'auto',
                 ]);
             }
         }

@@ -16,8 +16,6 @@
 
 namespace mod_journal\completion;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core_completion\activity_custom_completion;
 
 /**

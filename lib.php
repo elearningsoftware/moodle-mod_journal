@@ -1394,3 +1394,33 @@ function journal_get_printable_count($text) {
     $count = count_words($text);
     return get_string('numwords', 'moodle', $count);
 }
+
+/**
+ * Obtains the automatic completion state for this journal based on the rule
+ * on its completion settings.
+ *
+ * @param stdClass $course Course
+ * @param cm_info|stdClass $cm Course-module
+ * @param int $userid User ID
+ * @param bool $type Type of comparison (or/and; can be used as return value if no conditions are met)
+ * @return bool True if completed, false if not, $type if conditions not met.
+ */
+function journal_get_completion_state($course, $cm, $userid, $type) {
+    global $DB;
+
+    // No need to check for the 'view' condition, completion_info_custom::get_state
+    // already checks for the 'view' rule before calling this function.
+
+    if ($type == COMPLETION_AND) {
+        $journal = $DB->get_record('journal', ['id' => $cm->instance]);
+        if (!$journal) {
+            return $type;
+        }
+
+        if ($journal->completion_create_entry) {
+            return $DB->record_exists('journal_entries', ['journal' => $journal->id, 'userid' => $userid]);
+        }
+    }
+
+    return $type;
+}
