@@ -26,17 +26,30 @@ use invalid_parameter_exception;
 
 global $CFG;
 
-// Dynamic Parent Class Logic.
-// Moodle 4.0+ uses namespaces (core_external\external_api).
-// Moodle 3.9 uses global (external_api).
+// Dynamic Class Logic.
+// Ensures compatibility between Moodle 3.9 (global classes) and 4.0+ (core_external namespace).
+if (!class_exists('mod_journal\external\journal_external_api_base')) {
 if (class_exists('core_external\external_api')) {
     // Moodle 4.0 and higher.
     class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');
+
+        // Ensure global class aliases exist for the helper types used in this file.
+        // This is necessary because "use external_function_parameters;" expects the global class,
+        // which might not be aliased automatically in strict PHPUnit isolation.
+        if (!class_exists('external_function_parameters')) {
+            class_alias('core_external\external_function_parameters', 'external_function_parameters');
+        }
+        if (!class_exists('external_value')) {
+            class_alias('core_external\external_value', 'external_value');
+        }
+        if (!class_exists('external_single_structure')) {
+            class_alias('core_external\external_single_structure', 'external_single_structure');
+        }
 } else {
     // Moodle 3.9 - 3.11.
-    // We only include this file if the class is missing to avoid PHPUnit isolation issues in newer versions.
-    require_once($CFG->libdir . '/externallib.php');
+        require_once($CFG->libdir . '/externallib.php');
     class_alias('external_api', 'mod_journal\external\journal_external_api_base');
+}
 }
 
 /**

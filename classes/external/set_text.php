@@ -31,12 +31,20 @@ use stdClass;
 
 global $CFG;
 
-// Dynamic Parent Class Logic.
-// Ensures compatibility between Moodle 3.9 (global external_api) and 4.0+ (core_external namespace).
+// Dynamic Class Logic.
+// Ensures compatibility between Moodle 3.9 (global classes) and 4.0+ (core_external namespace).
 if (!class_exists('mod_journal\external\journal_external_api_base')) {
     if (class_exists('core_external\external_api')) {
         // Moodle 4.0 and higher.
         class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');
+
+        // Ensure global class aliases exist for the helper types used in this file.
+        if (!class_exists('external_function_parameters')) {
+            class_alias('core_external\external_function_parameters', 'external_function_parameters');
+        }
+        if (!class_exists('external_value')) {
+            class_alias('core_external\external_value', 'external_value');
+        }
     } else {
         // Moodle 3.9 - 3.11.
         require_once($CFG->libdir . '/externallib.php');
