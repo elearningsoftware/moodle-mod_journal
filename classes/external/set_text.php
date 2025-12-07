@@ -16,8 +16,12 @@
 
 namespace mod_journal\external;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-require_once($CFG->libdir . '/externallib.php');
+if (!class_exists('external_api')) {
+    require_once($CFG->libdir . '/externallib.php');
+}
 
 use coding_exception;
 use context_module;
@@ -85,15 +89,15 @@ class set_text extends external_api {
             ['journalid' => $journalid, 'text' => $text, 'format' => $format]
         );
 
-        if (! $cm = get_coursemodule_from_id('journal', $params['journalid'])) {
+        if (!$cm = get_coursemodule_from_id('journal', $params['journalid'])) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
-        if (! $course = $DB->get_record('course', ['id' => $cm->course])) {
+        if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
             throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
         }
 
-        if (! $journal = $DB->get_record('journal', ['id' => $cm->instance])) {
+        if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 

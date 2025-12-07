@@ -16,8 +16,12 @@
 
 namespace mod_journal\external;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
-require_once($CFG->libdir . '/externallib.php');
+if (!class_exists('external_api')) {
+    require_once($CFG->libdir . '/externallib.php');
+}
 
 use context_module;
 use external_api;

@@ -73,15 +73,15 @@ final class get_entry_test extends advanced_testcase {
         $result = get_entry::execute($journal->cmid);
 
         $maindata['comment'] = 'test comment';
-        
-        // Cast results to expected types for strict comparison in tests, 
+
+        // Cast results to expected types for strict comparison in tests,
         // ensuring compatibility with what the external API actually returns.
         $result['modified'] = (string)$result['modified'];
         $result['rating'] = (string)(int)$result['rating']; // Ratings usually come back as strings or ints in some DBs, normalize.
         $result['teacher'] = (string)$result['teacher'];
-        // Note: In the actual class we fixed return types, 
-        // but let's trust assertEquals handles loose type matching for values like '1' vs 1. 
-        // If strict mode is used, specific casts might be needed. 
+        // Note: In the actual class we fixed return types,
+        // but let's trust assertEquals handles loose type matching for values like '1' vs 1.
+        // If strict mode is used, specific casts might be needed.
         // The original test code was simple, keeping it simple.
 
         $this->assertEquals($maindata['text'], $result['text']);
