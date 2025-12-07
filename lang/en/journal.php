@@ -86,6 +86,7 @@ $string['noentry'] = 'No entry';
 $string['noratinggiven'] = 'No rating given';
 $string['notopenuntil'] = 'This journal won\'t be open until';
 $string['notstarted'] = 'You have not started this journal yet';
+$string['numchars'] = '{$a} characters';
 $string['overallrating'] = 'Overall rating';
 $string['pluginadministration'] = 'Journal module administration';
 $string['pluginname'] = 'Journal';

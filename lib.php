@@ -185,13 +185,9 @@ function journal_user_outline($course, $user, $mod, $journal) {
     if ($entry = $DB->get_record('journal_entries', ['userid' => $user->id, 'journal' => $journal->id])) {
         // Cast to string to prevent PHP 8.1 null deprecation notice in preg_split.
         $text = isset($entry->text) ? (string) $entry->text : '';
-        $numwords = count(preg_split('/\w\b/', $text)) - 1;
-        if ($numwords < 0) {
-            $numwords = 0;
-        }
 
         $result = new \stdClass();
-        $result->info = get_string('numwords', '', $numwords);
+        $result->info = journal_get_printable_count($text);
         $result->time = $entry->modified;
         return $result;
     }
@@ -1374,4 +1370,24 @@ function journal_get_coursemodule_info($cm): cached_cm_info {
     }
 
     return $result;
+}
+
+/**
+ * Returns the count of words or characters and the appropriate string.
+ *
+ * @param string $text The text to count.
+ * @return string The formatted string (e.g. "5 words" or "20 characters").
+ */
+function journal_get_printable_count($text) {
+    $text = isset($text) ? (string) $text : '';
+    $text = strip_tags($text);
+
+    // Check for CJK characters.
+    if (preg_match("/\p{Han}|\p{Hiragana}|\p{Katakana}/u", $text)) {
+        $count = mb_strlen($text, 'UTF-8');
+        return get_string('numchars', 'journal', $count);
+    }
+
+    $count = count_words($text);
+    return get_string('numwords', 'moodle', $count);
 }

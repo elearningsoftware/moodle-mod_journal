@@ -154,10 +154,9 @@ if ($timenow > $timestart) {
         if (!empty($entry->modified)) {
             // Safe count_words for PHP 8.1.
             $entrytext = isset($entry->text) ? (string) $entry->text : '';
-            $wordcount = count_words($entrytext);
             echo html_writer::div(
                 '<strong>' . get_string('lastedited') . ':</strong> ' . userdate($entry->modified) . ' (' .
-                get_string('numwords', '', $wordcount) . ')',
+                journal_get_printable_count($entrytext) . ')',
                 'lastedit'
             );
         }
