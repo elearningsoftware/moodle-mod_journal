@@ -16,202 +16,115 @@
 
 namespace mod_journal\external;
 
+defined('MOODLE_INTERNAL') || die();
 
 use context_module;
-use external_api;
 use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
 
-defined(constant_name: 'MOODLE_INTERNAL') || die();
+global $CFG;
 
-if ($CFG->branch < 400) {
-    require_once($CFG->dirroot . '/lib/externallib.php');
-
-    /**
-     * External function to get a journal entry.
-     *
-     * @package   mod_journal
-     * @copyright 2025 eDaktik GmbH {@link https://www.edaktik.at/}
-     * @author    Christian Abila <christian.abila@edaktik.at>
-     * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-     */
-    class get_entry extends external_api {
-        /**
-         * Returns description of method parameters
-         *
-         * @return external_function_parameters
-         * @since Moodle 3.3
-         */
-        public static function execute_parameters(): external_function_parameters {
-            return new external_function_parameters(
-                [
-                    'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
-                ]
-            );
-        }
-
-        /**
-         * Return one entry record from the database, including contents optionally.
-         *
-         * @param int $journalid Journal course module id
-         * @return array of warnings and the entries
-         * @since Moodle 3.3
-         * @throws invalid_parameter_exception
-         */
-        public static function execute(int $journalid): array {
-            global $DB, $USER;
-
-            $params = self::validate_parameters(self::execute_parameters(), ['journalid' => $journalid]);
-
-            if (!($cm = get_coursemodule_from_id('journal', $params['journalid']))) {
-                throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
-            }
-
-            if (!$DB->record_exists('course', ['id' => $cm->course])) {
-                throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
-            }
-
-            if (!($journal = $DB->get_record('journal', ['id' => $cm->instance]))) {
-                throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
-            }
-
-            $context = context_module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/journal:addentries', $context);
-
-            if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
-                return [
-                    'text' => (string) $entry->text,
-                    'modified' => $entry->modified,
-                    'rating' => (float) $entry->rating,
-                    'comment' => (string) $entry->entrycomment,
-                    'teacher' => $entry->teacher,
-                ];
-            }
-
-            return [
-                'text' => '',
-                'modified' => 0,
-                'rating' => -1.0,
-                'comment' => '',
-                'teacher' => 0,
-            ];
-        }
-
-        /**
-         * Returns description of method result value
-         *
-         * @return external_single_structure
-         * @since Moodle 3.3
-         */
-        public static function execute_returns(): external_single_structure {
-            return new external_single_structure(
-                [
-                    'text' => new external_value(PARAM_RAW, 'journal text'),
-                    'modified' => new external_value(PARAM_INT, 'last modified time'),
-                    'rating' => new external_value(PARAM_FLOAT, 'teacher rating'),
-                    'comment' => new external_value(PARAM_RAW, 'teacher comment'),
-                    'teacher' => new external_value(PARAM_INT, 'id of teacher'),
-                ]
-            );
-        }
-    }
+// Dynamic Parent Class Logic.
+// Moodle 4.0+ uses namespaces (core_external\external_api).
+// Moodle 3.9 uses global (external_api).
+if (class_exists('core_external\external_api')) {
+    // Moodle 4.0 and higher.
+    class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');
 } else {
-    if ($CFG->branch <= 500) {
-        require_once($CFG->dirroot . '/lib/external/classes/external_api.php');
-    } else if ($CFG->branch >= 501) {
-        require_once($CFG->dirroot . '/public/lib/external/classes/external_api.php');
+    // Moodle 3.9 - 3.11.
+    // We only include this file if the class is missing to avoid PHPUnit isolation issues in newer versions.
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'mod_journal\external\journal_external_api_base');
+}
+
+/**
+ * External function to get a journal entry.
+ *
+ * @package   mod_journal
+ * @copyright 2025 eDaktik GmbH {@link https://www.edaktik.at/}
+ * @author    Christian Abila <christian.abila@edaktik.at>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class get_entry extends journal_external_api_base {
+    /**
+     * Returns description of method parameters
+     *
+     * @return external_function_parameters
+     * @since Moodle 3.3
+     */
+    public static function execute_parameters(): external_function_parameters {
+        return new external_function_parameters(
+            [
+                'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
+            ]
+        );
     }
 
     /**
-     * External function to get a journal entry.
+     * Return one entry record from the database, including contents optionally.
      *
-     * @package   mod_journal
-     * @copyright 2025 eDaktik GmbH {@link https://www.edaktik.at/}
-     * @author    Christian Abila <christian.abila@edaktik.at>
-     * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+     * @param int $journalid Journal course module id
+     * @return array of warnings and the entries
+     * @since Moodle 3.3
+     * @throws invalid_parameter_exception
      */
-    class get_entry extends \core_external\external_api {
-        /**
-         * Returns description of method parameters
-         *
-         * @return external_function_parameters
-         * @since Moodle 3.3
-         */
-        public static function execute_parameters(): external_function_parameters {
-            return new external_function_parameters(
-                [
-                    'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
-                ]
-            );
+    public static function execute(int $journalid): array {
+        global $DB, $USER;
+
+        $params = self::validate_parameters(self::execute_parameters(), ['journalid' => $journalid]);
+
+        if (!($cm = get_coursemodule_from_id('journal', $params['journalid']))) {
+            throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
-        /**
-         * Return one entry record from the database, including contents optionally.
-         *
-         * @param int $journalid Journal course module id
-         * @return array of warnings and the entries
-         * @since Moodle 3.3
-         * @throws invalid_parameter_exception
-         */
-        public static function execute(int $journalid): array {
-            global $DB, $USER;
+        if (!$DB->record_exists('course', ['id' => $cm->course])) {
+            throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
+        }
 
-            $params = self::validate_parameters(self::execute_parameters(), ['journalid' => $journalid]);
+        if (!($journal = $DB->get_record('journal', ['id' => $cm->instance]))) {
+            throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
+        }
 
-            if (!($cm = get_coursemodule_from_id('journal', $params['journalid']))) {
-                throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
-            }
+        $context = context_module::instance($cm->id);
+        self::validate_context($context);
+        require_capability('mod/journal:addentries', $context);
 
-            if (!$DB->record_exists('course', ['id' => $cm->course])) {
-                throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
-            }
-
-            if (!($journal = $DB->get_record('journal', ['id' => $cm->instance]))) {
-                throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
-            }
-
-            $context = context_module::instance($cm->id);
-            self::validate_context($context);
-            require_capability('mod/journal:addentries', $context);
-
-            if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
-                return [
-                    'text' => (string) $entry->text,
-                    'modified' => $entry->modified,
-                    'rating' => (float) $entry->rating,
-                    'comment' => (string) $entry->entrycomment,
-                    'teacher' => $entry->teacher,
-                ];
-            }
-
+        if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
             return [
-                'text' => '',
-                'modified' => 0,
-                'rating' => -1.0,
-                'comment' => '',
-                'teacher' => 0,
+                'text' => (string) $entry->text,
+                'modified' => $entry->modified,
+                'rating' => (float) $entry->rating,
+                'comment' => (string) $entry->entrycomment,
+                'teacher' => $entry->teacher,
             ];
         }
 
-        /**
-         * Returns description of method result value
-         *
-         * @return external_single_structure
-         * @since Moodle 3.3
-         */
-        public static function execute_returns(): external_single_structure {
-            return new external_single_structure(
-                [
-                    'text' => new external_value(PARAM_RAW, 'journal text'),
-                    'modified' => new external_value(PARAM_INT, 'last modified time'),
-                    'rating' => new external_value(PARAM_FLOAT, 'teacher rating'),
-                    'comment' => new external_value(PARAM_RAW, 'teacher comment'),
-                    'teacher' => new external_value(PARAM_INT, 'id of teacher'),
-                ]
-            );
-        }
+        return [
+            'text' => '',
+            'modified' => 0,
+            'rating' => -1.0,
+            'comment' => '',
+            'teacher' => 0,
+        ];
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_single_structure
+     * @since Moodle 3.3
+     */
+    public static function execute_returns(): external_single_structure {
+        return new external_single_structure(
+            [
+                'text' => new external_value(PARAM_RAW, 'journal text'),
+                'modified' => new external_value(PARAM_INT, 'last modified time'),
+                'rating' => new external_value(PARAM_FLOAT, 'teacher rating'),
+                'comment' => new external_value(PARAM_RAW, 'teacher comment'),
+                'teacher' => new external_value(PARAM_INT, 'id of teacher'),
+            ]
+        );
     }
 }
