@@ -78,6 +78,17 @@ class mod_journal_mod_form extends moodleform_mod {
 
         $this->standard_grading_coursemodule_elements();
 
+        // Apply default grade from global settings.
+        // We only apply this for new instances (when $this->_instance is empty).
+        if (empty($this->_instance)) {
+            $defaultgrade = get_config('journal', 'defaultgrade');
+            // If the setting is missing, fallback to 100 (Standard Moodle default).
+            if ($defaultgrade === false) {
+                $defaultgrade = 100;
+            }
+            $mform->setDefault('grade', $defaultgrade);
+        }
+
         $this->standard_coursemodule_elements();
 
         $this->add_action_buttons();

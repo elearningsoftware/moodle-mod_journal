@@ -40,4 +40,13 @@ if ($ADMIN->fulltree) {
         1,
         ['0' => get_string('no'), '1' => get_string('yes')]
     ));
+
+    // Setting: Default Grade.
+    $settings->add(new admin_setting_configtext(
+        'journal/defaultgrade',
+        get_string('defaultgrade', 'journal'),
+        get_string('defaultgrade_help', 'journal'),
+        100,
+        PARAM_INT
+    ));
 }

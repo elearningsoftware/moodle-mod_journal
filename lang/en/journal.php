@@ -34,6 +34,10 @@ $string['dateasc'] = 'Date Ascending';
 $string['datedesc'] = 'Date Descending';
 $string['daysavailable'] = 'Days available';
 $string['deadline'] = 'Days Open';
+$string['defaultgrade'] = 'Default entry grade';
+$string['defaultgrade_help'] = 'The default maximum grade for new Journal entries.
+* Enter **100** (or any positive number) to default to Point grading.
+* Enter **0** to default to "No grade" (useful for formative activities).';
 $string['editingended'] = 'Editing period has ended';
 $string['editingends'] = 'Editing period ends';
 $string['entries'] = 'Entries';
