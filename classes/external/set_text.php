@@ -19,9 +19,7 @@ namespace mod_journal\external;
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
-if (!class_exists('external_api')) {
-    require_once($CFG->libdir . '/externallib.php');
-}
+
 
 use coding_exception;
 use context_module;
@@ -34,6 +32,10 @@ use mod_journal\event\entry_created;
 use mod_journal\event\entry_updated;
 use required_capability_exception;
 use stdClass;
+
+if (!class_exists('external_api')) {
+    require_once($CFG->libdir . '/externallib.php');
+}
 
 /**
  * External function to seta journal's text

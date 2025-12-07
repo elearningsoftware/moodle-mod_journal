@@ -1356,14 +1356,17 @@ function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
  * @param cm_info $cm
  * @return cached_cm_info|null
  */
-function journal_get_coursemodule_info($cm): cached_cm_info {
+function journal_get_coursemodule_info($cm): ?cached_cm_info {
     global $DB;
 
-    if (!$journal = $DB->get_record('journal', ['id' => $cm->instance], 'completion_create_entry')) {
+    // We only need the completion flag from the journal table.
+    // Note: We MUST include 'id' in fields to get a proper record object.
+    if (!$journal = $DB->get_record('journal', ['id' => $cm->instance], 'id, name, completion_create_entry')) {
         return null;
     }
 
     $result = new cached_cm_info();
+    $result->name = $journal->name;
 
     if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
         $result->customdata['customcompletionrules']['completion_create_entry'] = $journal->completion_create_entry;

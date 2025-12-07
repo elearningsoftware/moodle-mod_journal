@@ -16,6 +16,10 @@
 
 namespace mod_journal\completion;
 
+defined('MOODLE_INTERNAL') || die();
+
+use core_completion\activity_custom_completion;
+
 /**
  * Custom completion rules for mod_journal
  *
@@ -24,7 +28,7 @@ namespace mod_journal\completion;
  * @author      Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class custom_completion extends \core_completion\activity_custom_completion {
+class custom_completion extends activity_custom_completion {
     /**
      * Get the completion state of the custom completion rules
      * @param string $rule completion rule
