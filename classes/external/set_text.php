@@ -16,14 +16,16 @@
 
 namespace mod_journal\external;
 
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
 use coding_exception;
-use core\context\module;
-use core\exception\invalid_parameter_exception;
-use core_external\external_function_parameters;
-use core_external\external_value;
-use core_external\restricted_context_exception;
+use context_module;
 use dml_exception;
-use core_external\external_api;
+use external_api;
+use external_function_parameters;
+use external_value;
+use invalid_parameter_exception;
 use mod_journal\event\entry_created;
 use mod_journal\event\entry_updated;
 use required_capability_exception;
@@ -68,14 +70,14 @@ class set_text extends external_api {
      *
      * @param int $journalid Journal course module ID
      * @param string $text Text parameter
-     * @param string $format Format constant for the string
+     * @param int|string $format Format constant for the string
+     * @return string
      * @throws invalid_parameter_exception
      * @throws coding_exception
      * @throws dml_exception
      * @throws required_capability_exception
-     * @throws restricted_context_exception
      */
-    public static function execute(int $journalid, string $text, string $format) {
+    public static function execute(int $journalid, string $text, $format) {
         global $DB, $USER;
 
         $params = self::validate_parameters(
@@ -95,7 +97,7 @@ class set_text extends external_api {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
-        $context = module::instance($cm->id);
+        $context = context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/journal:addentries', $context);
 

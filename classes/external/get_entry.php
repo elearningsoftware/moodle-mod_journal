@@ -16,13 +16,15 @@
 
 namespace mod_journal\external;
 
-use core\context\module;
-use core\exception\invalid_parameter_exception;
-use core\exception\moodle_exception;
-use core_external\external_function_parameters;
-use core_external\external_single_structure;
-use core_external\external_value;
-use core_external\external_api;
+global $CFG;
+require_once($CFG->libdir . '/externallib.php');
+
+use context_module;
+use external_api;
+use external_function_parameters;
+use external_single_structure;
+use external_value;
+use invalid_parameter_exception;
 
 /**
  * External function to get a journal entry.
@@ -53,7 +55,7 @@ class get_entry extends external_api {
      * @param int $journalid Journal course module id
      * @return array of warnings and the entries
      * @since Moodle 3.3
-     * @throws moodle_exception
+     * @throws invalid_parameter_exception
      */
     public static function execute(int $journalid): array {
         global $DB, $USER;
@@ -72,16 +74,16 @@ class get_entry extends external_api {
             throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
         }
 
-        $context = module::instance($cm->id);
+        $context = context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/journal:addentries', $context);
 
         if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
             return [
-                'text' => $entry->text,
+                'text' => (string) $entry->text,
                 'modified' => $entry->modified,
-                'rating' => $entry->rating,
-                'comment' => $entry->entrycomment,
+                'rating' => (float) $entry->rating,
+                'comment' => (string) $entry->entrycomment,
                 'teacher' => $entry->teacher,
             ];
         }

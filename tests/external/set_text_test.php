@@ -17,11 +17,10 @@
 namespace mod_journal\external;
 
 use advanced_testcase;
-use core\exception\coding_exception;
-use core\exception\invalid_parameter_exception;
-use core_external\restricted_context_exception;
+use coding_exception;
 use dml_exception;
-use core\exception\required_capability_exception;
+use invalid_parameter_exception;
+use required_capability_exception;
 
 /**
  * Unit tests for the class \mod_journal\external\set_text
@@ -39,7 +38,6 @@ final class set_text_test extends advanced_testcase {
      * @return void
      * @throws coding_exception
      * @throws invalid_parameter_exception
-     * @throws restricted_context_exception
      * @throws required_capability_exception
      * @throws dml_exception
      * @covers ::execute
