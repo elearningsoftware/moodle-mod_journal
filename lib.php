@@ -16,7 +16,7 @@
 
 /**
  * mod_journal lib file
- *constant_name: 
+ * constant_name:
  * @package    mod_journal
  * @copyright  2014 David Monllao <david.monllao@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
