@@ -16,8 +16,6 @@
 
 namespace mod_journal\external;
 
-defined('MOODLE_INTERNAL') || die();
-
 use coding_exception;
 use context_module;
 use dml_exception;
@@ -29,6 +27,17 @@ use mod_journal\event\entry_created;
 use mod_journal\event\entry_updated;
 use required_capability_exception;
 use stdClass;
+
+if (!class_exists('external_api')) {
+    require_once($CFG->libdir . '/externallib.php');
+    
+    if (file_exists($CFG->dirroot.'/lib/external/classes/external_api.php')) {
+        require_once($CFG->dirroot.'/lib/external/classes/external_api.php');
+    }
+    if (file_exists($CFG->dirroot.'/public/lib/external/classes/external_api.php')) {
+        require_once($CFG->dirroot.'/public/lib/external/classes/external_api.php');
+    }
+}
 
 /**
  * External function to seta journal's text
