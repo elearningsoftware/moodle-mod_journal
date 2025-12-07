@@ -97,7 +97,6 @@ function xmldb_journal_upgrade($oldversion = 0) {
     }
 
     if ($oldversion < 2025020900) {
-
         // Define field completion_create_entry to be added to journal.
         $table = new xmldb_table('journal');
         $field = new xmldb_field(
