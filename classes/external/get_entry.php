@@ -25,7 +25,12 @@ use external_value;
 use invalid_parameter_exception;
 
 if ($CFG->branch < 400) {
-    require_once $CFG->dirroot.'/lib/externallib.php';
+    defined('MOODLE_INTERNAL') || die();
+    require_once($CFG->dirroot . '/lib/externallib.php');
+} else if ($CFG->branch <= 500) {
+    require_once($CFG->dirroot . '/lib/external/classes/external_api.php');
+} else if ($CFG->branch >= 501) {
+    require_once($CFG->dirroot . '/public/lib/external/classes/external_api.php');
 }
 
 /**
