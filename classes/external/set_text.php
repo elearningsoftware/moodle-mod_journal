@@ -28,120 +28,233 @@ use mod_journal\event\entry_updated;
 use required_capability_exception;
 use stdClass;
 
+defined('MOODLE_INTERNAL') || die();
+
 if ($CFG->branch < 400) {
-    defined('MOODLE_INTERNAL') || die();
     require_once($CFG->dirroot . '/lib/externallib.php');
-} else if ($CFG->branch <= 500) {
-    require_once($CFG->dirroot . '/lib/external/classes/external_api.php');
-} else if ($CFG->branch >= 501) {
-    require_once($CFG->dirroot . '/public/lib/external/classes/external_api.php');
-}
 
-/**
- * External function to seta journal's text
- *
- * @package   mod_journal
- * @copyright 2025 eDaktik GmbH {@link https://www.edaktik.at/}
- * @author    Christian Abila <christian.abila@edaktik.at>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class set_text extends external_api {
+
     /**
-     * Returns description of method parameters
+     * External function to seta journal's text
      *
-     * @since Moodle 3.3
+     * @package   mod_journal
+     * @copyright 2025 eDaktik GmbH {@link https://www.edaktik.at/}
+     * @author    Christian Abila <christian.abila@edaktik.at>
+     * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
      */
-    public static function execute_parameters(): external_function_parameters {
-        return new external_function_parameters(
-            [
-                'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
-                'text' => new external_value(PARAM_RAW, 'text to set'),
-                'format' => new external_value(PARAM_INT, 'format of text'),
-            ]
-        );
+    class set_text extends external_api {
+        /**
+         * Returns description of method parameters
+         *
+         * @since Moodle 3.3
+         */
+        public static function execute_parameters(): external_function_parameters {
+            return new external_function_parameters(
+                [
+                    'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
+                    'text' => new external_value(PARAM_RAW, 'text to set'),
+                    'format' => new external_value(PARAM_INT, 'format of text'),
+                ]
+            );
+        }
+
+        /**
+         * Returns description of method result value
+         *
+         * @return external_value
+         * @since Moodle 3.3
+         */
+        public static function execute_returns(): external_value {
+            return new external_value(PARAM_RAW, 'new text');
+        }
+
+        /**
+         * Sets the text for the element
+         *
+         * @param int $journalid Journal course module ID
+         * @param string $text Text parameter
+         * @param int|string $format Format constant for the string
+         * @return string
+         * @throws invalid_parameter_exception
+         * @throws coding_exception
+         * @throws dml_exception
+         * @throws required_capability_exception
+         */
+        public static function execute(int $journalid, string $text, $format) {
+            global $DB, $USER;
+
+            $params = self::validate_parameters(
+                self::execute_parameters(),
+                ['journalid' => $journalid, 'text' => $text, 'format' => $format]
+            );
+
+            if (!$cm = get_coursemodule_from_id('journal', $params['journalid'])) {
+                throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
+            }
+
+            if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
+                throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
+            }
+
+            if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
+                throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
+            }
+
+            $context = context_module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('mod/journal:addentries', $context);
+
+            $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
+
+            $timenow = time();
+            $newentry = new stdClass();
+            $newentry->text = $params['text'];
+            $newentry->format = $params['format'];
+            $newentry->modified = $timenow;
+
+            if ($entry) {
+                $newentry->id = $entry->id;
+                $DB->update_record('journal_entries', $newentry);
+            } else {
+                $newentry->userid = $USER->id;
+                $newentry->journal = $journal->id;
+                $newentry->id = $DB->insert_record('journal_entries', $newentry);
+            }
+
+            if ($entry) {
+                // Trigger module entry updated event.
+                $event = entry_updated::create([
+                    'objectid' => $journal->id,
+                    'context' => $context,
+                ]);
+            } else {
+                // Trigger module entry created event.
+                $event = entry_created::create([
+                    'objectid' => $journal->id,
+                    'context' => $context,
+                ]);
+            }
+            $event->add_record_snapshot('course_modules', $cm);
+            $event->add_record_snapshot('course', $course);
+            $event->add_record_snapshot('journal', $journal);
+            $event->trigger();
+
+            return $newentry->text;
+        }
+    }
+} else {
+    if ($CFG->branch <= 500) {
+        require_once($CFG->dirroot . '/lib/external/classes/external_api.php');
+    } else if ($CFG->branch >= 501) {
+        require_once($CFG->dirroot . '/public/lib/external/classes/external_api.php');
     }
 
     /**
-     * Returns description of method result value
+     * External function to seta journal's text
      *
-     * @return external_value
-     * @since Moodle 3.3
+     * @package   mod_journal
+     * @copyright 2025 eDaktik GmbH {@link https://www.edaktik.at/}
+     * @author    Christian Abila <christian.abila@edaktik.at>
+     * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
      */
-    public static function execute_returns(): external_value {
-        return new external_value(PARAM_RAW, 'new text');
-    }
-
-    /**
-     * Sets the text for the element
-     *
-     * @param int $journalid Journal course module ID
-     * @param string $text Text parameter
-     * @param int|string $format Format constant for the string
-     * @return string
-     * @throws invalid_parameter_exception
-     * @throws coding_exception
-     * @throws dml_exception
-     * @throws required_capability_exception
-     */
-    public static function execute(int $journalid, string $text, $format) {
-        global $DB, $USER;
-
-        $params = self::validate_parameters(
-            self::execute_parameters(),
-            ['journalid' => $journalid, 'text' => $text, 'format' => $format]
-        );
-
-        if (!$cm = get_coursemodule_from_id('journal', $params['journalid'])) {
-            throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
+    class set_text extends \core_external\external_api {
+        /**
+         * Returns description of method parameters
+         *
+         * @since Moodle 3.3
+         */
+        public static function execute_parameters(): external_function_parameters {
+            return new external_function_parameters(
+                [
+                    'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
+                    'text' => new external_value(PARAM_RAW, 'text to set'),
+                    'format' => new external_value(PARAM_INT, 'format of text'),
+                ]
+            );
         }
 
-        if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
-            throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
+        /**
+         * Returns description of method result value
+         *
+         * @return external_value
+         * @since Moodle 3.3
+         */
+        public static function execute_returns(): external_value {
+            return new external_value(PARAM_RAW, 'new text');
         }
 
-        if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
-            throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
+        /**
+         * Sets the text for the element
+         *
+         * @param int $journalid Journal course module ID
+         * @param string $text Text parameter
+         * @param int|string $format Format constant for the string
+         * @return string
+         * @throws invalid_parameter_exception
+         * @throws coding_exception
+         * @throws dml_exception
+         * @throws required_capability_exception
+         */
+        public static function execute(int $journalid, string $text, $format) {
+            global $DB, $USER;
+
+            $params = self::validate_parameters(
+                self::execute_parameters(),
+                ['journalid' => $journalid, 'text' => $text, 'format' => $format]
+            );
+
+            if (!$cm = get_coursemodule_from_id('journal', $params['journalid'])) {
+                throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
+            }
+
+            if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
+                throw new invalid_parameter_exception(get_string('incorrectcourseid', 'journal'));
+            }
+
+            if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
+                throw new invalid_parameter_exception(get_string('incorrectjournalid', 'journal'));
+            }
+
+            $context = context_module::instance($cm->id);
+            self::validate_context($context);
+            require_capability('mod/journal:addentries', $context);
+
+            $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
+
+            $timenow = time();
+            $newentry = new stdClass();
+            $newentry->text = $params['text'];
+            $newentry->format = $params['format'];
+            $newentry->modified = $timenow;
+
+            if ($entry) {
+                $newentry->id = $entry->id;
+                $DB->update_record('journal_entries', $newentry);
+            } else {
+                $newentry->userid = $USER->id;
+                $newentry->journal = $journal->id;
+                $newentry->id = $DB->insert_record('journal_entries', $newentry);
+            }
+
+            if ($entry) {
+                // Trigger module entry updated event.
+                $event = entry_updated::create([
+                    'objectid' => $journal->id,
+                    'context' => $context,
+                ]);
+            } else {
+                // Trigger module entry created event.
+                $event = entry_created::create([
+                    'objectid' => $journal->id,
+                    'context' => $context,
+                ]);
+            }
+            $event->add_record_snapshot('course_modules', $cm);
+            $event->add_record_snapshot('course', $course);
+            $event->add_record_snapshot('journal', $journal);
+            $event->trigger();
+
+            return $newentry->text;
         }
-
-        $context = context_module::instance($cm->id);
-        self::validate_context($context);
-        require_capability('mod/journal:addentries', $context);
-
-        $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
-
-        $timenow = time();
-        $newentry = new stdClass();
-        $newentry->text = $params['text'];
-        $newentry->format = $params['format'];
-        $newentry->modified = $timenow;
-
-        if ($entry) {
-            $newentry->id = $entry->id;
-            $DB->update_record('journal_entries', $newentry);
-        } else {
-            $newentry->userid = $USER->id;
-            $newentry->journal = $journal->id;
-            $newentry->id = $DB->insert_record('journal_entries', $newentry);
-        }
-
-        if ($entry) {
-            // Trigger module entry updated event.
-            $event = entry_updated::create([
-                'objectid' => $journal->id,
-                'context' => $context,
-            ]);
-        } else {
-            // Trigger module entry created event.
-            $event = entry_created::create([
-                'objectid' => $journal->id,
-                'context' => $context,
-            ]);
-        }
-        $event->add_record_snapshot('course_modules', $cm);
-        $event->add_record_snapshot('course', $course);
-        $event->add_record_snapshot('journal', $journal);
-        $event->trigger();
-
-        return $newentry->text;
     }
 }

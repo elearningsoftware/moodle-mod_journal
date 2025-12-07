@@ -48,7 +48,7 @@ class behat_mod_journal extends behat_base {
         global $CFG;
 
         // Moodle 4.0+ (Build 2022041900 or higher approx, we use branch 400).
-        if ($CFG->branch >= 400) {
+        if ($CFG->branch >= 311) {
             // New completion UI (Badges).
             // "not complete" maps to "todo".
             // "complete" maps to "done".
