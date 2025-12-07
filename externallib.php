@@ -182,6 +182,12 @@ class mod_journal_external extends external_api {
             $newentry->id = $DB->insert_record('journal_entries', $newentry);
         }
 
+        // Update completion state.
+        $completion = new completion_info($course);
+        if ($completion->is_enabled($cm) && $journal->completion_create_entry) {
+            $completion->update_state($cm, COMPLETION_COMPLETE);
+        }
+
         if ($entry) {
             // Trigger module entry updated event.
             $event = \mod_journal\event\entry_updated::create([

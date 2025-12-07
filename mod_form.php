@@ -73,4 +73,32 @@ class mod_journal_mod_form extends moodleform_mod {
 
         $this->add_action_buttons();
     }
+
+    /**
+     * Returns whether the custom completion rules are enabled.
+     *
+     * @param array $data form data
+     * @return bool
+     */
+    public function completion_rule_enabled($data): bool {
+        return (!empty($data['completion_create_entry' . $this->get_suffix()]));
+    }
+
+    /**
+     * Adds the custom completion rules for mod_journal
+     *
+     * @return array
+     */
+    public function add_completion_rules(): array {
+        $mform = $this->_form;
+
+        $fieldname = 'completion_create_entry' . $this->get_suffix();
+
+        $mform->addElement('advcheckbox', $fieldname, get_string('completiondetail:completion_create_entry', 'journal'));
+
+        $mform->setType($fieldname, PARAM_INT);
+        $mform->hideIf($fieldname, 'completion', 'neq', COMPLETION_TRACKING_AUTOMATIC);
+
+        return([$fieldname]);
+    }
 }

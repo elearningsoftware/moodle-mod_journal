@@ -111,6 +111,12 @@ if ($form->is_cancelled()) {
         }
     }
 
+    // Update completion state.
+    $completion = new completion_info($course);
+    if ($completion->is_enabled($cm) && $journal->completion_create_entry) {
+        $completion->update_state($cm, COMPLETION_COMPLETE);
+    }
+
     // Relink using the proper entryid.
     // We need to do this as draft area didn't have an itemid associated when creating the entry.
     $fromform = file_postupdate_standard_editor(

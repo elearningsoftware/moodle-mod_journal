@@ -74,7 +74,7 @@ foreach ($entries as $entry) {
 }
 
 // Map users with entries for the filter.
-$userswithentries = array_map(function($entry) {
+$userswithentries = array_map(function ($entry) {
     return $entry->userid;
 }, $entries);
 
@@ -190,14 +190,14 @@ if ($data = data_submitted()) {
 if (!$users) {
     echo $OUTPUT->notification(get_string('nousersyet', 'journal'), \core\output\notification::NOTIFY_INFO);
 } else {
-    // --- Toolbar Area: Filter, Group, Sort ---
+    // Toolbar Area: Filter, Group, Sort.
     echo html_writer::start_div('d-flex flex-wrap justify-content-between align-items-center mb-3');
 
     // 1. User Filter Form.
     $filterform = html_writer::start_tag('form', [
         'method' => 'get',
         'action' => 'report.php',
-        'class' => 'd-flex align-items-center me-3', // me-3 for spacing (Bootstrap 5).
+        'class' => 'd-flex align-items-center me-3', // Class me-3 for spacing (Bootstrap 5).
     ]);
     $filterform .= html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'id', 'value' => $id]);
     $filterform .= html_writer::select(
@@ -205,7 +205,7 @@ if (!$users) {
         'selecteduser',
         $selecteduser,
         ['' => get_string('allusers', 'search')],
-        ['class' => 'form-select me-2'] // form-select and me-2 (Bootstrap 5).
+        ['class' => 'form-select me-2'] // Classes form-select and me-2 (Bootstrap 5).
     );
     $filterform .= html_writer::empty_tag('input', [
         'type' => 'submit',

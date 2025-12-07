@@ -43,6 +43,7 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
             'days',
             'grade',
             'timemodified',
+            'completion_create_entry',
         ]);
 
         $entries = new backup_nested_element('entries');
