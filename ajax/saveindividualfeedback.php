@@ -91,8 +91,9 @@ if ($ratingchanged || $feedback !== $entry->entrycomment) {
         }
         journal_update_grades($journal, $entry->userid);
 
-        // Trigger module entry updated event.
-        $event = \mod_journal\event\entry_updated::create([
+        // Trigger module feedback updated event.
+        // We use feedback_updated (teaching level) instead of entry_updated (participating level).
+        $event = \mod_journal\event\feedback_updated::create([
             'objectid' => $journal->id,
             'context' => $context,
         ]);

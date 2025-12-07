@@ -809,7 +809,9 @@ function journal_count_entries($journal, $groupids = 0) {
 function journal_get_unmailed_graded($cutofftime) {
     global $DB;
 
-    $sql = 'SELECT je.*, j.course, j.name FROM {journal_entries} je
+    // Added j.notifystudents to the select list.
+    $sql = 'SELECT je.*, j.course, j.name, j.notifystudents
+            FROM {journal_entries} je
             JOIN {journal} j ON je.journal = j.id
             WHERE je.mailed = 0 AND je.timemarked < ? AND je.timemarked > 0
             AND (je.rating <> -1 OR (je.entrycomment IS NOT NULL AND trim(je.entrycomment) <> ?))';

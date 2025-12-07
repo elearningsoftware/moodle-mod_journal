@@ -44,6 +44,8 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
             'grade',
             'timemodified',
             'completion_create_entry',
+            'notifyteachers',
+            'notifystudents',
         ]);
 
         $entries = new backup_nested_element('entries');

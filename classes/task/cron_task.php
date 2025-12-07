@@ -27,6 +27,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
+use core\message\message;
+
 /**
  * The cron_task class.
  *
@@ -60,7 +62,7 @@ class cron_task extends \core\task\scheduled_task {
             } else {
                 $usernamefields = get_all_user_name_fields();
             }
-            $requireduserfields = 'id, auth, mnethostid, email, mailformat, maildisplay, lang, deleted, suspended, '
+            $requireduserfields = 'id, auth, mnethostid, email, emailstop, mailformat, maildisplay, lang, deleted, suspended, '
                 . implode(', ', $usernamefields);
 
             // To save some db queries.
@@ -68,6 +70,13 @@ class cron_task extends \core\task\scheduled_task {
             $courses = [];
 
             foreach ($entries as $entry) {
+                // Check instance setting.
+                if (empty($entry->notifystudents)) {
+                    // Just mark as mailed without sending so we don't process it again.
+                    $DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id]);
+                    continue;
+                }
+
                 echo "Processing journal entry $entry->id\n";
 
                 if (!empty($users[$entry->userid])) {
@@ -85,7 +94,8 @@ class cron_task extends \core\task\scheduled_task {
                 if (!empty($courses[$entry->course])) {
                     $course = $courses[$entry->course];
                 } else {
-                    if (!$course = $DB->get_record('course', ['id' => $entry->course], 'id, shortname')) {
+                    // We need fullname for the email template.
+                    if (!$course = $DB->get_record('course', ['id' => $entry->course], 'id, shortname, fullname')) {
                         echo "Could not find course $entry->course\n";
                         continue;
                     }
@@ -119,36 +129,46 @@ class cron_task extends \core\task\scheduled_task {
                     continue;  // Not an active participant.
                 }
 
+                // Prepare data for email template.
                 $journalinfo = new \stdClass();
                 $journalinfo->teacher = fullname($teacher);
+                $journalinfo->student = fullname($user);
                 $journalinfo->journal = format_string($entry->name, true);
+                $journalinfo->course_name = format_string($course->fullname, true, ['context' => $context]);
+                $journalinfo->date = userdate($entry->timemarked);
                 $journalinfo->url = "$CFG->wwwroot/mod/journal/view.php?id=$mod->id";
-                $modnamepl = get_string('modulenameplural', 'journal');
-                $msubject = get_string('mailsubject', 'journal');
 
-                $postsubject = "$course->shortname: $msubject: " . format_string($entry->name, true);
-                $posttext = "$course->shortname -> $modnamepl -> " . format_string($entry->name, true) . "\n";
-                $posttext .= "---------------------------------------------------------------------\n";
-                $posttext .= get_string("journalmail", "journal", $journalinfo) . "\n";
-                $posttext .= "---------------------------------------------------------------------\n";
+                $postsubject = get_string('mailsubject', 'journal') . ': ' . $journalinfo->journal;
+                $posttext = get_string("journalmail", "journal", $journalinfo);
+
                 if ($user->mailformat == 1) {  // HTML.
-                    $posthtml = "<p><font face=\"sans-serif\">" .
-                        "<a href=\"$CFG->wwwroot/course/view.php?id=$course->id\">$course->shortname</a> ->" .
-                        "<a href=\"$CFG->wwwroot/mod/journal/index.php?id=$course->id\">journals</a> ->" .
-                        "<a href=\"$CFG->wwwroot/mod/journal/view.php?id=$mod->id\">"
-                        . format_string($entry->name, true)
-                        . "</a></font></p>";
-                    $posthtml .= "<hr /><font face=\"sans-serif\">";
-                    $posthtml .= "<p>" . get_string("journalmailhtml", "journal", $journalinfo) . "</p>";
-                    $posthtml .= "</font><hr />";
+                    $posthtml = get_string("journalmailhtml", "journal", $journalinfo);
                 } else {
                     $posthtml = "";
                 }
 
-                if (!email_to_user($user, $teacher, $postsubject, $posttext, $posthtml)) {
-                    echo "Error: Journal cron: Could not send out mail for "
+                // Prepare the message for the notification system.
+                $eventdata = new message();
+                $eventdata->courseid = $course->id;
+                $eventdata->component = 'mod_journal';
+                $eventdata->name = 'journal_feedback';
+                $eventdata->userfrom = $teacher;
+                $eventdata->userto = $user;
+                $eventdata->subject = $postsubject;
+                $eventdata->fullmessage = $posttext;
+                $eventdata->fullmessageformat = FORMAT_PLAIN;
+                $eventdata->fullmessagehtml = $posthtml;
+                $eventdata->smallmessage = $postsubject;
+                $eventdata->contexturl = $journalinfo->url;
+                $eventdata->contexturlname = $journalinfo->journal;
+
+                $msgid = message_send($eventdata);
+
+                if (!$msgid) {
+                    echo "Error: Journal cron: Could not send out notification for "
                         . "id $entry->id to user $user->id ($user->email)\n";
                 }
+
                 if (!$DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id])) {
                     echo "Could not update the mailed field for id $entry->id\n";
                 }

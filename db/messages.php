@@ -14,18 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * mod_journal version file
- *
- * @package    mod_journal
- * @copyright  2014 David Monllao <david.monllao@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_journal';
-$plugin->version = 2025120700;
-$plugin->requires = 2020061500;  /* Moodle 3.9 */
-$plugin->release = '4.5.3 (Build: 2024120503)';
-$plugin->maturity = MATURITY_STABLE;
+$messageproviders = [
+    // Notify teacher when a student adds or edits an entry.
+    'submission' => [
+        'capability' => 'mod/journal:manageentries',
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
+    ],
+    // Notify student when a teacher provides feedback.
+    'journal_feedback' => [
+        'capability' => 'mod/journal:addentries',
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
+    ],
+];

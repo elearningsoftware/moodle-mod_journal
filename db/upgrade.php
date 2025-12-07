@@ -96,7 +96,7 @@ function xmldb_journal_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2022041100, 'journal');
     }
 
-    if ($oldversion < 2025020900) {
+    if ($oldversion < 2025120700) {
         // Define field completion_create_entry to be added to journal.
         $table = new xmldb_table('journal');
         $field = new xmldb_field(
@@ -115,8 +115,38 @@ function xmldb_journal_upgrade($oldversion = 0) {
             $dbman->add_field($table, $field);
         }
 
+        // Add notifyteachers field.
+        $field = new xmldb_field(
+            'notifyteachers',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '1',
+            'completion_create_entry'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Add notifystudents field.
+        $field = new xmldb_field(
+            'notifystudents',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '1',
+            'notifyteachers'
+        );
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
         // Journal savepoint reached.
-        upgrade_mod_savepoint(true, 2025020900, 'journal');
+        upgrade_mod_savepoint(true, 2025120700, 'journal');
     }
 
     return true;

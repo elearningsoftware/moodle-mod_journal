@@ -67,6 +67,15 @@ class mod_journal_mod_form extends moodleform_mod {
             $mform->setDefault('days', '0');
         }
 
+        // Notifications settings.
+        $mform->addElement('checkbox', 'notifyteachers', get_string('notifyteachers', 'journal'));
+        $mform->addHelpButton('notifyteachers', 'notifyteachers', 'journal');
+        $mform->setDefault('notifyteachers', 1);
+
+        $mform->addElement('checkbox', 'notifystudents', get_string('notifystudents', 'journal'));
+        $mform->addHelpButton('notifystudents', 'notifystudents', 'journal');
+        $mform->setDefault('notifystudents', 1);
+
         $this->standard_grading_coursemodule_elements();
 
         $this->standard_coursemodule_elements();
@@ -99,6 +108,6 @@ class mod_journal_mod_form extends moodleform_mod {
         $mform->setType($fieldname, PARAM_INT);
         $mform->hideIf($fieldname, 'completion', 'neq', COMPLETION_TRACKING_AUTOMATIC);
 
-        return([$fieldname]);
+        return ([$fieldname]);
     }
 }

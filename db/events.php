@@ -14,18 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * mod_journal version file
- *
- * @package    mod_journal
- * @copyright  2014 David Monllao <david.monllao@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_journal';
-$plugin->version = 2025120700;
-$plugin->requires = 2020061500;  /* Moodle 3.9 */
-$plugin->release = '4.5.3 (Build: 2024120503)';
-$plugin->maturity = MATURITY_STABLE;
+$observers = [
+    [
+        'eventname' => '\mod_journal\event\entry_created',
+        'callback'  => '\mod_journal\event_observer::entry_modified',
+    ],
+    [
+        'eventname' => '\mod_journal\event\entry_updated',
+        'callback'  => '\mod_journal\event_observer::entry_modified',
+    ],
+];
