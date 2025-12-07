@@ -82,9 +82,22 @@ $userswithentries = array_map(function ($entry) {
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 
-// Fetch users.
+// Fetch users who can ADD entries (Students, but also Teachers/Admins).
 $groups = $currentgroup ? $currentgroup : '';
 $users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '', '', $groups);
+
+// Fetch users who can MANAGE entries (Teachers, Managers, Admins).
+$teachers = get_users_by_capability($context, 'mod/journal:manageentries');
+
+// Filter out Teachers/Managers from the "Users" list.
+// This ensures they don't appear in the "Users who have not completed the journal" list.
+if ($users && $teachers) {
+    foreach ($teachers as $teacherid => $teacher) {
+        if (isset($users[$teacherid])) {
+            unset($users[$teacherid]);
+        }
+    }
+}
 
 // Build filter options.
 $useroptions = [];
@@ -187,7 +200,7 @@ if ($data = data_submitted()) {
     $event->trigger();
 }
 
-if (!$users) {
+if (!$users && !journal_get_users_done($journal, $currentgroup)) {
     echo $OUTPUT->notification(get_string('nousersyet', 'journal'), \core\output\notification::NOTIFY_INFO);
 } else {
     // Toolbar Area: Filter, Group, Sort.
@@ -241,7 +254,6 @@ if (!$users) {
     echo html_writer::end_div(); // End Toolbar.
 
     $grades = make_grades_menu($journal->grade);
-    $teachers = get_users_by_capability($context, 'mod/journal:manageentries');
 
     // Start the form.
     echo html_writer::start_tag('form', [
@@ -257,7 +269,10 @@ if (!$users) {
             if ($selecteduser == 0 || $selecteduser == $user->id) {
                 journal_print_user_entry($course, $user, $entrybyuser[$user->id], $teachers, $grades, $cm->id);
             }
-            unset($users[$user->id]);
+            // Remove user from the "Not Completed" list if they are in the "Done" list.
+            if (isset($users[$user->id])) {
+                unset($users[$user->id]);
+            }
         }
     }
 

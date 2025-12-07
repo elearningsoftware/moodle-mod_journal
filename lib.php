@@ -16,7 +16,7 @@
 
 /**
  * mod_journal lib file
- * constant_name:
+ *
  * @package    mod_journal
  * @copyright  2014 David Monllao <david.monllao@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -733,14 +733,20 @@ function journal_get_users_done($journal, $currentgroup) {
         return null;
     }
 
-    // Remove unenrolled participants.
+    // Remove unenrolled participants and Teachers/Managers.
     foreach ($journals as $key => $user) {
         $context = \context_module::instance($cm->id);
 
         $canadd = has_capability('mod/journal:addentries', $context, $user);
         $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
-        if (!$entriesmanager && !$canadd) {
+        // Exclude users who can manage entries (Teachers, Admins, Managers) from the completed list.
+        if ($entriesmanager) {
+            unset($journals[$key]);
+            continue;
+        }
+
+        if (!$canadd) {
             unset($journals[$key]);
         }
     }
@@ -790,9 +796,15 @@ function journal_count_entries($journal, $groupids = 0) {
     $canadd = get_users_by_capability($context, 'mod/journal:addentries', 'u.id');
     $entriesmanager = get_users_by_capability($context, 'mod/journal:manageentries', 'u.id');
 
-    // Remove unenrolled participants.
+    // Remove unenrolled participants and Managers.
     foreach ($journals as $userid => $notused) {
-        if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
+        // Exclude users who can manage entries from the count.
+        if (isset($entriesmanager[$userid])) {
+            unset($journals[$userid]);
+            continue;
+        }
+
+        if (!isset($canadd[$userid])) {
             unset($journals[$userid]);
         }
     }
