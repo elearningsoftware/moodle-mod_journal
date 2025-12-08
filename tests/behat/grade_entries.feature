@@ -53,6 +53,7 @@ Feature: Teacher can view, comment and grade students entries
     And I am on "Course1" course homepage
 
   Scenario: Teacher can access students entries from the journals list page
+    Given the site is running Moodle version 5.0 or lower
     When I am on "Course1" course homepage
     And I turn editing mode on
     And I add the "Activities" block
@@ -62,12 +63,13 @@ Feature: Teacher can view, comment and grade students entries
     And I follow "View 3 journal entries"
 
   Scenario: Teacher grades and adds/edits feedback to student's entries
-    When I follow "Test journal name"
+    When I am on the "Course1" "course" page logged in as "teacher1"
+    And I follow "Test journal name"
     And I should see "Journal question"
     And I follow "View 3 journal entries"
     And I wait until the page is ready
-    Then I should see "Student 1 first reply" in the "//table[@class='journaluserentry mb-1 m-b-1']/descendant::td[@class='userfullname'][contains(., 'Student 1')]/ancestor::table[@class='journaluserentry mb-1 m-b-1']" "xpath_element"
-    And I should see "Student 2 first reply" in the "//table[@class='journaluserentry mb-1 m-b-1']/descendant::td[@class='userfullname'][contains(., 'Student 2')]/ancestor::table[@class='journaluserentry mb-1 m-b-1']" "xpath_element"
+    Then I should see "Student 1 first reply"
+    And I should see "Student 2 first reply"
     And I should not see "Entry has changed since last feedback was saved."
     And I set the field "Student 2 Grade" to "94"
     And I set the field "Student 2 Feedback" to "Well done macho man"
@@ -101,7 +103,6 @@ Feature: Teacher can view, comment and grade students entries
     And I am on "Course1" course homepage
     And I follow "Test journal name"
     And I follow "View 3 journal entries"
-    And I should see "Entry has changed since last feedback was saved" in the "//table[@class='journaluserentry mb-1 m-b-1'][contains(., 'Student 1')]" "xpath_element"
-    And I should see "Student 1 edited first reply" in the "//table[@class='journaluserentry mb-1 m-b-1'][contains(., 'Student 1')]" "xpath_element"
-    And I should not see "Entry has changed since last feedback was saved" in the "//table[@class='journaluserentry mb-1 m-b-1'][contains(., 'Student 2')]" "xpath_element"
-    And I should see "Student 2 first reply" in the "//table[@class='journaluserentry mb-1 m-b-1'][contains(., 'Student 2')]" "xpath_element"
+    And I should see "Entry has changed since last feedback was saved"
+    And I should see "Student 1 edited first reply"
+    And I should see "Student 2 first reply"

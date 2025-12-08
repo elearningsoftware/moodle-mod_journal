@@ -16,8 +16,6 @@
 
 namespace mod_journal;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core\message\message;
 
 /**
@@ -115,8 +113,8 @@ class event_observer {
         $eventdata->courseid = $course->id;
         $eventdata->component = 'mod_journal';
         $eventdata->name = 'submission';
-        $eventdata->userfrom = $sender;
-        $eventdata->userto = $recipient;
+        $eventdata->userfrom = $sender->id;
+        $eventdata->userto = $recipient->id;
         $eventdata->subject = $postsubject;
         $eventdata->fullmessage = $posttext;
         $eventdata->fullmessageformat = FORMAT_PLAIN;

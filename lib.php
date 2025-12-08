@@ -880,9 +880,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     $context = context_module::instance($cmid);
 
     $entryid = 'entry-' . $user->id;
-    $content = html_writer::start_div('journaluserentrywrapper');
-    // Use both classes to support Bootstrap 4 (Moodle 3.9) and Bootstrap 5 (Moodle 4.0+).
-    $content .= html_writer::start_tag('table', ['class' => 'journaluserentry mb-1 m-b-1', 'id' => $entryid]);
+    $content = \html_writer::start_div('journaluserentrywrapper');
+    $content .= \html_writer::start_tag('table', ['class' => 'journaluserentry table-reboot mb-1', 'id' => $entryid]);
 
     // User picture and fullname row.
     $content .= html_writer::start_tag('tr');
@@ -1131,7 +1130,7 @@ function journal_print_feedback($course, $entry, $grades) {
     $cmid = $DB->get_field('course_modules', 'id', ['module' => $module->id, 'instance' => $entry->journal]);
     $context = \context_module::instance($cmid);
 
-    echo '<table class="feedbackbox">';
+    echo '<table class="feedbackbox table table-reboot">';
 
     echo '<tr>';
     echo '<td class="left picture">';
