@@ -115,8 +115,8 @@ class event_observer {
         $eventdata->courseid = $course->id;
         $eventdata->component = 'mod_journal';
         $eventdata->name = 'submission';
-        $eventdata->userfrom = $sender->id;
-        $eventdata->userto = $recipient->id;
+        $eventdata->userfrom = $sender;
+        $eventdata->userto = $recipient;
         $eventdata->subject = $postsubject;
         $eventdata->fullmessage = $posttext;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
