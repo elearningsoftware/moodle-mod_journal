@@ -34,6 +34,11 @@ function journal_add_instance($journal) {
     global $DB;
 
     $journal->timemodified = time();
+
+    // Checkbox handling: Use !empty to ensure 0 is saved as 0.
+    $journal->notifyteachers = !empty($journal->notifyteachers) ? 1 : 0;
+    $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
+
     $journal->id = $DB->insert_record('journal', $journal);
 
     journal_grade_item_update($journal);
@@ -61,6 +66,10 @@ function journal_update_instance($journal) {
 
     $journal->timemodified = time();
     $journal->id = $journal->instance;
+
+    // Checkbox handling: Use !empty to ensure 0 is saved as 0.
+    $journal->notifyteachers = !empty($journal->notifyteachers) ? 1 : 0;
+    $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
     $result = $DB->update_record('journal', $journal);
 

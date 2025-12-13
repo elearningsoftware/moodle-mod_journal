@@ -49,4 +49,20 @@ if ($ADMIN->fulltree) {
         100,
         PARAM_INT
     ));
+
+    // Setting: Default Notify Teachers.
+    $settings->add(new admin_setting_configcheckbox(
+        'journal/notifyteachers_default',
+        get_string('notifyteachers_default', 'journal'),
+        get_string('notifyteachers_default_help', 'journal'),
+        1
+    ));
+
+    // Setting: Default Notify Students.
+    $settings->add(new admin_setting_configcheckbox(
+        'journal/notifystudents_default',
+        get_string('notifystudents_default', 'journal'),
+        get_string('notifystudents_default_help', 'journal'),
+        1
+    ));
 }

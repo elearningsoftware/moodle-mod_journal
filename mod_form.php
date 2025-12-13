@@ -68,20 +68,22 @@ class mod_journal_mod_form extends moodleform_mod {
         }
 
         // Notifications settings.
+        $config = get_config('journal');
+        
         $mform->addElement('checkbox', 'notifyteachers', get_string('notifyteachers', 'journal'));
         $mform->addHelpButton('notifyteachers', 'notifyteachers', 'journal');
-        $mform->setDefault('notifyteachers', 1);
+        $mform->setDefault('notifyteachers', isset($config->notifyteachers_default) ? $config->notifyteachers_default : 1);
 
         $mform->addElement('checkbox', 'notifystudents', get_string('notifystudents', 'journal'));
         $mform->addHelpButton('notifystudents', 'notifystudents', 'journal');
-        $mform->setDefault('notifystudents', 1);
+        $mform->setDefault('notifystudents', isset($config->notifystudents_default) ? $config->notifystudents_default : 1);
 
         $this->standard_grading_coursemodule_elements();
 
         // Apply default grade from global settings.
         // We only apply this for new instances (when $this->_instance is empty).
         if (empty($this->_instance)) {
-            $defaultgrade = get_config('journal', 'defaultgrade');
+            $defaultgrade = isset($config->defaultgrade) ? $config->defaultgrade : false;
             // If the setting is missing, fallback to 100 (Standard Moodle default).
             if ($defaultgrade === false) {
                 $defaultgrade = 100;
