@@ -889,8 +889,10 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     $context = context_module::instance($cmid);
 
     $entryid = 'entry-' . $user->id;
-    $content = \html_writer::start_div('journaluserentrywrapper');
-    $content .= \html_writer::start_tag('table', ['class' => 'journaluserentry table-reboot mb-1', 'id' => $entryid]);
+    // PR Change: Added 'table-reboot' class for Moodle 5.0 compatibility.
+    // Also kept 'journaluserentry' for specific styling.
+    $content = html_writer::start_div('journaluserentrywrapper');
+    $content .= html_writer::start_tag('table', ['class' => 'journaluserentry table-reboot mb-1', 'id' => $entryid]);
 
     // User picture and fullname row.
     $content .= html_writer::start_tag('tr');
