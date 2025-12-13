@@ -69,7 +69,7 @@ class mod_journal_mod_form extends moodleform_mod {
 
         // Notifications settings.
         $config = get_config('journal');
-        
+
         $mform->addElement('checkbox', 'notifyteachers', get_string('notifyteachers', 'journal'));
         $mform->addHelpButton('notifyteachers', 'notifyteachers', 'journal');
         $mform->setDefault('notifyteachers', isset($config->notifyteachers_default) ? $config->notifyteachers_default : 1);
