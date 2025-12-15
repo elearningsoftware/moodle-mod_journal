@@ -1,5 +1,5 @@
 
-![Build Status](https://github.com//elearningsoftware/moodle-mod_journal/workflows/Moodle%20Plugin%20CI/badge.svg?branch=master)
+[![Moodle Plugin CI](https://github.com/elearningsoftware/moodle-mod_journal/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/elearningsoftware/moodle-mod_journal/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amaster)
 
 # Moodle Journal module
 - Documentation: http://docs.moodle.org/en/Journal_module
