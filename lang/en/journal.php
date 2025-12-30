@@ -141,6 +141,7 @@ $string['search:activity'] = 'Journal - activity information';
 $string['search:entry'] = 'Journal - entries';
 $string['showoverview'] = 'Show journals overview on my moodle';
 $string['showrecentactivity'] = 'Show recent activity';
+$string['started'] = 'You have started this journal';
 $string['startoredit'] = 'Start or edit my journal entry';
 $string['userswhocompletedthejournal'] = 'Users who completed the journal';
 $string['userswhodidnotcompletedthejournal'] = 'Users who have not completed the journal';
