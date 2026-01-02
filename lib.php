@@ -253,7 +253,12 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     }
 
     $dbparams = [$timestart, $course->id, 'journal'];
-    $namefields = user_picture::fields('u', null, 'userid');
+    if (class_exists('\core_user\fields')) {
+        $userfieldsapi = \core_user\fields::for_userpic();
+        $namefields = $userfieldsapi->get_sql('u', false, '', 'userid', false)->selects;
+    } else {
+        $namefields = user_picture::fields('u', null, 'userid');
+    }
     $sql = "SELECT je.id, je.modified, cm.id AS cmid, $namefields
          FROM {journal_entries} je
               JOIN {journal} j         ON j.id = je.journal
