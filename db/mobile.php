@@ -55,7 +55,7 @@ $addons = [
             ['entries', 'mod_journal'],
             ['noentriesmanagers', 'mod_journal'],
             ['entry', 'mod_journal'],
-            ['gradedby', 'moodle'],
+            ['gradedby', 'mod_journal'],
             ['nograde', 'mod_journal'],
             ['changessaved', 'mod_journal'],
         ],

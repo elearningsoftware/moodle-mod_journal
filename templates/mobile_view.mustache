@@ -1,3 +1,96 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_journal/mobile_view
+
+    This template will render the mobile view.
+
+    Variables required for this template:
+    * id - Journal entry record id
+    * cmid - Course module id (used for component-id and links)
+    * userid - Owner user id
+    * timemodified - Time the entry was last modified (formatted)
+    * attempt - Attempt number
+    * rawscore - Numeric raw score
+    * maxscore - Maximum possible score
+    * duration - Duration text (e.g. "2 minutes 10 seconds")
+    * completionicon - HTML for completion icon
+    * successicon - HTML for success icon
+    * reporturl - URL/object for report links
+    * name - Activity name
+    * intro - Activity introduction (HTML)
+
+    Variables optional for this template:
+    * user - Optional user object (student)
+    * submissions - Array of submission objects (teacher view)
+    * studentpic / studentname / studentid / entryid - per-submission fields
+    * gradeoptions / rating_minus_one / selected / label - grading select data
+    * feedback_plain / feedbacktext - teacher feedback fields
+    * teacherpic / teachername / feedbackdate - feedback author info
+    * hasentry / hasfeedback / canedit / info - control flags and messages
+    * courseid - Course id for navigation
+
+    Example context (json):
+    {
+      "id": 123,
+      "cmid": 456,
+      "userid": 789,
+      "timemodified": "2026-01-17 12:34",
+      "attempt": 1,
+      "rawscore": 8.5,
+      "maxscore": 10,
+      "duration": "2 minutes 10 seconds",
+      "completionicon": "<core-icon name=\"checkmark-circle\"></core-icon>",
+      "successicon": "<core-icon name=\"thumbs-up\"></core-icon>",
+      "reporturl": "https://example.com/report",
+      "name": "Journal activity example",
+      "intro": "<p>Journal description.</p>",
+      "hasentry": true,
+      "hasfeedback": true,
+      "canedit": true,
+      "studentpic": "<img src=\"pic.jpg\"/>",
+      "studentname": "Student One",
+      "studentid": 789,
+      "entryid": 111,
+      "text": "<p>Entry text by the student.</p>",
+      "feedback_plain": "Well done.",
+      "teacherpic": "<img src=\"teacher.jpg\"/>",
+      "teachername": "Teacher One",
+      "feedbackdate": "2026-01-16",
+      "grade": "8.5",
+      "feedbacktext": "<p>Positive feedback</p>",
+      "courseid": 42,
+      "submissions": [
+        {
+          "studentpic": "<img src=\"pic.jpg\"/>",
+          "studentname": "Student One",
+          "timemodified": "2026-01-17 12:00",
+          "text": "<p>Entry</p>",
+          "entryid": 111,
+          "studentid": 789,
+          "rating_minus_one": "",
+          "gradeoptions": [
+            { "val": 0, "label": "0" },
+            { "val": 10, "label": "10", "selected": "selected" }
+          ]
+        }
+      ]
+    }
+}}
 <div class="ion-padding">
     {{#warning}}
         <core-alert message="{{warning}}" type="warning"></core-alert>
@@ -42,9 +135,9 @@
 
                 <div class="ion-padding">
 
-                    <!-- 
+                    <!--
                          GRADING FORM CONTAINER
-                         Using <form ngNoForm> is crucial here. 
+                         Using <form ngNoForm> is crucial here.
                          It prevents Angular from throwing "Cannot find control" errors for the inputs inside.
                          It provides a clean DOM scope for the core-site-plugins-call-ws directive to scrape data.
                     -->
@@ -86,7 +179,7 @@
                     </form>
 
                     <div class="ion-margin-top">
-                        <!-- 
+                        <!--
                             SAVE BUTTON
                             The directive is placed directly on the ion-button.
                             form="journal-feedback-{{entryid}}" links this button to the form above.
@@ -159,7 +252,7 @@
                 <ion-card-content>
                     {{#info}}<p><i>{{info}}</i></p>{{/info}}
 
-                    <!-- 
+                    <!--
                         NAVIGATE TO EDIT PAGE
                         We use core-site-plugins-new-content to push a new page onto the stack.
                         This calls 'mobile_entry_edit' in mobile.php.

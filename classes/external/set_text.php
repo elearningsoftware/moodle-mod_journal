@@ -101,6 +101,7 @@ class set_text extends journal_external_api_base {
      * @param int $journalid Journal course module ID
      * @param string $text Text parameter
      * @param int|string $format Format constant for the string
+     * @param int $itemid Item id for draft area (files)
      * @return array
      */
     public static function execute(int $journalid, string $text, $format, int $itemid = 0) {
@@ -111,7 +112,7 @@ class set_text extends journal_external_api_base {
             ['journalid' => $journalid, 'text' => $text, 'format' => $format, 'itemid' => $itemid]
         );
 
-        if (!$cm = get_coursemodule_from_instance('journal', $params['journalid'])) {
+        if (!$cm = get_coursemodule_from_id('journal', $params['journalid'])) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
@@ -142,9 +143,9 @@ class set_text extends journal_external_api_base {
         } else {
             // Create a record first to get an ID for file storage.
             $tempentry = clone $newentry;
-            $tempentry->text = ''; 
+            $tempentry->text = '';
             $newentry->id = $DB->insert_record('journal_entries', $tempentry);
-            $entry = $newentry; 
+            $entry = $newentry;
         }
 
         // Handle File Drafts.
@@ -186,10 +187,10 @@ class set_text extends journal_external_api_base {
             $completion->update_state($cm, COMPLETION_COMPLETE);
         }
 
-        // Return array matching execute_returns
+        // Return array matching execute_returns.
         return [
             'status' => 'ok',
-            'text' => $newentry->text
+            'text' => $newentry->text,
         ];
     }
 }

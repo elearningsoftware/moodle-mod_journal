@@ -4,7 +4,6 @@ Feature: Testing overview integration in journal activity
   As a user
   I need to be able to see the journal activity overview
 
-
   Background:
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |

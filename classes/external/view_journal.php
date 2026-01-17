@@ -25,7 +25,7 @@ use invalid_parameter_exception;
 
 global $CFG;
 
-// Dynamic Class Logic
+// Dynamic Class Logic.
 if (!class_exists('mod_journal\external\journal_external_api_base')) {
     if (class_exists('core_external\external_api')) {
         class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');
@@ -49,7 +49,6 @@ if (!class_exists('mod_journal\external\journal_external_api_base')) {
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class view_journal extends journal_external_api_base {
-
     /**
      * Parameters.
      * @return external_function_parameters

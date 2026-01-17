@@ -52,15 +52,12 @@ if (!class_exists('mod_journal\external\journal_external_api_base')) {
  * @copyright 2026 Adrian Sarmas adrian.emanuel.sarmas@gmail.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class save_feedback extends journal_external_api_base
-{
-
+class save_feedback extends journal_external_api_base {
     /**
      * Parameters.
      * @return external_function_parameters
      */
-    public static function execute_parameters(): external_function_parameters
-    {
+    public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'cmid' => new external_value(PARAM_INT, 'Course module id'),
             'entryid' => new external_value(PARAM_INT, 'Journal entry id'),
@@ -71,8 +68,33 @@ class save_feedback extends journal_external_api_base
         ]);
     }
 
-    public static function execute(int $cmid, int $entryid, int $userid, int $grade, string $feedback = '', int $itemid = 0): array
-    {
+    /**
+     * Execute.
+     *
+     * @param int $cmid
+     * @param int $entryid
+     * @param int $userid
+     * @param int $grade
+     * @param string $feedback
+     * @param int $itemid
+     * @return array
+     * @throws \coding_exception
+     * @throws \core_external\restricted_context_exception
+     * @throws \dml_exception
+     * @throws \dml_transaction_exception
+     * @throws \moodle_exception
+     * @throws \require_login_exception
+     * @throws \required_capability_exception
+     * @throws invalid_parameter_exception
+     */
+    public static function execute(
+        int $cmid,
+        int $entryid,
+        int $userid,
+        int $grade,
+        string $feedback = '',
+        int $itemid = 0
+    ): array {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::execute_parameters(), [
@@ -160,8 +182,12 @@ class save_feedback extends journal_external_api_base
         ];
     }
 
-    public static function execute_returns(): external_single_structure
-    {
+    /**
+     * Return structure.
+     *
+     * @return external_single_structure
+     */
+    public static function execute_returns(): external_single_structure {
         return new external_single_structure([
             'status' => new external_value(PARAM_ALPHA, 'ok'),
             'changed' => new external_value(PARAM_INT, '1 if something changed, else 0'),

@@ -1,3 +1,90 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_journal/mobile_edit_entry
+
+    This template will render the entry editing page in mobile view.
+
+    Variables required for this template:
+      * cmid: Course module ID, used to build the form id and links.
+      * name: Activity name shown in the card title.
+      * text_plain: Prefill text for the textarea.
+      * canedit: Boolean; controls whether the editing form is displayed.
+      * journalid: Sent as a hidden field in the form.
+      * format: Sent as a hidden field in the form.
+
+    Variables optional for this template:
+      * warning: Message displayed as a warning notice at the top.
+      * info: Additional information line below the title.
+      * hasentry, hasfeedback: Booleans for display/logic.
+      * userid, id, entryid, studentid, courseid
+      * studentpic, studentname, teacherpic, teachername
+      * feedback_plain, feedbacktext, feedbackdate, grade
+      * timemodified, attempt, rawscore, maxscore, duration
+      * completionicon, successicon, reporturl, intro
+      * submissions: Array of submission objects (see example JSON in the template).
+
+    Example context (json):
+    {
+      "id": 123,
+      "cmid": 456,
+      "userid": 789,
+      "timemodified": "2026-01-17 12:34",
+      "attempt": 1,
+      "rawscore": 8.5,
+      "maxscore": 10,
+      "duration": "2 minutes 10 seconds",
+      "completionicon": "<core-icon name=\\\"checkmark-circle\\\"></core-icon>",
+      "successicon": "<core-icon name=\\\"thumbs-up\\\"></core-icon>",
+      "reporturl": "https://example.com/report",
+      "name": "Journal activity example",
+      "intro": "<p>Journal description.</p>",
+      "hasentry": true,
+      "hasfeedback": true,
+      "canedit": true,
+      "studentpic": "<img src=\"pic.jpg\"/>",
+      "studentname": "Student One",
+      "studentid": 789,
+      "entryid": 111,
+      "text_plain": "<p>Entry text by the student.</p>",
+      "feedback_plain": "Well done.",
+      "teacherpic": "<img src=\"teacher.jpg\"/>",
+      "teachername": "Teacher One",
+      "feedbackdate": "2026-01-16",
+      "grade": "8.5",
+      "feedbacktext": "<p>Positive feedback</p>",
+      "courseid": 42,
+      "submissions": [
+        {
+          "studentpic": "<img src=\"pic.jpg\"/>",
+          "studentname": "Student One",
+          "timemodified": "2026-01-17 12:00",
+          "text": "<p>Entry</p>",
+          "entryid": 111,
+          "studentid": 789,
+          "rating_minus_one": "",
+          "gradeoptions": [
+            { "val": 0, "label": "0" },
+            { "val": 10, "label": "10", "selected": "selected" }
+          ]
+        }
+      ]
+    }
+}}
 <div class="ion-padding">
     {{#warning}}
         <core-alert message="{{warning}}" type="warning"></core-alert>
@@ -16,13 +103,13 @@
             {{/canedit}}
 
             {{#canedit}}
-                <!-- 
+                <!--
                     FORM CONTAINER
                     Using <form ngNoForm> creates a standard HTML form context.
                     This allows the directive to find the textarea easily.
                 -->
                 <form id="journal-entry-form-{{cmid}}" ngNoForm>
-                    
+
                     <!-- Textarea wrapped in a plain div -->
                     <div style="margin-bottom: 15px;">
                     <textarea
@@ -38,9 +125,9 @@
                 </form>
 
                 <div class="ion-margin-top">
-                   
 
-                    <!-- 
+
+                    <!--
                         SAVE BUTTON
                         1. core-site-plugins-call-ws on the ion-button.
                         2. form="journal-entry-form-{{cmid}}" links to the form ID above.

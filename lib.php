@@ -1095,7 +1095,8 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             $options,
             $fpoptions
         );
-        echo "<p><div>".get_string('feedback', 'journal').":</div><textarea id=\"c$entry->id[text]\" name=\"c$entry->id[text]\" rows=\"7\" $feedbackdisabledstr>";
+        echo "<p><div>" . get_string('feedback', 'journal') .
+            ":</div><textarea id=\"c$entry->id[text]\" name=\"c$entry->id[text]\" rows=\"7\" $feedbackdisabledstr>";
         p($feedbacktext);
         echo '</textarea></p>';
 
