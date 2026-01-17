@@ -66,6 +66,11 @@ $string['incorrectuserid'] = 'Selected user ID is incorrect';
 $string['journal:addentries'] = 'Add journal entries';
 $string['journal:addinstance'] = 'Add a new journal';
 $string['journal:manageentries'] = 'Manage journal entries';
+$string['grade'] = 'Grade';
+$string['feedback'] = 'Feedback';
+$string['savechanges'] = 'Save changes'; 
+$string['nograde'] = 'No grade';
+$string['changessaved'] = 'Changes saved';
 
 // Updated Plain Text Template.
 $string['journalmail'] = 'Hi {$a->student},
@@ -88,6 +93,7 @@ $string['journalmailhtml'] = '<p>Hi {$a->student},</p>
 <p>You can view the feedback <a href="{$a->url}">here</a>.</p>';
 $string['journalname'] = 'Journal name';
 $string['journalquestion'] = 'Journal question';
+$string['lastedited'] = 'Last edited';
 $string['lastnameasc'] = 'Lastname Ascending';
 $string['lastnamedesc'] = 'Lastname Descending';
 $string['mailbody'] = '{$a->username} has updated the journal entry for \'{$a->journalname}\'

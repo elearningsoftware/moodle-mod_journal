@@ -1,0 +1,74 @@
+<div class="ion-padding">
+    {{#warning}}
+        <core-alert message="{{warning}}" type="warning"></core-alert>
+    {{/warning}}
+
+    <ion-card>
+        <ion-card-header>
+            <ion-card-title>{{name}}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+            <h3 style="margin-top: 0;">{{#str}}startoredit, mod_journal{{/str}}</h3>
+            {{#info}}<p><i>{{info}}</i></p>{{/info}}
+
+            {{^canedit}}
+                <core-alert message="{{#str}}editingended, mod_journal{{/str}}" type="info"></core-alert>
+            {{/canedit}}
+
+            {{#canedit}}
+                <!-- 
+                    FORM CONTAINER
+                    Using <form ngNoForm> creates a standard HTML form context.
+                    This allows the directive to find the textarea easily.
+                -->
+                <form id="journal-entry-form-{{cmid}}" ngNoForm>
+                    
+                    <!-- Textarea wrapped in a plain div -->
+                    <div style="margin-bottom: 15px;">
+                    <textarea
+                        name="text"
+                        rows="15"
+                            style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: sans-serif;"
+                        placeholder="{{#str}}entry, mod_journal{{/str}}">{{text_plain}}</textarea>
+                    </div>
+
+                    <input type="hidden" name="journalid" value="{{journalid}}">
+                    <input type="hidden" name="format" value="{{format}}">
+                    <input type="hidden" name="itemid" value="0">
+                </form>
+
+                <div class="ion-margin-top">
+                   
+
+                    <!-- 
+                        SAVE BUTTON
+                        1. core-site-plugins-call-ws on the ion-button.
+                        2. form="journal-entry-form-{{cmid}}" links to the form ID above.
+                        3. goBackOnSuccess="true" automatically navigates back to the View page on success.
+                    -->
+                    <ion-button
+                        expand="block"
+                        core-site-plugins-call-ws
+                        name="mod_journal_set_text"
+                        form="journal-entry-form-{{cmid}}"
+                        successMessage="{{#str}}changessaved, mod_journal{{/str}}"
+                        goBackOnSuccess="true">
+                        {{#str}}savechanges, mod_journal{{/str}}
+                    </ion-button>
+
+                    <ion-button expand="block" fill="clear" (click)="goBack()">
+                        {{#str}}cancel{{/str}}
+                    </ion-button>
+                </div>
+            {{/canedit}}
+
+            {{^canedit}}
+                <div class="ion-margin-top">
+                    <ion-button expand="block" fill="clear" (click)="goBack()">
+                        {{#str}}back{{/str}}
+                    </ion-button>
+                </div>
+            {{/canedit}}
+        </ion-card-content>
+    </ion-card>
+</div>

@@ -1,0 +1,180 @@
+<div class="ion-padding">
+    {{#warning}}
+        <core-alert message="{{warning}}" type="warning"></core-alert>
+    {{/warning}}
+
+    <ion-card>
+        <ion-card-header>
+            <ion-card-title>{{name}}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+            <core-format-text text="{{intro}}" component="mod_journal" component-id="{{cmid}}"></core-format-text>
+        </ion-card-content>
+    </ion-card>
+
+    <!-- TEACHER VIEW: Grading List -->
+    {{#isteacher}}
+        <h3>{{#str}}entries, mod_journal{{/str}}</h3>
+        {{^submissions}}
+            <core-alert message="{{#str}}noentriesmanagers, mod_journal{{/str}}" type="info"></core-alert>
+        {{/submissions}}
+
+        <ion-list>
+            {{#submissions}}
+            <ion-card style="box-shadow: 2px 2px 10px #dedede;">
+                <!-- Student Header -->
+                <ion-item lines="none">
+                    <ion-avatar slot="start">
+                        {{{studentpic}}}
+                    </ion-avatar>
+                    <ion-label>
+                        <h2>{{studentname}}</h2>
+                        <p>{{timemodified}}</p>
+                    </ion-label>
+                </ion-item>
+
+                <!-- Student Entry Content -->
+                <ion-card-content>
+                    <core-format-text text="{{text}}" component="mod_journal" component-id="{{cmid}}"></core-format-text>
+                </ion-card-content>
+
+                <hr style="background: var(--ion-card-border-color);">
+
+                <div class="ion-padding">
+
+                    <!-- 
+                         GRADING FORM CONTAINER
+                         Using <form ngNoForm> is crucial here. 
+                         It prevents Angular from throwing "Cannot find control" errors for the inputs inside.
+                         It provides a clean DOM scope for the core-site-plugins-call-ws directive to scrape data.
+                    -->
+                    <form id="journal-feedback-{{entryid}}" ngNoForm>
+
+                        <!-- Required identifiers for the save_feedback Web Service -->
+                        <input type="hidden" name="cmid" value="{{cmid}}">
+                        <input type="hidden" name="entryid" value="{{entryid}}">
+                        <input type="hidden" name="userid" value="{{studentid}}">
+
+                        <!-- Grade Selector -->
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; color: #666; font-size: 12px; margin-bottom: 5px;">
+                                {{#str}}grade, mod_journal{{/str}}
+                            </label>
+                            <select name="grade"
+                                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: white; -webkit-appearance: none;">
+                                <option value="-1" {{rating_minus_one}}>{{#str}}nograde, mod_journal{{/str}}</option>
+                                {{#gradeoptions}}
+                                    <option value="{{val}}" {{selected}}>{{label}}</option>
+                                {{/gradeoptions}}
+                            </select>
+                        </div>
+
+                        <!-- Feedback Editor (Standard Textarea) -->
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; color: #666; font-size: 12px; margin-bottom: 5px;">
+                                {{#str}}feedback, mod_journal{{/str}}
+                            </label>
+
+                            <textarea
+                                name="feedback"
+                                rows="6"
+                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">{{feedback_plain}}</textarea>
+                        </div>
+
+                        <!-- itemid required by WS, keep 0 for now -->
+                        <input type="hidden" name="itemid" value="0">
+                    </form>
+
+                    <div class="ion-margin-top">
+                        <!-- 
+                            SAVE BUTTON
+                            The directive is placed directly on the ion-button.
+                            form="journal-feedback-{{entryid}}" links this button to the form above.
+                        -->
+                        <ion-button
+                            expand="block"
+                            core-site-plugins-call-ws
+                            name="mod_journal_save_feedback"
+                            form="journal-feedback-{{entryid}}"
+                            successMessage="{{#str}}changessaved, mod_journal{{/str}}"
+                            refreshOnSuccess="true">
+                                {{#str}}savefeedback, mod_journal{{/str}}
+                        </ion-button>
+                    </div>
+
+                </div>
+            </ion-card>
+            {{/submissions}}
+        </ion-list>
+    {{/isteacher}}
+
+    <!-- STUDENT VIEW -->
+    {{^isteacher}}
+        {{#hasentry}}
+            <ion-card>
+                <ion-item-divider>
+                    <ion-label>{{#str}}entry, mod_journal{{/str}}</ion-label>
+                </ion-item-divider>
+                <ion-card-content>
+                    <p><strong>{{#str}}lastedited, mod_journal{{/str}}:</strong> {{lastedited}}</p>
+                    <core-format-text text="{{text}}" component="mod_journal" component-id="{{cmid}}"></core-format-text>
+                </ion-card-content>
+            </ion-card>
+
+            {{#hasfeedback}}
+            <ion-card>
+                <ion-item-divider>
+                    <ion-label>{{#str}}feedback, mod_journal{{/str}}</ion-label>
+                </ion-item-divider>
+                <ion-item lines="none">
+                    <ion-avatar slot="start">
+                        {{{teacherpic}}}
+                    </ion-avatar>
+                    <ion-label>
+                        <h2>{{teachername}}</h2>
+                        <p>{{feedbackdate}}</p>
+                    </ion-label>
+                </ion-item>
+                <ion-card-content>
+                    {{#grade}}<p><strong>{{#str}}grade, mod_journal{{/str}}:</strong> {{grade}}</p>{{/grade}}
+                    <hr>
+                    <core-format-text text="{{feedbacktext}}" component="mod_journal" component-id="{{cmid}}"></core-format-text>
+                </ion-card-content>
+            </ion-card>
+            {{/hasfeedback}}
+        {{/hasentry}}
+
+        {{^hasentry}}
+            {{^canedit}}
+                <core-alert message="{{#str}}notstarted, mod_journal{{/str}}" type="info"></core-alert>
+            {{/canedit}}
+        {{/hasentry}}
+
+        <!-- Student edit action: open separate page (no duplicate inline editor/preview) -->
+        {{#canedit}}
+            <ion-card>
+                <ion-item-divider>
+                    <ion-label>{{#str}}startoredit, mod_journal{{/str}}</ion-label>
+                </ion-item-divider>
+                <ion-card-content>
+                    {{#info}}<p><i>{{info}}</i></p>{{/info}}
+
+                    <!-- 
+                        NAVIGATE TO EDIT PAGE
+                        We use core-site-plugins-new-content to push a new page onto the stack.
+                        This calls 'mobile_entry_edit' in mobile.php.
+                    -->
+                    <ion-button
+                        expand="block"
+                        core-site-plugins-new-content
+                        title="{{#str}}startoredit, mod_journal{{/str}}"
+                        component="mod_journal"
+                        method="mobile_entry_edit"
+                        [args]="{cmid: {{cmid}}, courseid: {{courseid}}}">
+                        {{#str}}startoredit, mod_journal{{/str}}
+                    </ion-button>
+                </ion-card-content>
+            </ion-card>
+        {{/canedit}}
+    {{/isteacher}}
+</div>

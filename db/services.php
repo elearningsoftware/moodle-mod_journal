@@ -41,4 +41,20 @@ $functions = [
         'ajax'        => true,
         'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'mod_journal_save_feedback' => [
+        'classname'   => 'mod_journal\external\save_feedback',
+        'methodname'  => 'execute',
+        'description' => 'Saves feedback and grade for a student entry.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'mod_journal_view_journal' => [
+        'classname'   => 'mod_journal\external\view_journal',
+        'methodname'  => 'execute',
+        'description' => 'Trigger the course module viewed event.',
+        'type'        => 'write',
+        'ajax'        => true,
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
 ];

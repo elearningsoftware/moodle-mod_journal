@@ -941,7 +941,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             ['class' => 'userpix', 'style' => 'border-top: 1px solid #dedede;']
         );
 
-        $feedbacksection = get_string('feedback') . ': ';
+        $feedbacksection = get_string('grade', 'journal') . ': ';
         $gradinginfo = grade_get_grades($course->id, 'mod', 'journal', $entry->journal, [$user->id]);
 
         $attrs = [];
@@ -1087,7 +1087,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             $options,
             $fpoptions
         );
-        echo "<p><textarea id=\"c$entry->id[text]\" name=\"c$entry->id[text]\" rows=\"7\" $feedbackdisabledstr>";
+        echo "<p><div>".get_string('feedback', 'journal').":</div><textarea id=\"c$entry->id[text]\" name=\"c$entry->id[text]\" rows=\"7\" $feedbackdisabledstr>";
         p($feedbacktext);
         echo '</textarea></p>';
 
