@@ -33,7 +33,6 @@ require_once($CFG->libdir . '/weblib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mobile {
-
     /**
      * Returns the template and data for the main course view in the mobile app.
      *
@@ -77,13 +76,13 @@ class mobile {
         $canadd = has_capability('mod/journal:addentries', $context);
         $canmanage = has_capability('mod/journal:manageentries', $context);
 
-        // --- TEACHER VIEW LOGIC ---
+        // TEACHER VIEW LOGIC.
         if ($canmanage) {
             $data['isteacher'] = true;
 
             // Determine grouping.
             $currentgroup = groups_get_activity_group($cm, true);
-            
+
             // Get list of users who have submitted entries.
             $users = journal_get_users_done($journal, $currentgroup);
             $submissions = [];
@@ -155,7 +154,7 @@ class mobile {
             $data['submissions'] = $submissions;
         }
 
-        // --- STUDENT VIEW LOGIC ---
+        // STUDENT VIEW LOGIC.
         // Calculate open/close dates.
         $timenow = time();
         $timestart = 0;
@@ -189,7 +188,7 @@ class mobile {
         if ($entry) {
             $data['hasentry'] = true;
             $data['lastedited'] = userdate($entry->modified);
-            
+
             // Rewrite files for display.
             $text = file_rewrite_pluginfile_urls(
                 (string) $entry->text,
@@ -204,7 +203,7 @@ class mobile {
             // Check for feedback.
             if (!empty($entry->entrycomment) || (!empty($entry->rating) && $entry->rating != -1)) {
                 $data['hasfeedback'] = true;
-                
+
                 $feedbacktext = file_rewrite_pluginfile_urls(
                     (string) $entry->entrycomment,
                     'pluginfile.php',
@@ -262,7 +261,7 @@ class mobile {
 
     /**
      * Student entry editor page.
-     * 
+     *
      * This page is opened via core-site-plugins-new-content from the main view.
      * It provides a simple textarea for the student to write their entry.
      *
