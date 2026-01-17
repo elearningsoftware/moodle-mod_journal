@@ -106,9 +106,21 @@ $string['mailsubject'] = 'Journal feedback';
 $string['messageprovider:journal_feedback'] = 'Journal feedback from teacher';
 $string['messageprovider:submission'] = 'Journal entry created or modified';
 $string['modulename'] = 'Journal';
-$string['modulename_help'] = 'The journal activity enables teachers to obtain students feedback
- about a specific topic';
+$string['modulename_help'] = '###### Key features
+- Collect online text entries from students for review and grading
+- Entries are private between student and teacher (not visible to other students)
+- Supports feedback in text form and grading by the teacher
+- Includes a "Days available" setting to control submission period
+- Displays all entries for a class or group on one page for efficient review
+
+###### Ways to use it
+- Assign short reflective writing tasks or learning journals
+- Use for ongoing feedback and iterative improvement of student work
+- Encourage students to summarize lessons or readings in their own words
+- Track student progress on simple text-based assignments
+- Facilitate private communication between teacher and student for formative assessment';
 $string['modulename_link'] = 'mod/journal/view';
+$string['modulename_summary'] = 'Collects private online text entries from students for feedback and grading, with a set availability period and no file uploads.';
 $string['modulenameplural'] = 'Journals';
 $string['needsregrade'] = 'Entry has changed since last feedback was saved.';
 $string['newjournalentries'] = 'New journal entries';

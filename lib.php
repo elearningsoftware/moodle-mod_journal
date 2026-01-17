@@ -132,6 +132,12 @@ function journal_supports($feature) {
     ) {
         return MOD_PURPOSE_COLLABORATION;
     }
+
+    // For versions of Moodle prior to 5.1, we need to define that constant here.
+    if (!defined('FEATURE_MOD_OTHERPURPOSE')) {
+        define('FEATURE_MOD_OTHERPURPOSE', 'mod_otherpurpose');
+    }
+
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -155,6 +161,8 @@ function journal_supports($feature) {
             return true;
         case FEATURE_SHOW_DESCRIPTION:
             return true;
+        case FEATURE_MOD_OTHERPURPOSE:
+            return MOD_PURPOSE_ASSESSMENT;
         default:
             return null;
     }
