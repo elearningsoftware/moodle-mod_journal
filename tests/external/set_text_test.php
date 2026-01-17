@@ -76,7 +76,7 @@ final class set_text_test extends advanced_testcase {
             ] + $maindata,
         );
 
-        $result = set_text::execute($journal->cmid, 'newtext', FORMAT_PLAIN);
+        $result = set_text::execute($journal->id, 'newtext', FORMAT_PLAIN);
 
         $this->assertEquals('newtext', $result['text']);
 
