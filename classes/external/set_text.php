@@ -112,7 +112,7 @@ class set_text extends journal_external_api_base {
             ['journalid' => $journalid, 'text' => $text, 'format' => $format, 'itemid' => $itemid]
         );
 
-        if (!$cm = get_coursemodule_from_id('journal', $params['journalid'])) {
+        if (!$cm = get_coursemodule_from_instance('journal', $params['journalid'])) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
