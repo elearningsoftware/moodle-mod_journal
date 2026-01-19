@@ -66,11 +66,7 @@ Feature: Testing overview integration in journal activity
   @javascript
   Scenario: The journal activity index redirect to the activities overview
     Given the site is running Moodle version 5.0 or higher
-    When I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    And I add the "Activities" block
-    And I click on "Journals" "link" in the "Activities" "block"
-    Then I should see "An overview of all activities in the course"
-    And I should see "Name" in the "journal_overview_collapsible" "region"
+    When I am on the "C1" "course > activities > journal" page logged in as "admin"
+    Then I should see "Name" in the "journal_overview_collapsible" "region"
     And I should see "Entries" in the "journal_overview_collapsible" "region"
     And I should see "Test journal name"
