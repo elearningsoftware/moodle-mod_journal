@@ -84,9 +84,19 @@ class overview extends \core_courseformat\activityoverviewbase {
         $submissions = $this->manager->count_all_users_answered($groupids);
         $total = $this->manager->count_all_users($groupids);
 
-        if (defined('button::SECONDARY_OUTLINE')) {
-            $secondaryoutline = button::SECONDARY_OUTLINE;
-            $buttonclass = $secondaryoutline->classes();
+        if (
+            class_exists(button::class) &&
+            (new \ReflectionClass(button::class))->hasConstant('SECONDARY_OUTLINE')
+        ) {
+            if (
+                class_exists(button::class) &&
+                (new \ReflectionClass(button::class))->hasConstant('BODY_OUTLINE')
+            ) {
+                $buttonoutline = button::BODY_OUTLINE;
+            } else {
+                $buttonoutline = button::SECONDARY_OUTLINE;
+            }
+            $buttonclass = $buttonoutline->classes();
         } else {
             $buttonclass = "btn btn-outline-secondary";
         }
