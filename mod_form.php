@@ -103,7 +103,9 @@ class mod_journal_mod_form extends moodleform_mod {
      * @return bool
      */
     public function completion_rule_enabled($data): bool {
-        return (!empty($data['completion_create_entry' . $this->get_suffix()]));
+        // Compatibility check: get_suffix only exists in Moodle 4.3+.
+        $suffix = method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
+        return (!empty($data['completion_create_entry' . $suffix]));
     }
 
     /**
@@ -114,7 +116,9 @@ class mod_journal_mod_form extends moodleform_mod {
     public function add_completion_rules(): array {
         $mform = $this->_form;
 
-        $fieldname = 'completion_create_entry' . $this->get_suffix();
+        // Compatibility check: get_suffix only exists in Moodle 4.3+.
+        $suffix = method_exists($this, 'get_suffix') ? $this->get_suffix() : '';
+        $fieldname = 'completion_create_entry' . $suffix;
 
         $mform->addElement('advcheckbox', $fieldname, get_string('completiondetail:completion_create_entry', 'journal'));
 
