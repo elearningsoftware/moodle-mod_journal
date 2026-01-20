@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_journal';
-$plugin->version = 2026011801;
+$plugin->version = 2026012100;
 $plugin->requires = 2022041900;  /* Moodle 4.0 */
-$plugin->release = '5.1.1 (Build: 2026011801)';
+$plugin->release = '5.1.2 (Build: 2026012100)';
 $plugin->maturity = MATURITY_STABLE;
