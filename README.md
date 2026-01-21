@@ -30,10 +30,11 @@ The Journal activity allows teachers to obtain student feedback or reflections o
 3. Log in to your Moodle site as an administrator and go to **Site administration > Notifications** to complete the installation.
 
 ### Via Zip
-1. Download the zip file from the [GitHub Releases page](https://github.com/elearningsoftware/moodle-mod_journal/releases) or the Moodle Plugin Directory.
+1. Download the ZIP file from the [GitHub repository](https://github.com/elearningsoftware/moodle-mod_journal) (Click on the green **Code** button and select **Download ZIP**).
 2. Unzip the file.
-3. Upload the resulting `journal` folder to your Moodle `mod/` directory.
-4. Log in to your Moodle site as an administrator and go to **Site administration > Notifications** to complete the installation.
+3. Rename the extracted folder to `journal` (GitHub downloads are often named `moodle-mod_journal-master`, so you must rename it manually).
+4. Upload the `journal` folder to your Moodle `mod/` directory.
+5. Log in to your Moodle site as an administrator and go to **Site administration > Notifications** to complete the installation.
 
 ## Compatibility
 This version is compatible with Moodle 4.0 and higher.
