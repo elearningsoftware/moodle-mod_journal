@@ -139,6 +139,7 @@ $string['notifyteachers_default_help'] = 'Default setting for new Journal activi
 $string['notifyteachers_help'] = 'If enabled, teachers will receive a notification via Moodle messaging when a student creates or updates a journal entry.';
 $string['notopenuntil'] = 'This journal won\'t be open until';
 $string['notstarted'] = 'You have not started this journal yet';
+$string['nousersyet'] = 'There are no users yet';
 $string['numchars'] = '{$a} characters';
 $string['overallrating'] = 'Overall rating';
 $string['pluginadministration'] = 'Journal module administration';
