@@ -4,19 +4,19 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="journal" COMMENT="data for each journal" NEXT="journal_entries">
+    <TABLE NAME="journal" COMMENT="data for each journal">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="course"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="name"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="course" NEXT="intro"/>
-        <FIELD NAME="intro" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="name" NEXT="introformat"/>
-        <FIELD NAME="introformat" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="days"/>
-        <FIELD NAME="days" TYPE="int" LENGTH="5" NOTNULL="true" UNSIGNED="true" DEFAULT="7" SEQUENCE="false" PREVIOUS="introformat" NEXT="grade"/>
-        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="days" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="grade" NEXT="completion_create_entry"/>
-        <FIELD NAME="completion_create_entry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timemodified" NEXT="notifyteachers"/>
-        <FIELD NAME="notifyteachers" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="completion_create_entry" NEXT="notifystudents"/>
-        <FIELD NAME="notifystudents" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="1" SEQUENCE="false" PREVIOUS="notifyteachers"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="days" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="7" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="completion_create_entry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="notifyteachers" TYPE="int" LENGTH="1" DEFAULT="1" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="notifystudents" TYPE="int" LENGTH="1" DEFAULT="1" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -25,23 +25,23 @@
         <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="journal_entries" COMMENT="All the journal entries of all people" PREVIOUS="journal">
+    <TABLE NAME="journal_entries" COMMENT="All the journal entries of all people">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="journal"/>
-        <FIELD NAME="journal" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="journal" NEXT="modified"/>
-        <FIELD NAME="modified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="userid" NEXT="text"/>
-        <FIELD NAME="text" TYPE="text" LENGTH="small" NOTNULL="true" SEQUENCE="false" PREVIOUS="modified" NEXT="format"/>
-        <FIELD NAME="format" TYPE="int" LENGTH="2" NOTNULL="true" UNSIGNED="false" DEFAULT="0" SEQUENCE="false" PREVIOUS="text" NEXT="rating"/>
-        <FIELD NAME="rating" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="false" DEFAULT="-1" SEQUENCE="false" PREVIOUS="format" NEXT="entrycomment"/>
-        <FIELD NAME="entrycomment" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" PREVIOUS="rating" NEXT="teacher"/>
-        <FIELD NAME="teacher" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="entrycomment" NEXT="timemarked"/>
-        <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="teacher" NEXT="mailed"/>
-        <FIELD NAME="mailed" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timemarked"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="journal" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="modified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="text" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="format" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="rating" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="-1" SEQUENCE="false"/>
+        <FIELD NAME="entrycomment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="teacher" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemarked" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mailed" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="journal"/>
-        <KEY NAME="journal" TYPE="foreign" FIELDS="journal" REFTABLE="journal" REFFIELDS="id" PREVIOUS="primary"/>
+        <KEY NAME="primary" FIELDS="id" TYPE="primary"/>
+        <KEY NAME="journal" FIELDS="journal" REFFIELDS="id" REFTABLE="journal" TYPE="foreign"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
