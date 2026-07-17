@@ -62,8 +62,9 @@ class cron_task extends \core\task\scheduled_task {
             } else {
                 $usernamefields = get_all_user_name_fields();
             }
-            $requireduserfields = 'id, auth, mnethostid, email, emailstop, mailformat, maildisplay, lang, deleted, suspended, '
-                . implode(', ', $usernamefields);
+            // Since Moodle 5.0, email_to_user() also reads username for its log context.
+            $requireduserfields = 'id, auth, mnethostid, username, email, emailstop, mailformat, maildisplay, '
+                . 'lang, deleted, suspended, ' . implode(', ', $usernamefields);
 
             // To save some db queries.
             $users = [];
