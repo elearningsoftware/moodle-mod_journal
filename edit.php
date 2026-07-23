@@ -23,7 +23,7 @@
  **/
 
 require_once('../../config.php');
-require_once('./edit_form.php');
+require_once($CFG->dirroot . '/mod/journal/edit_form.php');
 
 $id = required_param('id', PARAM_INT);    // Course Module ID.
 
