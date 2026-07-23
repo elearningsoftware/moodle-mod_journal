@@ -8,7 +8,11 @@ jobs:
 
     services:
       postgres:
+<<<<<<< HEAD
         image: postgres:15
+=======
+        image: postgres:16
+>>>>>>> 19a326e (Fix notification user fields for Moodle 5.2, declare 4.0 - 5.2 support (Closes #160))
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -31,6 +35,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - php: 8.4
+            moodle-branch: MOODLE_502_STABLE
+            database: pgsql
+          - php: 8.4
+            moodle-branch: MOODLE_502_STABLE
+            database: mariadb
+          - php: 8.3
+            moodle-branch: MOODLE_502_STABLE
+            database: pgsql
+          - php: 8.3
+            moodle-branch: MOODLE_502_STABLE
+            database: mariadb
           - php: 8.4
             moodle-branch: MOODLE_501_STABLE
             database: pgsql

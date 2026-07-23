@@ -62,7 +62,9 @@ class event_observer {
 
         // Changed from get_users_by_capability to get_enrolled_users to prevent site admins
         // receiving notifications unless they are explicitly enrolled in the course.
-        $teachers = get_enrolled_users($context, 'mod/journal:manageentries', 0, 'u.id, u.email, u.lang, ' . $userfields);
+        $requiredfields = 'u.id, u.auth, u.mnethostid, u.username, u.email, u.emailstop, '
+            . 'u.mailformat, u.maildisplay, u.lang, u.deleted, u.suspended';
+        $teachers = get_enrolled_users($context, 'mod/journal:manageentries', 0, $requiredfields . ', ' . $userfields);
 
         if (empty($teachers)) {
             return;
