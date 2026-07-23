@@ -107,6 +107,17 @@ function journal_delete_instance($id) {
         return false;
     }
 
+    // Delete grade item from Gradebook.
+    journal_grade_item_delete($journal);
+
+    // Delete area files associated with module context.
+    if ($cm) {
+        $context = \context_module::instance($cm->id);
+        $fs = get_file_storage();
+        $fs->delete_area_files($context->id, 'mod_journal', 'feedback');
+        $fs->delete_area_files($context->id, 'mod_journal', 'entry');
+    }
+
     if (!$DB->delete_records('journal_entries', ['journal' => $journal->id])) {
         $result = false;
     }
