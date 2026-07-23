@@ -177,17 +177,19 @@ if ($data = data_submitted()) {
         }
     }
 
-    // Trigger feedback updated event.
-    $event = \mod_journal\event\feedback_updated::create([
-        'objectid' => $journal->id,
-        'context' => $context,
-    ]);
-    $event->add_record_snapshot('course_modules', $cm);
-    $event->add_record_snapshot('course', $course);
-    $event->add_record_snapshot('journal', $journal);
-    $event->trigger();
+    // Trigger feedback updated event if entries were modified.
+    if ($count > 0) {
+        $event = \mod_journal\event\feedback_updated::create([
+            'objectid' => $journal->id,
+            'context' => $context,
+        ]);
+        $event->add_record_snapshot('course_modules', $cm);
+        $event->add_record_snapshot('course', $course);
+        $event->add_record_snapshot('journal', $journal);
+        $event->trigger();
 
-    echo $OUTPUT->notification(get_string('feedbackupdated', 'journal', $count), \core\output\notification::NOTIFY_SUCCESS);
+        echo $OUTPUT->notification(get_string('feedbackupdated', 'journal', $count), \core\output\notification::NOTIFY_SUCCESS);
+    }
 } else {
     // Trigger entries viewed event.
     $event = \mod_journal\event\entries_viewed::create([
