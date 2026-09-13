@@ -111,7 +111,7 @@ if ($users) {
 
 // Process incoming data if there is any.
 if ($data = data_submitted()) {
-    confirm_sesskey();
+    require_sesskey();
     $feedback = [];
     $data = (array) $data;
 

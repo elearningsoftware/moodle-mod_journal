@@ -69,7 +69,9 @@ if (!$entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'id
     throw new \moodle_exception(get_string('incorrectjournalentry', 'journal'));
 }
 
-confirm_sesskey($sesskey);
+if (!confirm_sesskey($sesskey)) {
+    throw new \moodle_exception('invalidsesskey');
+}
 
 // Only update entries where feedback has actually changed.
 $ratingchanged = false;
