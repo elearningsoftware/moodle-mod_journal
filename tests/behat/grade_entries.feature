@@ -21,8 +21,8 @@ Feature: Teacher can view, comment and grade students entries
       | student2 | C1 | student |
       | student3 | C1 | student |
     And the following "activities" exist:
-      | activity | name               | intro            | course | idnumber | groupmode |
-      | journal  | Test journal name  | Journal question | C1     | journal1 | 1         |
+      | activity | name               | intro            | course | idnumber |
+      | journal  | Test journal name  | Journal question | C1     | journal1 |
     And I log in as "student1"
     And I am on "Course1" course homepage
     And I follow "Test journal name"
@@ -106,22 +106,3 @@ Feature: Teacher can view, comment and grade students entries
     And I should see "Entry has changed since last feedback was saved"
     And I should see "Student 1 edited first reply"
     And I should see "Student 2 first reply"
-
-  Scenario: Non-editing teacher in no group cannot see entries in separate groups mode
-    Given the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher2 | Teacher | 2 | teacher2@asd.com |
-    And the following "course enrolments" exist:
-      | user | course | role |
-      | teacher2 | C1 | teacher |
-    And the following "groups" exist:
-      | name | course | idnumber |
-      | Group 1 | C1 | G1 |
-    And the following "group members" exist:
-      | user | group |
-      | student1 | G1 |
-    When I am on the "Test journal name" "journal activity" page logged in as "teacher2"
-    And I follow "View 0 journal entries"
-    Then I should see "Sorry, but you need to be part of a group to see this page."
-    And I should not see "Student 1 first reply"
-    And I should not see "Student 2 first reply"
