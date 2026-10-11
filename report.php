@@ -131,6 +131,9 @@ if ($data = data_submitted()) {
             continue;
         }
         $entry = $entrybyentry[$num];
+        if (!groups_user_groups_visible($course, $entry->userid, $cm)) {
+            continue;
+        }
         $ratingchanged = false;
 
         $studentrating = clean_param($vals['r'], PARAM_INT);

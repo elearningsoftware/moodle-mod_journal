@@ -69,6 +69,10 @@ if (!$entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'id
     throw new \moodle_exception(get_string('incorrectjournalentry', 'journal'));
 }
 
+if (!groups_user_groups_visible($course, $entry->userid, $cm)) {
+    throw new \moodle_exception('nopermissions', 'error', '', get_string('savefeedback', 'journal'));
+}
+
 if (!confirm_sesskey($sesskey)) {
     throw new \moodle_exception('invalidsesskey');
 }
