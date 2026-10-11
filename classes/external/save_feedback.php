@@ -16,34 +16,11 @@
 
 namespace mod_journal\external;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->libdir . '/externallib.php');
-
-
 use context_module;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use invalid_parameter_exception;
-
-global $CFG;
-
-// Dynamic Class Logic for compatibility.
-if (!class_exists('mod_journal\external\journal_external_api_base')) {
-    if (class_exists('core_external\external_api')) {
-        class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');
-        if (!class_exists('external_function_parameters')) {
-            class_alias('core_external\external_function_parameters', 'external_function_parameters');
-        }
-        if (!class_exists('external_value')) {
-            class_alias('core_external\external_value', 'external_value');
-        }
-    } else {
-        require_once($CFG->libdir . '/externallib.php');
-        class_alias('external_api', 'mod_journal\external\journal_external_api_base');
-    }
-}
 
 /**
  * External function to save feedback and grade for a journal entry.
