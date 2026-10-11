@@ -1256,6 +1256,11 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
         return false;
     }
 
+    // Graders can only see entries of users in groups they have access to.
+    if ($canmanage && $USER->id != $entry->userid && !groups_user_groups_visible($course, $entry->userid, $cm)) {
+        return false;
+    }
+
     if ($filearea !== 'entry' && $filearea !== 'feedback') {
         return false;
     }
