@@ -82,6 +82,13 @@ $userswithentries = array_map(function ($entry) {
 $groupmode = groups_get_activity_groupmode($cm);
 $currentgroup = groups_get_activity_group($cm, true);
 
+// In separate groups mode, a grader who is in no group and cannot access all groups must not see any entries.
+if ($groupmode == SEPARATEGROUPS && !$currentgroup && !has_capability('moodle/site:accessallgroups', $context)) {
+    echo $OUTPUT->notification(get_string('notingroup'), \core\output\notification::NOTIFY_INFO);
+    echo $OUTPUT->footer();
+    exit;
+}
+
 // Fetch users who can ADD entries (Students, but also Teachers/Admins).
 $groups = $currentgroup ? $currentgroup : '';
 $users = get_users_by_capability($context, 'mod/journal:addentries', '', '', '', '', $groups);
