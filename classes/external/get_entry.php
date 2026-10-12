@@ -16,41 +16,11 @@
 
 namespace mod_journal\external;
 
-defined('MOODLE_INTERNAL') || die();
-
 use context_module;
-use external_function_parameters;
-use external_single_structure;
-use external_value;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_value;
 use invalid_parameter_exception;
-
-global $CFG;
-
-// Dynamic Class Logic.
-// Ensures compatibility between Moodle 3.9 (global classes) and 4.0+ (core_external namespace).
-if (!class_exists('mod_journal\external\journal_external_api_base')) {
-    if (class_exists('core_external\external_api')) {
-        // Moodle 4.0 and higher.
-        class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');
-
-        // Ensure global class aliases exist for the helper types used in this file.
-        // This is necessary because "use external_function_parameters;" expects the global class,
-        // which might not be aliased automatically in strict PHPUnit isolation.
-        if (!class_exists('external_function_parameters')) {
-            class_alias('core_external\external_function_parameters', 'external_function_parameters');
-        }
-        if (!class_exists('external_value')) {
-            class_alias('core_external\external_value', 'external_value');
-        }
-        if (!class_exists('external_single_structure')) {
-            class_alias('core_external\external_single_structure', 'external_single_structure');
-        }
-    } else {
-        // Moodle 3.9 - 3.11.
-        require_once($CFG->libdir . '/externallib.php');
-        class_alias('external_api', 'mod_journal\external\journal_external_api_base');
-    }
-}
 
 /**
  * External function to get a journal entry.
