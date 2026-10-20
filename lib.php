@@ -1187,7 +1187,7 @@ function journal_print_feedback($course, $entry, $grades) {
     require_once($CFG->dirroot . '/lib/gradelib.php');
 
     if (!$teacher = $DB->get_record('user', ['id' => $entry->teacher])) {
-        throw new \moodle_exception(get_string('Weird journal error'));
+        throw new \moodle_exception('incorrectuserid', 'journal');
     }
 
     $module = $DB->get_record('modules', ['name' => 'journal']);
