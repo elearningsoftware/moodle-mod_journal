@@ -121,6 +121,24 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * A journal whose course module no longer exists can still be deleted.
+     *
+     * @covers ::journal_delete_instance
+     */
+    public function test_delete_instance_without_course_module(): void {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $journal = $this->getDataGenerator()->get_plugin_generator('mod_journal')->create_instance(['course' => $course->id]);
+        $DB->delete_records('course_modules', ['id' => $journal->cmid]);
+
+        $this->assertTrue(journal_delete_instance($journal->id));
+        $this->assertFalse($DB->record_exists('journal', ['id' => $journal->id]));
+    }
+
+    /**
      * The feedback is passed to the gradebook as HTML, whatever the format of the entry text.
      *
      * @covers ::journal_get_user_grades

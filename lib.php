@@ -100,9 +100,6 @@ function journal_delete_instance($id) {
 
     $result = true;
 
-    $cm = get_coursemodule_from_instance('journal', $id);
-    \core_completion\api::update_completion_date_event($cm->id, 'journal', $id, null);
-
     if (!$journal = $DB->get_record('journal', ['id' => $id])) {
         return false;
     }
@@ -110,8 +107,9 @@ function journal_delete_instance($id) {
     // Delete grade item from Gradebook.
     journal_grade_item_delete($journal);
 
-    // Delete area files associated with module context.
-    if ($cm) {
+    // Delete the completion date event and the area files associated with module context.
+    if ($cm = get_coursemodule_from_instance('journal', $id)) {
+        \core_completion\api::update_completion_date_event($cm->id, 'journal', $id, null);
         $context = \context_module::instance($cm->id);
         $fs = get_file_storage();
         $fs->delete_area_files($context->id, 'mod_journal', 'feedback');
