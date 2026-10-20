@@ -70,6 +70,7 @@ $string['incorrectuserid'] = 'Selected user ID is incorrect';
 $string['journal:addentries'] = 'Add journal entries';
 $string['journal:addinstance'] = 'Add a new journal';
 $string['journal:manageentries'] = 'Manage journal entries';
+$string['journalclosed'] = 'This journal is not open for editing.';
 
 // Updated Plain Text Template.
 $string['journalmail'] = 'Hi {$a->student},

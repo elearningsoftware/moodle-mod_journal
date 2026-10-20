@@ -84,4 +84,30 @@ final class set_text_test extends advanced_testcase {
 
         $this->assertEquals($journal->id, $result->journal);
     }
+
+    /**
+     * No text can be set once the editing period of the journal has ended.
+     *
+     * @return void
+     * @covers ::execute
+     */
+    public function test_text_is_not_set_after_editing_period(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['format' => 'weeks', 'startdate' => time() - 4 * WEEKSECS]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $journal = $generator->create_module('journal', ['course' => $course, 'section' => 1, 'days' => 7]);
+        $this->setUser($student);
+
+        try {
+            set_text::execute($journal->id, 'newtext', FORMAT_PLAIN);
+            $this->fail('An exception should have been thrown.');
+        } catch (\moodle_exception $e) {
+            $this->assertEquals('journalclosed', $e->errorcode);
+        }
+
+        $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $journal->id]));
+    }
 }

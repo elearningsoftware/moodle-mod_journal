@@ -78,7 +78,8 @@ class set_text extends journal_external_api_base {
      * @return array
      */
     public static function execute(int $journalid, string $text, $format, int $itemid = 0) {
-        global $DB, $USER;
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $params = self::validate_parameters(
             self::execute_parameters(),
@@ -100,6 +101,10 @@ class set_text extends journal_external_api_base {
         $context = context_module::instance($cm->id);
         self::validate_context($context);
         require_capability('mod/journal:addentries', $context);
+
+        if (!journal_is_open($journal, $course, $cm)) {
+            throw new \moodle_exception('journalclosed', 'journal');
+        }
 
         $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
 

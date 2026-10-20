@@ -23,6 +23,7 @@
  **/
 
 require_once('../../config.php');
+require_once($CFG->dirroot . '/mod/journal/lib.php');
 require_once($CFG->dirroot . '/mod/journal/edit_form.php');
 
 $id = required_param('id', PARAM_INT);    // Course Module ID.
@@ -43,6 +44,15 @@ require_capability('mod/journal:addentries', $context);
 
 if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
     throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
+}
+
+if (!journal_is_open($journal, $course, $cm)) {
+    redirect(
+        new moodle_url('/mod/journal/view.php', ['id' => $cm->id]),
+        get_string('journalclosed', 'journal'),
+        null,
+        \core\output\notification::NOTIFY_WARNING
+    );
 }
 
 // Header.

@@ -1456,6 +1456,31 @@ function journal_get_printable_count($text) {
 }
 
 /**
+ * Returns whether entries of the journal can be edited at the given time.
+ *
+ * Only journals in courses in weekly format with a number of days available have an editing period,
+ * starting with the week of their section. All other journals are always open.
+ *
+ * @param stdClass $journal Journal record
+ * @param stdClass $course Course record
+ * @param stdClass|cm_info $cm Course module of the journal
+ * @param int|null $timenow Time to check, defaults to now
+ * @return bool True if the journal is open for editing
+ */
+function journal_is_open($journal, $course, $cm, $timenow = null): bool {
+    if ($course->format != 'weeks' || empty($journal->days)) {
+        return true;
+    }
+
+    $timenow = $timenow ?? time();
+    $sectionnum = get_fast_modinfo($course)->get_section_info_by_id($cm->section)->sectionnum;
+    $timestart = $course->startdate + (($sectionnum - 1) * 604800);
+    $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
+
+    return $timenow > $timestart && $timenow < $timefinish;
+}
+
+/**
  * Obtains the automatic completion state for this journal based on the rule
  * on its completion settings.
  *
