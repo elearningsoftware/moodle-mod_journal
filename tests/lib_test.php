@@ -52,6 +52,41 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Resetting the journals of a course also removes the grades of the deleted entries.
+     *
+     * @covers ::journal_reset_userdata
+     * @covers ::journal_reset_gradebook
+     */
+    public function test_reset_removes_grades(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/gradelib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $journalgenerator = $generator->get_plugin_generator('mod_journal');
+        $course = $generator->create_course();
+        $journal = $journalgenerator->create_instance(['course' => $course->id]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $journalgenerator->create_entry((object)[
+            'journal' => $journal->id,
+            'userid' => $student->id,
+            'rating' => 80,
+            'teacher' => $teacher->id,
+            'timemarked' => time(),
+        ]);
+        journal_update_grades($DB->get_record('journal', ['id' => $journal->id]), $student->id);
+
+        $grades = grade_get_grades($course->id, 'mod', 'journal', $journal->id, $student->id);
+        $this->assertEquals(80, $grades->items[0]->grades[$student->id]->grade);
+
+        journal_reset_userdata((object)['reset_journal' => true, 'courseid' => $course->id]);
+
+        $grades = grade_get_grades($course->id, 'mod', 'journal', $journal->id, $student->id);
+        $this->assertNull($grades->items[0]->grades[$student->id]->grade);
+    }
+
+    /**
      * A grader must not be served files of an entry of a student in another separate group.
      *
      * @covers ::journal_pluginfile

@@ -491,6 +491,11 @@ function journal_reset_userdata($data) {
             $fs->delete_area_files($context->id, 'mod_journal', 'entry');
         }
 
+        // Remove the grades of the deleted entries, unless the whole gradebook is reset anyway.
+        if (empty($data->reset_gradebook_grades)) {
+            journal_reset_gradebook($data->courseid);
+        }
+
         $status[] = [
             'component' => get_string('modulenameplural', 'journal'),
             'item' => get_string('removeentries', 'journal'),
@@ -499,6 +504,25 @@ function journal_reset_userdata($data) {
     }
 
     return $status;
+}
+
+/**
+ * Removes all grades from the gradebook of the journals in a course.
+ *
+ * @param int $courseid Course ID
+ */
+function journal_reset_gradebook($courseid) {
+    global $DB;
+
+    $sql = 'SELECT j.*, cm.idnumber AS cmidnumber
+              FROM {journal} j
+              JOIN {course_modules} cm ON cm.instance = j.id
+              JOIN {modules} m ON m.id = cm.module
+             WHERE m.name = :modname AND j.course = :courseid';
+    $journals = $DB->get_records_sql($sql, ['modname' => 'journal', 'courseid' => $courseid]);
+    foreach ($journals as $journal) {
+        journal_grade_item_update($journal, 'reset');
+    }
 }
 
 /**
