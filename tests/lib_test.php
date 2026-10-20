@@ -85,6 +85,34 @@ final class lib_test extends \advanced_testcase {
         }
     }
 
+    /**
+     * Nothing is served for a file that does not exist in the entry of the student.
+     *
+     * @covers ::journal_pluginfile
+     */
+    public function test_pluginfile_missing_file(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $journal = $generator->get_plugin_generator('mod_journal')->create_instance(['course' => $course->id]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $entryid = $generator->get_plugin_generator('mod_journal')->create_entry((object)[
+            'journal' => $journal->id,
+            'userid' => $student->id,
+        ]);
+
+        $cm = get_coursemodule_from_instance('journal', $journal->id, $course->id, false, MUST_EXIST);
+        $context = \context_module::instance($cm->id);
+
+        $this->setUser($student);
+        foreach (['entry', 'feedback'] as $filearea) {
+            $this->assertFalse(journal_pluginfile($course, $cm, $context, $filearea, [$entryid, 'missing.txt'], false));
+        }
+    }
+
     #[\PHPUnit\Framework\Attributes\Group('baseline')]
     /**
      * Feedback of an overridden grade must not break out of the hidden input attribute.

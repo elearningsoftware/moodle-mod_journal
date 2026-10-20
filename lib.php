@@ -1254,7 +1254,7 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
     }
 
     // Students can only see their own entry.
-    if (!$canmanage && $USER->id !== $entry->userid) {
+    if (!$canmanage && $USER->id != $entry->userid) {
         return false;
     }
 
@@ -1271,6 +1271,9 @@ function journal_pluginfile($course, $cm, $context, $filearea, $args, $forcedown
     $relativepath = implode('/', $args);
     $fullpath = "/$context->id/mod_journal/$filearea/$entryid/$relativepath";
     $file = $fs->get_file_by_hash(sha1($fullpath));
+    if (!$file || $file->is_directory()) {
+        return false;
+    }
 
     // Finally send the file.
     send_stored_file($file, null, 0, $forcedownload, $options);
