@@ -202,8 +202,6 @@ class provider implements
      * @param context $context The specific context to delete data for.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        global $DB;
-
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
         }
@@ -212,7 +210,7 @@ class provider implements
             return;
         }
 
-        $DB->delete_records('journal_entries', ['journal' => $journalid]);
+        static::delete_entries($context, $journalid);
     }
 
     /**
@@ -221,8 +219,6 @@ class provider implements
      * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        global $DB;
-
         $userid = $contextlist->get_user()->id;
         $cmids = array_reduce($contextlist->get_contexts(), function ($carry, $context) {
             if ($context->contextlevel == CONTEXT_MODULE) {
@@ -236,17 +232,9 @@ class provider implements
 
         // Find the journal IDs.
         $journalidstocmids = static::get_journal_ids_to_cmids_from_cmids($cmids);
-        $journalids = array_keys($journalidstocmids);
-        if (empty($journalids)) {
-            return;
+        foreach ($journalidstocmids as $journalid => $cmid) {
+            static::delete_entries(context_module::instance($cmid), $journalid, [$userid]);
         }
-
-        // Prepare the SQL we'll need below.
-        [$insql, $inparams] = $DB->get_in_or_equal($journalids, SQL_PARAMS_NAMED);
-        $sql = "journal $insql AND userid = :userid";
-        $params = array_merge($inparams, ['userid' => $userid]);
-
-        $DB->delete_records_select('journal_entries', $sql, $params);
     }
 
     /**
@@ -255,21 +243,48 @@ class provider implements
      * @param   approved_userlist    $userlist The approved context and user information to delete information for.
      */
     public static function delete_data_for_users(approved_userlist $userlist) {
-        global $DB;
-
         $context = $userlist->get_context();
         $journalid = static::get_journal_id_from_context($context);
         $userids = $userlist->get_userids();
 
-        if (empty($journalid)) {
+        if (empty($journalid) || empty($userids)) {
             return;
         }
 
-        // Prepare the SQL we'll need below.
-        [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
-        $sql = "journal = :journalid AND userid {$insql}";
-        $params = array_merge($inparams, ['journalid' => $journalid]);
-        $DB->delete_records_select('journal_entries', $sql, $params);
+        static::delete_entries($context, $journalid, $userids);
+    }
+
+    /**
+     * Delete journal entries and their files.
+     *
+     * @param context_module $context The module context of the journal.
+     * @param int $journalid The journal ID.
+     * @param int[] $userids The users whose entries are deleted, empty for all users.
+     */
+    protected static function delete_entries(context_module $context, int $journalid, array $userids = []) {
+        global $DB;
+
+        $fs = get_file_storage();
+        $select = 'journal = :journalid';
+        $params = ['journalid' => $journalid];
+
+        if (empty($userids)) {
+            $fs->delete_area_files($context->id, 'mod_journal', 'entry');
+            $fs->delete_area_files($context->id, 'mod_journal', 'feedback');
+        } else {
+            [$insql, $inparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+            $select .= " AND userid $insql";
+            $params += $inparams;
+
+            $entryids = $DB->get_fieldset_select('journal_entries', 'id', $select, $params);
+            if ($entryids) {
+                [$insql, $inparams] = $DB->get_in_or_equal($entryids, SQL_PARAMS_NAMED);
+                $fs->delete_area_files_select($context->id, 'mod_journal', 'entry', $insql, $inparams);
+                $fs->delete_area_files_select($context->id, 'mod_journal', 'feedback', $insql, $inparams);
+            }
+        }
+
+        $DB->delete_records_select('journal_entries', $select, $params);
     }
 
     /**
