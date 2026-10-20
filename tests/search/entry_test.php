@@ -36,9 +36,10 @@ final class entry_test extends \advanced_testcase {
      * @throws dml_exception
      */
     public function test_get_recordset_by_timestamp(): void {
-        global $DB, $USER;
+        global $DB;
         $this->resetAfterTest();
         $this->setAdminUser();
+        $generator = $this->getDataGenerator();
 
         $time = time();
         // Create journal entries.
@@ -54,7 +55,7 @@ final class entry_test extends \advanced_testcase {
             'journal_entries',
             [
                 'journal' => $journalid,
-                'userid' => $USER->id,
+                'userid' => $generator->create_user()->id,
                 'modified' => $time,
                 'text' => 'text',
             ],
@@ -64,7 +65,7 @@ final class entry_test extends \advanced_testcase {
             'journal_entries',
             [
                 'journal' => $journalid,
-                'userid' => $USER->id,
+                'userid' => $generator->create_user()->id,
                 'modified' => $time + 1000,
                 'text' => 'text',
             ],
@@ -74,7 +75,7 @@ final class entry_test extends \advanced_testcase {
             'journal_entries',
             [
                 'journal' => $journalid,
-                'userid' => $USER->id,
+                'userid' => $generator->create_user()->id,
                 'modified' => $time - 1000,
                 'text' => 'text',
             ],

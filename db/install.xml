@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/journal/db" VERSION="20251207" COMMENT="XMLDB file for Moodle mod/journal"
+<XMLDB PATH="mod/journal/db" VERSION="20261020" COMMENT="XMLDB file for Moodle mod/journal"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -45,6 +45,7 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="journaluser" UNIQUE="true" FIELDS="journal, userid"/>
       </INDEXES>
     </TABLE>
   </TABLES>
