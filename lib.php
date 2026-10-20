@@ -617,7 +617,7 @@ function journal_get_user_grades($journal, $userid = 0) {
     if (!$journal) {
         return false;
     } else {
-        $sql = 'SELECT userid, modified as datesubmitted, format as feedbackformat,
+        $sql = 'SELECT userid, modified as datesubmitted,
                 rating as rawgrade, entrycomment as feedback, teacher as usermodifier, timemarked as dategraded
                 FROM {journal_entries}
                 WHERE journal = :jid ' . $userstr;
@@ -628,6 +628,8 @@ function journal_get_user_grades($journal, $userid = 0) {
         if ($grades) {
             foreach ($grades as $key => $grade) {
                 $grades[$key]->id = $grade->userid;
+                // Feedback is always saved from an HTML editor, whatever the format of the entry text.
+                $grades[$key]->feedbackformat = FORMAT_HTML;
                 if ($grade->rawgrade == -1) {
                     $grades[$key]->rawgrade = null;
                 }

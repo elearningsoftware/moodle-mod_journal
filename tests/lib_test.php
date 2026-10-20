@@ -121,6 +121,33 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * The feedback is passed to the gradebook as HTML, whatever the format of the entry text.
+     *
+     * @covers ::journal_get_user_grades
+     */
+    public function test_get_user_grades_feedback_format(): void {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $journal = $generator->get_plugin_generator('mod_journal')->create_instance(['course' => $course->id]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $generator->get_plugin_generator('mod_journal')->create_entry((object)[
+            'journal' => $journal->id,
+            'userid' => $student->id,
+            'format' => FORMAT_PLAIN,
+            'rating' => 50,
+            'entrycomment' => '<p>Well done</p>',
+        ]);
+
+        $grades = journal_get_user_grades($DB->get_record('journal', ['id' => $journal->id]), $student->id);
+        $this->assertEquals(FORMAT_HTML, $grades[$student->id]->feedbackformat);
+        $this->assertEquals('<p>Well done</p>', $grades[$student->id]->feedback);
+    }
+
+    /**
      * Nothing is served for a file that does not exist in the entry of the student.
      *
      * @covers ::journal_pluginfile
