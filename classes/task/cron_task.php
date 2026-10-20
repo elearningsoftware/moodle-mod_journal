@@ -85,6 +85,7 @@ class cron_task extends \core\task\scheduled_task {
                 } else {
                     if (!$user = $DB->get_record("user", ["id" => $entry->userid], $requireduserfields)) {
                         echo "Could not find user $entry->userid\n";
+                        $DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id]);
                         continue;
                     }
                     $users[$entry->userid] = $user;
@@ -98,6 +99,7 @@ class cron_task extends \core\task\scheduled_task {
                     // We need fullname for the email template.
                     if (!$course = $DB->get_record('course', ['id' => $entry->course], 'id, shortname, fullname')) {
                         echo "Could not find course $entry->course\n";
+                        $DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id]);
                         continue;
                     }
                     $courses[$entry->course] = $course;
@@ -108,6 +110,7 @@ class cron_task extends \core\task\scheduled_task {
                 } else {
                     if (!$teacher = $DB->get_record("user", ["id" => $entry->teacher], $requireduserfields)) {
                         echo "Could not find teacher $entry->teacher\n";
+                        $DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id]);
                         continue;
                     }
                     $users[$entry->teacher] = $teacher;
@@ -117,6 +120,7 @@ class cron_task extends \core\task\scheduled_task {
                 $coursejournals = get_fast_modinfo($course)->get_instances_of('journal');
                 if (empty($coursejournals) || empty($coursejournals[$entry->journal])) {
                     echo "Could not find course module for journal id $entry->journal\n";
+                    $DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id]);
                     continue;
                 }
                 $mod = $coursejournals[$entry->journal];
@@ -127,7 +131,9 @@ class cron_task extends \core\task\scheduled_task {
                 $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
 
                 if (!$canadd && $entriesmanager) {
-                    continue;  // Not an active participant.
+                    // Not an active participant.
+                    $DB->set_field("journal_entries", "mailed", "1", ["id" => $entry->id]);
+                    continue;
                 }
 
                 // Prepare data for email template.
