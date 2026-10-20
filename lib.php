@@ -1115,7 +1115,11 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         );
 
         if ($feedbackdisabledstr != '') {
-            echo '<input type="hidden" name="c' . $entry->id . '" value="' . $feedbacktext . '"/>';
+            echo html_writer::empty_tag('input', [
+                'type' => 'hidden',
+                'name' => 'c' . $entry->id,
+                'value' => $feedbacktext,
+            ]);
         }
 
         // Feedback save button.

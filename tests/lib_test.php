@@ -84,4 +84,83 @@ final class lib_test extends \advanced_testcase {
             $this->assertFalse(journal_pluginfile($course, $cm, $context, $filearea, [$entryid, 'file.txt'], false));
         }
     }
+
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Feedback of an overridden grade must not break out of the hidden input attribute.
+     *
+     * @covers ::journal_print_user_entry
+     */
+    public function test_print_user_entry_escapes_overridden_feedback(): void {
+        $input = $this->render_overridden_feedback_input('" onfocus=alert(document.domain) autofocus x="');
+
+        $this->assertFalse($input->hasAttribute('onfocus'));
+        $this->assertFalse($input->hasAttribute('autofocus'));
+        $this->assertStringContainsString('" onfocus=alert(document.domain) autofocus x="', $input->getAttribute('value'));
+    }
+
+    #[\PHPUnit\Framework\Attributes\Group('baseline')]
+    /**
+     * Legitimate feedback of an overridden grade is kept in the hidden input.
+     *
+     * @covers ::journal_print_user_entry
+     */
+    public function test_print_user_entry_keeps_overridden_feedback(): void {
+        $input = $this->render_overridden_feedback_input('<p>Gut gemacht & weiter so, Übung: <strong>5/5</strong></p>');
+
+        $this->assertSame('<p>Gut gemacht &amp; weiter so, Übung: <strong>5/5</strong></p>', $input->getAttribute('value'));
+    }
+
+    /**
+     * Renders a graded entry whose grade is overridden in the gradebook and returns the hidden feedback input.
+     *
+     * @param string $feedback Feedback of the entry.
+     * @return \DOMElement
+     */
+    private function render_overridden_feedback_input(string $feedback): \DOMElement {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        require_once($CFG->libdir . '/gradelib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $journal = $generator->get_plugin_generator('mod_journal')->create_instance(['course' => $course->id]);
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $student = $generator->create_and_enrol($course, 'student');
+        $entryid = $generator->get_plugin_generator('mod_journal')->create_entry((object)[
+            'journal' => $journal->id,
+            'userid' => $student->id,
+            'format' => FORMAT_HTML,
+            'modified' => time() - 10,
+            'rating' => 50,
+            'entrycomment' => $feedback,
+            'teacher' => $teacher->id,
+            'timemarked' => time(),
+        ]);
+        journal_update_grades($DB->get_record('journal', ['id' => $journal->id]), $student->id);
+        $gradeitem = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'journal',
+            'iteminstance' => $journal->id,
+            'courseid' => $course->id,
+        ]);
+        \grade_grade::fetch(['itemid' => $gradeitem->id, 'userid' => $student->id])->set_overridden(true);
+
+        $this->setUser($teacher);
+        $cm = get_coursemodule_from_instance('journal', $journal->id, $course->id, false, MUST_EXIST);
+        $entry = $DB->get_record('journal_entries', ['id' => $entryid]);
+        ob_start();
+        journal_print_user_entry($course, $student, $entry, [], make_grades_menu(100), $cm->id);
+        $html = ob_get_clean();
+
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<?xml encoding="utf-8"?>' . $html, LIBXML_NOERROR);
+        foreach ($dom->getElementsByTagName('input') as $input) {
+            if ($input->getAttribute('name') === 'c' . $entryid) {
+                return $input;
+            }
+        }
+        $this->fail('Hidden feedback input not found.');
+    }
 }
