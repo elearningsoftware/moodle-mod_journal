@@ -118,7 +118,7 @@ final class lib_test extends \advanced_testcase {
      * @return \DOMElement
      */
     private function render_overridden_feedback_input(string $feedback): \DOMElement {
-        global $CFG, $DB;
+        global $CFG, $DB, $PAGE;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
         require_once($CFG->libdir . '/gradelib.php');
         $this->resetAfterTest();
@@ -149,6 +149,9 @@ final class lib_test extends \advanced_testcase {
 
         $this->setUser($teacher);
         $cm = get_coursemodule_from_instance('journal', $journal->id, $course->id, false, MUST_EXIST);
+        // The Atto editor (default before Moodle 4.2) reads the page URL.
+        $PAGE->set_url('/mod/journal/report.php', ['id' => $cm->id]);
+        $PAGE->set_context(\context_module::instance($cm->id));
         $entry = $DB->get_record('journal_entries', ['id' => $entryid]);
         ob_start();
         journal_print_user_entry($course, $student, $entry, [], make_grades_menu(100), $cm->id);
