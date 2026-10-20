@@ -311,7 +311,7 @@ class mobile {
             'format' => FORMAT_MOODLE, // Using FORMAT_MOODLE (0) preserves newlines from the textarea properly.
             'canedit' => $canadd && $journalopen,
             'text_plain' => '',
-            'journalid' => $journal->id, // Note: The WebService actually expects CMID in the journalid param, checked in template.
+            'journalid' => $journal->id, // The mod_journal_set_text web service expects the journal instance ID.
         ];
 
         // Warnings logic.

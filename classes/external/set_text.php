@@ -45,7 +45,7 @@ class set_text extends journal_external_api_base {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'journalid' => new external_value(PARAM_INT, 'course module id of journal'),
+                'journalid' => new external_value(PARAM_INT, 'journal instance id'),
                 'text' => new external_value(PARAM_RAW, 'text to set'),
                 'format' => new external_value(PARAM_INT, 'format of text'),
                 'itemid' => new external_value(PARAM_INT, 'Draft item id for files', VALUE_DEFAULT, 0),
@@ -71,7 +71,7 @@ class set_text extends journal_external_api_base {
     /**
      * Sets the text for the element.
      *
-     * @param int $journalid Journal course module ID
+     * @param int $journalid Journal instance ID
      * @param string $text Text parameter
      * @param int|string $format Format constant for the string
      * @param int $itemid Item id for draft area (files)
@@ -85,6 +85,10 @@ class set_text extends journal_external_api_base {
             self::execute_parameters(),
             ['journalid' => $journalid, 'text' => $text, 'format' => $format, 'itemid' => $itemid]
         );
+
+        if (!in_array($params['format'], [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_MARKDOWN])) {
+            throw new invalid_parameter_exception('Invalid text format: ' . $params['format']);
+        }
 
         if (!$cm = get_coursemodule_from_instance('journal', $params['journalid'])) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));

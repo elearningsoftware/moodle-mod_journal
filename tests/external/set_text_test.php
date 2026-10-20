@@ -86,6 +86,28 @@ final class set_text_test extends advanced_testcase {
     }
 
     /**
+     * Text with an unknown format is rejected.
+     *
+     * @return void
+     * @covers ::execute
+     */
+    public function test_text_with_invalid_format_is_rejected(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $journal = $this->getDataGenerator()->create_module('journal', ['course' => $course]);
+
+        $this->expectException(invalid_parameter_exception::class);
+        try {
+            set_text::execute($journal->id, 'newtext', 99);
+        } finally {
+            $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $journal->id]));
+        }
+    }
+
+    /**
      * No text can be set once the editing period of the journal has ended.
      *
      * @return void
