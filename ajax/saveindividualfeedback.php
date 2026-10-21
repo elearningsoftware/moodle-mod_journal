@@ -77,6 +77,10 @@ if (!confirm_sesskey($sesskey)) {
     throw new \moodle_exception('invalidsesskey');
 }
 
+if (!journal_is_valid_grade($journal, $grade)) {
+    throw new \moodle_exception('invalidgrade', 'journal');
+}
+
 // Only update entries where feedback has actually changed.
 $ratingchanged = false;
 if ($grade !== (int) $entry->rating) {

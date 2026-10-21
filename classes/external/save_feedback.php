@@ -72,7 +72,8 @@ class save_feedback extends journal_external_api_base {
         string $feedback = '',
         int $itemid = 0
     ): array {
-        global $DB, $USER;
+        global $CFG, $DB, $USER;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $params = self::validate_parameters(self::execute_parameters(), [
             'cmid' => $cmid,
@@ -108,6 +109,9 @@ class save_feedback extends journal_external_api_base {
         $newgrade = (int) $params['grade'];
         if ($newgrade < -1) {
             $newgrade = -1;
+        }
+        if (!journal_is_valid_grade($journal, $newgrade)) {
+            throw new invalid_parameter_exception('Invalid grade: ' . $newgrade);
         }
 
         $newfeedback = clean_text((string) $params['feedback'], FORMAT_HTML);

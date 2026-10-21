@@ -126,4 +126,39 @@ final class save_feedback_test extends advanced_testcase {
         $this->assertSame('Feedback', $entry->entrycomment);
         $this->assertEquals($this->teacher->id, $entry->teacher);
     }
+
+    /**
+     * A grade above the maximum grade of the journal is rejected.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_rejects_grade_above_maximum(): void {
+        global $DB;
+        $entryid = $this->create_entry($this->studenta);
+        $this->setUser($this->teacher);
+
+        try {
+            save_feedback::execute($this->journal->cmid, $entryid, $this->studenta->id, 101, 'Feedback');
+            $this->fail('Expected invalid_parameter_exception was not thrown');
+        } catch (\invalid_parameter_exception $e) {
+            $this->assertStringContainsString('Invalid grade', $e->getMessage());
+        }
+        $entry = $DB->get_record('journal_entries', ['id' => $entryid], '*', MUST_EXIST);
+        $this->assertNull($entry->rating);
+    }
+
+    /**
+     * Removing the grade of an entry is allowed.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_accepts_no_grade(): void {
+        global $DB;
+        $entryid = $this->create_entry($this->studenta);
+        $this->setUser($this->teacher);
+
+        save_feedback::execute($this->journal->cmid, $entryid, $this->studenta->id, -1, 'Feedback');
+
+        $this->assertEquals(-1, $DB->get_field('journal_entries', 'rating', ['id' => $entryid]));
+    }
 }

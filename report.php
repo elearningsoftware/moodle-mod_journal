@@ -144,6 +144,14 @@ if ($data = data_submitted()) {
         $ratingchanged = false;
 
         $studentrating = clean_param($vals['r'], PARAM_INT);
+        // A locked grade is sent back unchanged, even if it is no longer valid.
+        if ((string) $studentrating !== (string) $entry->rating && !journal_is_valid_grade($journal, (int) $studentrating)) {
+            echo $OUTPUT->notification(
+                get_string('failedupdate', 'journal', $entry->userid),
+                \core\output\notification::NOTIFY_ERROR
+            );
+            continue;
+        }
         // Ensure text is a string to satisfy PHP 8.1 strict typing.
         $rawtext = isset($vals['c']['text']) ? (string) $vals['c']['text'] : '';
         $studentcomment = clean_text($rawtext, FORMAT_HTML);

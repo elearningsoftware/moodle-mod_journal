@@ -274,4 +274,34 @@ final class lib_test extends \advanced_testcase {
         }
         $this->fail('Hidden feedback input not found.');
     }
+
+    /**
+     * Only no grade and the grades of the grade menu of a journal are valid.
+     *
+     * @covers ::journal_is_valid_grade
+     */
+    public function test_is_valid_grade(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $points = (object) ['grade' => 10];
+        $this->assertTrue(journal_is_valid_grade($points, -1));
+        $this->assertTrue(journal_is_valid_grade($points, 0));
+        $this->assertTrue(journal_is_valid_grade($points, 10));
+        $this->assertFalse(journal_is_valid_grade($points, 11));
+        $this->assertFalse(journal_is_valid_grade($points, -2));
+
+        $scale = $this->getDataGenerator()->create_scale(['scale' => 'Bad,Good']);
+        $scaled = (object) ['grade' => -$scale->id];
+        $this->assertTrue(journal_is_valid_grade($scaled, -1));
+        $this->assertTrue(journal_is_valid_grade($scaled, 1));
+        $this->assertTrue(journal_is_valid_grade($scaled, 2));
+        $this->assertFalse(journal_is_valid_grade($scaled, 0));
+        $this->assertFalse(journal_is_valid_grade($scaled, 3));
+
+        $nograde = (object) ['grade' => 0];
+        $this->assertTrue(journal_is_valid_grade($nograde, -1));
+        $this->assertFalse(journal_is_valid_grade($nograde, 0));
+    }
 }

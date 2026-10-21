@@ -1508,6 +1508,19 @@ function journal_is_open($journal, $course, $cm, $timenow = null): bool {
 }
 
 /**
+ * Returns whether a rating can be given to an entry of the journal.
+ *
+ * Valid ratings are -1 for no grade and the grades of the menu teachers pick them from.
+ *
+ * @param stdClass $journal Journal record
+ * @param int $rating Rating to check
+ * @return bool True if the rating is valid
+ */
+function journal_is_valid_grade($journal, int $rating): bool {
+    return $rating == -1 || array_key_exists($rating, make_grades_menu($journal->grade));
+}
+
+/**
  * Obtains the automatic completion state for this journal based on the rule
  * on its completion settings.
  *
