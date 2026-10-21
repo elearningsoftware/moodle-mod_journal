@@ -29,11 +29,11 @@ require_once($CFG->dirroot . '/mod/journal/edit_form.php');
 $id = required_param('id', PARAM_INT);    // Course Module ID.
 
 if (!$cm = get_coursemodule_from_id('journal', $id)) {
-    throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
+    throw new \moodle_exception('incorrectcmid', 'journal');
 }
 
 if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
-    throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
+    throw new \moodle_exception('incorrectcourseid', 'journal');
 }
 
 $context = context_module::instance($cm->id);
@@ -43,7 +43,7 @@ require_login($course, false, $cm);
 require_capability('mod/journal:addentries', $context);
 
 if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
-    throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
+    throw new \moodle_exception('incorrectjournalid', 'journal');
 }
 
 if (!journal_is_open($journal, $course, $cm)) {
@@ -111,13 +111,13 @@ if ($form->is_cancelled()) {
     if ($entry) {
         $newentry->id = $entry->id;
         if (!$DB->update_record('journal_entries', $newentry)) {
-            throw new \moodle_exception(get_string('couldnotupdatejournal', 'journal'));
+            throw new \moodle_exception('couldnotupdatejournal', 'journal');
         }
     } else {
         $newentry->userid = $USER->id;
         $newentry->journal = $journal->id;
         if (!$newentry->id = $DB->insert_record('journal_entries', $newentry)) {
-            throw new \moodle_exception(get_string('countnotinsertjournalentry', 'journal'));
+            throw new \moodle_exception('countnotinsertjournalentry', 'journal');
         }
     }
 

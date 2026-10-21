@@ -44,15 +44,15 @@ if ($grade === '') {
 }
 
 if (!$cm = get_coursemodule_from_id('journal', $cmid)) {
-    throw new \moodle_exception(get_string('incorrectcmid', 'journal'));
+    throw new \moodle_exception('incorrectcmid', 'journal');
 }
 
 if (!$course = $DB->get_record('course', ['id' => $cm->course])) {
-    throw new \moodle_exception(get_string('incorrectcourseid', 'journal'));
+    throw new \moodle_exception('incorrectcourseid', 'journal');
 }
 
 if (!$user = $DB->get_record('user', ['id' => $userid])) {
-    throw new \moodle_exception(get_string('incorrectuserid', 'journal'));
+    throw new \moodle_exception('incorrectuserid', 'journal');
 }
 
 require_login($course, false, $cm);
@@ -61,12 +61,12 @@ $context = context_module::instance($cm->id);
 require_capability('mod/journal:manageentries', $context);
 
 if (!$journal = $DB->get_record('journal', ['id' => $cm->instance])) {
-    throw new \moodle_exception(get_string('incorrectjournalid', 'journal'));
+    throw new \moodle_exception('incorrectjournalid', 'journal');
 }
 $journal->cmidnumber = $cm->idnumber;
 
 if (!$entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'id' => $entryid])) {
-    throw new \moodle_exception(get_string('incorrectjournalentry', 'journal'));
+    throw new \moodle_exception('incorrectjournalentry', 'journal');
 }
 
 if (!groups_user_groups_visible($course, $entry->userid, $cm)) {

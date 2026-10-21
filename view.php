@@ -32,7 +32,7 @@ $course = get_course($cm->course);
 $journal = $DB->get_record('journal', ['id' => $cm->instance], '*', MUST_EXIST);
 
 if (!$cw = $DB->get_record('course_sections', ['id' => $cm->section])) {
-    throw new moodle_exception(get_string('incorrectcoursesectionid', 'journal'));
+    throw new moodle_exception('incorrectcoursesectionid', 'journal');
 }
 
 $context = context_module::instance($cm->id);
@@ -45,7 +45,7 @@ $entriesmanager = has_capability('mod/journal:manageentries', $context);
 $canadd = has_capability('mod/journal:addentries', $context);
 
 if (!$entriesmanager && !$canadd) {
-    throw new moodle_exception(get_string('accessdenied', 'journal'));
+    throw new moodle_exception('accessdenied', 'journal');
 }
 
 $journalname = format_string($journal->name, true, ['context' => $context]);
