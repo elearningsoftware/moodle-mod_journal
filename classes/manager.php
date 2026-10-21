@@ -213,4 +213,21 @@ class manager {
 
         return $entrycount;
     }
+
+    /**
+     * Count the users whose entries need grading, because they were never graded or were edited since.
+     *
+     * @param int[] $groupids The groups to count the users of, empty for all users
+     * @return int
+     */
+    public function count_all_users_needing_grading(array $groupids = []): int {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        if (!has_capability('mod/journal:manageentries', $this->context)) {
+            return 0;
+        }
+
+        return journal_count_entries($this->instance, $groupids ?: 0, true);
+    }
 }

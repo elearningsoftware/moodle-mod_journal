@@ -60,30 +60,29 @@ class overview extends \core_courseformat\activityoverviewbase {
     public function get_extra_overview_items(): array {
         return [
             'studentswhowrote' => $this->get_extra_responses_overview(),
+            'needgrading' => $this->get_extra_needgrading_overview(),
             'write' => $this->get_extra_status_for_user(),
         ];
     }
 
     /**
-     * Retrieves an overview of entries for the journal.
+     * Returns the groups to count the users of, empty for all users.
      *
-     * @return overviewitem|null An overview item c, or null if the user lacks the required capability.
+     * @return int[]
      */
-    private function get_extra_responses_overview(): ?overviewitem {
-        global $USER;
-
-        if (!has_capability('mod/journal:manageentries', $this->manager->get_coursemodule()->context)) {
-            return null;
-        }
+    private function get_group_ids(): array {
         if (is_callable([$this, 'get_groups_for_filtering'])) {
-            $groupids = array_keys($this->get_groups_for_filtering());
-        } else {
-            $groupids = [];
+            return array_keys($this->get_groups_for_filtering());
         }
+        return [];
+    }
 
-        $submissions = $this->manager->count_all_users_answered($groupids);
-        $total = $this->manager->count_all_users($groupids);
-
+    /**
+     * Returns the classes of the buttons linking to the report.
+     *
+     * @return string
+     */
+    private function get_button_class(): string {
         if (
             class_exists(button::class) &&
             (new \ReflectionClass(button::class))->hasConstant('SECONDARY_OUTLINE')
@@ -96,16 +95,56 @@ class overview extends \core_courseformat\activityoverviewbase {
             } else {
                 $buttonoutline = button::SECONDARY_OUTLINE;
             }
-            $buttonclass = $buttonoutline->classes();
-        } else {
-            $buttonclass = "btn btn-outline-secondary";
+            return $buttonoutline->classes();
         }
+        return "btn btn-outline-secondary";
+    }
+
+    /**
+     * Retrieves the number of entries that need grading.
+     *
+     * @return overviewitem|null An overview item, or null if the user lacks the required capability.
+     */
+    private function get_extra_needgrading_overview(): ?overviewitem {
+        if (!has_capability('mod/journal:manageentries', $this->manager->get_coursemodule()->context)) {
+            return null;
+        }
+
+        $count = $this->manager->count_all_users_needing_grading($this->get_group_ids());
+        $content = new action_link(
+            new url('/mod/journal/report.php', ['id' => $this->cm->id, 'show' => 'needsgrading']),
+            (string) $count,
+            null,
+            ['class' => $this->get_button_class()]
+        );
+
+        return new overviewitem(
+            get_string('needsgrading', 'journal'),
+            $count,
+            $content,
+            text_align::CENTER
+        );
+    }
+
+    /**
+     * Retrieves an overview of entries for the journal.
+     *
+     * @return overviewitem|null An overview item c, or null if the user lacks the required capability.
+     */
+    private function get_extra_responses_overview(): ?overviewitem {
+        if (!has_capability('mod/journal:manageentries', $this->manager->get_coursemodule()->context)) {
+            return null;
+        }
+        $groupids = $this->get_group_ids();
+
+        $submissions = $this->manager->count_all_users_answered($groupids);
+        $total = $this->manager->count_all_users($groupids);
 
         $content = new action_link(
             new url('/mod/journal/report.php', ['id' => $this->cm->id]),
             get_string('count_of_total', 'core', ['count' => $submissions, 'total' => $total]),
             null,
-            ['class' => $buttonclass]
+            ['class' => $this->get_button_class()]
         );
 
         return new overviewitem(

@@ -728,10 +728,13 @@ function journal_get_users_done($journal, $currentgroup) {
  * Counts all the journal entries (optionally in a given group)
  * @param stdClass $journal Journal object
  * @param boolean|int|array $groupids Group id or array of ids. 0 or false = see all.
+ * @param bool $needsgrading Only count the entries that need grading
  * @return int Number of entries
  */
-function journal_count_entries($journal, $groupids = 0) {
+function journal_count_entries($journal, $groupids = 0, bool $needsgrading = false) {
     global $DB;
+
+    $needsgradingsql = $needsgrading ? ' AND (j.timemarked = 0 OR j.modified > j.timemarked)' : '';
 
     $cm = journal_get_coursemodule($journal->id);
     $context = \context_module::instance($cm->id);
@@ -750,12 +753,12 @@ function journal_count_entries($journal, $groupids = 0) {
         $sql = "SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {groups_members} g ON g.userid = j.userid
                 JOIN {user} u ON u.id = g.userid
-                WHERE j.journal = ? AND g.groupid $sqlin[0]";
+                WHERE j.journal = ? AND g.groupid $sqlin[0]" . $needsgradingsql;
         $journals = $DB->get_records_sql($sql, array_merge($params, $sqlin[1]));
     } else if ($groupids === 0 || $groupids === false) { // Count all the entries from the whole course.
         $sql = 'SELECT DISTINCT u.id FROM {journal_entries} j
                 JOIN {user} u ON u.id = j.userid
-                WHERE j.journal = ?';
+                WHERE j.journal = ?' . $needsgradingsql;
         $journals = $DB->get_records_sql($sql, [$journal->id]);
     }
 
@@ -780,6 +783,16 @@ function journal_count_entries($journal, $groupids = 0) {
     }
 
     return count($journals);
+}
+
+/**
+ * Returns whether an entry needs grading, because it was never graded or was edited since it was graded.
+ *
+ * @param stdClass|null $entry Journal entry, null if the user has not written one
+ * @return bool True if the entry needs grading
+ */
+function journal_entry_needs_grading($entry): bool {
+    return !empty($entry) && (empty($entry->timemarked) || $entry->modified > $entry->timemarked);
 }
 
 /**
@@ -847,6 +860,13 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     );
 
     $userfullname = html_writer::tag('strong', fullname($user));
+    if (journal_entry_needs_grading($entry)) {
+        // Bootstrap 4 and 5 badge classes, for Moodle 4.x and 5.x.
+        $userfullname .= ' ' . html_writer::span(
+            get_string('needsgrading', 'journal'),
+            'badge badge-warning bg-warning text-dark needsgrading'
+        );
+    }
     if ($entry) {
         $userfullname .= ' ' . html_writer::tag(
             'span',

@@ -114,4 +114,57 @@ final class manager_test extends advanced_testcase {
         $this->setUser($student2);
         $this->assertTrue($manager->has_answered(), 'student2 must be reported as having answered');
     }
+
+    /**
+     * Entries that were never graded or were edited since they were graded need grading.
+     *
+     * @return void
+     * @covers ::count_all_users_needing_grading
+     * @covers ::journal_entry_needs_grading
+     */
+    public function test_count_all_users_needing_grading(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $ungraded = $generator->create_and_enrol($course, 'student');
+        $graded = $generator->create_and_enrol($course, 'student');
+        $edited = $generator->create_and_enrol($course, 'student');
+        $generator->create_and_enrol($course, 'student');
+        $group = $generator->create_group(['courseid' => $course->id]);
+        $generator->create_group_member(['groupid' => $group->id, 'userid' => $ungraded->id]);
+        $journal = $generator->create_module('journal', ['course' => $course]);
+
+        $journalgenerator = $generator->get_plugin_generator('mod_journal');
+        $journalgenerator->create_entry((object) ['journal' => $journal->id, 'userid' => $ungraded->id, 'modified' => 100]);
+        $journalgenerator->create_entry((object) [
+            'journal' => $journal->id,
+            'userid' => $graded->id,
+            'modified' => 100,
+            'timemarked' => 200,
+        ]);
+        $journalgenerator->create_entry((object) [
+            'journal' => $journal->id,
+            'userid' => $edited->id,
+            'modified' => 300,
+            'timemarked' => 200,
+        ]);
+
+        $entries = $DB->get_records('journal_entries', ['journal' => $journal->id], '', 'userid, modified, timemarked');
+        $this->assertTrue(journal_entry_needs_grading($entries[$ungraded->id]));
+        $this->assertFalse(journal_entry_needs_grading($entries[$graded->id]));
+        $this->assertTrue(journal_entry_needs_grading($entries[$edited->id]));
+        $this->assertFalse(journal_entry_needs_grading(null));
+
+        $manager = manager::create_from_instance((object) ['id' => $journal->id]);
+        $this->setUser($teacher);
+        $this->assertEquals(2, $manager->count_all_users_needing_grading());
+        $this->assertEquals(1, $manager->count_all_users_needing_grading([$group->id]));
+
+        // Only graders can see what needs grading.
+        $this->setUser($ungraded);
+        $this->assertEquals(0, $manager->count_all_users_needing_grading());
+    }
 }

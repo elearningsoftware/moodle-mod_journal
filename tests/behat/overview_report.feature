@@ -69,4 +69,5 @@ Feature: Testing overview integration in journal activity
     When I am on the "C1" "course > activities > journal" page logged in as "admin"
     Then I should see "Name" in the "journal_overview_collapsible" "region"
     And I should see "Entries" in the "journal_overview_collapsible" "region"
+    And I should see "Needs grading" in the "journal_overview_collapsible" "region"
     And I should see "Test journal name"
