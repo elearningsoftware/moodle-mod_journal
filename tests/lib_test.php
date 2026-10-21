@@ -304,4 +304,40 @@ final class lib_test extends \advanced_testcase {
         $this->assertTrue(journal_is_valid_grade($nograde, -1));
         $this->assertFalse(journal_is_valid_grade($nograde, 0));
     }
+
+    /**
+     * Journals in weekly courses with days available are open from the start of the week of their section.
+     *
+     * @covers ::journal_get_editing_period
+     * @covers ::journal_is_open
+     */
+    public function test_editing_period(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $startdate = make_timestamp(2026, 1, 5);
+        $weekly = $generator->create_course(['format' => 'weeks', 'startdate' => $startdate, 'numsections' => 3]);
+        $journal = $generator->create_module('journal', ['course' => $weekly->id, 'section' => 2, 'days' => 3]);
+        $cm = get_coursemodule_from_instance('journal', $journal->id);
+
+        $timestart = $startdate + WEEKSECS;
+        $timefinish = $timestart + 3 * DAYSECS;
+        $this->assertEquals([$timestart, $timefinish], journal_get_editing_period($journal, $weekly, $cm));
+        $this->assertFalse(journal_is_open($journal, $weekly, $cm, $timestart));
+        $this->assertTrue(journal_is_open($journal, $weekly, $cm, $timestart + 1));
+        $this->assertTrue(journal_is_open($journal, $weekly, $cm, $timefinish - 1));
+        $this->assertFalse(journal_is_open($journal, $weekly, $cm, $timefinish));
+
+        // Without days available, or in other course formats, there is no editing period.
+        $alwaysopen = $generator->create_module('journal', ['course' => $weekly->id, 'section' => 2, 'days' => 0]);
+        $alwaysopencm = get_coursemodule_from_instance('journal', $alwaysopen->id);
+        $this->assertNull(journal_get_editing_period($alwaysopen, $weekly, $alwaysopencm));
+        $topics = $generator->create_course(['format' => 'topics', 'startdate' => $startdate]);
+        $topicsjournal = $generator->create_module('journal', ['course' => $topics->id, 'section' => 2, 'days' => 3]);
+        $topicscm = get_coursemodule_from_instance('journal', $topicsjournal->id);
+        $this->assertNull(journal_get_editing_period($topicsjournal, $topics, $topicscm));
+        $this->assertTrue(journal_is_open($topicsjournal, $topics, $topicscm, $startdate - YEARSECS));
+    }
 }

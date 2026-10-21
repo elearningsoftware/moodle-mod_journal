@@ -93,27 +93,16 @@ if ($entriesmanager) {
 
 // Determine time constraints for journal editing.
 $timenow = time();
-if ($course->format == 'weeks' && $journal->days) {
-    $modinfo = get_fast_modinfo($course);
-    $sectionnum = $modinfo->get_section_info_by_id($cm->section)->section;
-    $timestart = $course->startdate + (($sectionnum - 1) * 604800);
-    $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
-} else {
-    $timestart = $timenow - 1;
-    if (empty($journal->days)) {
-        $timefinish = $timenow + 1;
-        $journal->days = 0;
-    } else {
-        $timefinish = $timenow + (3600 * 24 * (int) $journal->days);
-    }
-}
+$period = journal_get_editing_period($journal, $course, $cm);
+$started = !$period || $timenow > $period[0];
+$isopen = journal_is_open($journal, $course, $cm, $timenow);
 
 // Display journal entry form or message.
-if ($timenow > $timestart) {
+if ($started) {
     echo $OUTPUT->box_start();
 
     // Render "Add/Edit Entry" button if within time constraints.
-    if ($timenow < $timefinish && $canadd) {
+    if ($isopen && $canadd) {
         echo $OUTPUT->single_button(
             new moodle_url('/mod/journal/edit.php', ['id' => $cm->id]),
             get_string('startoredit', 'journal'),
@@ -139,7 +128,7 @@ if ($timenow > $timestart) {
     echo $OUTPUT->box_end();
 
     // Display entry information and feedback.
-    if ($timenow < $timefinish) {
+    if ($isopen) {
         if (!empty($entry->modified)) {
             // Safe count_words for PHP 8.1.
             $entrytext = isset($entry->text) ? (string) $entry->text : '';
@@ -152,15 +141,15 @@ if ($timenow > $timestart) {
         if (!empty($entry->modified) && !empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
             echo $OUTPUT->notification(get_string('needsregrade', 'journal'), \core\output\notification::NOTIFY_WARNING);
         }
-        if (!empty($journal->days)) {
+        if ($period) {
             echo html_writer::div(
-                '<strong>' . get_string('editingends', 'journal') . ':</strong> ' . userdate($timefinish),
+                '<strong>' . get_string('editingends', 'journal') . ':</strong> ' . userdate($period[1]),
                 'editend'
             );
         }
     } else {
         echo $OUTPUT->notification(
-            '<strong>' . get_string('editingended', 'journal') . ':</strong> ' . userdate($timefinish),
+            '<strong>' . get_string('editingended', 'journal') . ':</strong> ' . userdate($period[1]),
             \core\output\notification::NOTIFY_WARNING
         );
     }
@@ -173,7 +162,7 @@ if ($timenow > $timestart) {
     }
 } else {
     echo $OUTPUT->notification(get_string('notopenuntil', 'journal')
-        . ': ' . userdate($timestart), \core\output\notification::NOTIFY_WARNING);
+        . ': ' . userdate($period[0]), \core\output\notification::NOTIFY_WARNING);
 }
 
 // Trigger the module viewed event.

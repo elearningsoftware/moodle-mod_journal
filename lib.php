@@ -1363,10 +1363,28 @@ function journal_get_printable_count($text) {
 }
 
 /**
- * Returns whether entries of the journal can be edited at the given time.
+ * Returns the period in which entries of the journal can be edited.
  *
  * Only journals in courses in weekly format with a number of days available have an editing period,
  * starting with the week of their section. All other journals are always open.
+ *
+ * @param stdClass $journal Journal record
+ * @param stdClass $course Course record
+ * @param stdClass|cm_info $cm Course module of the journal
+ * @return int[]|null The start and end time of the editing period, null if the journal is always open
+ */
+function journal_get_editing_period($journal, $course, $cm): ?array {
+    if ($course->format != 'weeks' || empty($journal->days)) {
+        return null;
+    }
+
+    $sectionnum = get_fast_modinfo($course)->get_section_info_by_id($cm->section)->section;
+    $timestart = $course->startdate + (($sectionnum - 1) * WEEKSECS);
+    return [$timestart, $timestart + ((int) $journal->days * DAYSECS)];
+}
+
+/**
+ * Returns whether entries of the journal can be edited at the given time.
  *
  * @param stdClass $journal Journal record
  * @param stdClass $course Course record
@@ -1375,16 +1393,13 @@ function journal_get_printable_count($text) {
  * @return bool True if the journal is open for editing
  */
 function journal_is_open($journal, $course, $cm, $timenow = null): bool {
-    if ($course->format != 'weeks' || empty($journal->days)) {
+    $period = journal_get_editing_period($journal, $course, $cm);
+    if (!$period) {
         return true;
     }
 
     $timenow = $timenow ?? time();
-    $sectionnum = get_fast_modinfo($course)->get_section_info_by_id($cm->section)->section;
-    $timestart = $course->startdate + (($sectionnum - 1) * 604800);
-    $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
-
-    return $timenow > $timestart && $timenow < $timefinish;
+    return $timenow > $period[0] && $timenow < $period[1];
 }
 
 /**

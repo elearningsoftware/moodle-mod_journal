@@ -157,29 +157,14 @@ class mobile {
         // STUDENT VIEW LOGIC.
         // Calculate open/close dates.
         $timenow = time();
-        $timestart = 0;
-        $timefinish = 0;
-        $journalopen = false;
-
-        if ($course->format == 'weeks' && $journal->days) {
-            $modinfo = get_fast_modinfo($course);
-            $section = $modinfo->get_section_info_by_id($cm->section);
-            $sectionnum = $section->section;
-            $timestart = $course->startdate + (($sectionnum - 1) * 604800);
-            $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
-        } else {
-            $journal->days = 0;
-        }
-
-        if ($journal->days == 0 || ($timenow > $timestart && $timenow < $timefinish)) {
-            $journalopen = true;
-        }
+        $period = journal_get_editing_period($journal, $course, $cm);
+        $journalopen = journal_is_open($journal, $course, $cm, $timenow);
 
         // Populate warning messages if journal is closed or not open yet.
-        if ($timenow < $timestart) {
-            $data['warning'] = get_string('notopenuntil', 'journal') . ': ' . userdate($timestart);
-        } else if ($journal->days && $timenow > $timefinish) {
-            $data['warning'] = get_string('editingended', 'journal') . ': ' . userdate($timefinish);
+        if ($period && $timenow <= $period[0]) {
+            $data['warning'] = get_string('notopenuntil', 'journal') . ': ' . userdate($period[0]);
+        } else if ($period && $timenow >= $period[1]) {
+            $data['warning'] = get_string('editingended', 'journal') . ': ' . userdate($period[1]);
         }
 
         // Fetch student entry.
@@ -233,8 +218,8 @@ class mobile {
 
         // Determine if editing is allowed.
         $data['canedit'] = $canadd && $journalopen;
-        if ($data['canedit'] && !empty($journal->days)) {
-            $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($timefinish);
+        if ($data['canedit'] && $period) {
+            $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($period[1]);
         }
 
         // JS INJECTION:
@@ -287,23 +272,8 @@ class mobile {
 
         // Calculate timing to ensure edit capability is still valid.
         $timenow = time();
-        $timestart = 0;
-        $timefinish = 0;
-        $journalopen = false;
-
-        if ($course->format == 'weeks' && $journal->days) {
-            $modinfo = get_fast_modinfo($course);
-            $section = $modinfo->get_section_info_by_id($cm->section);
-            $sectionnum = $section->section;
-            $timestart = $course->startdate + (($sectionnum - 1) * 604800);
-            $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
-        } else {
-            $journal->days = 0;
-        }
-
-        if ($journal->days == 0 || ($timenow > $timestart && $timenow < $timefinish)) {
-            $journalopen = true;
-        }
+        $period = journal_get_editing_period($journal, $course, $cm);
+        $journalopen = journal_is_open($journal, $course, $cm, $timenow);
 
         $data = [
             'cmid' => $cmid,
@@ -315,14 +285,14 @@ class mobile {
         ];
 
         // Warnings logic.
-        if ($timenow < $timestart) {
-            $data['warning'] = get_string('notopenuntil', 'journal') . ': ' . userdate($timestart);
-        } else if ($journal->days && $timenow > $timefinish) {
-            $data['warning'] = get_string('editingended', 'journal') . ': ' . userdate($timefinish);
+        if ($period && $timenow <= $period[0]) {
+            $data['warning'] = get_string('notopenuntil', 'journal') . ': ' . userdate($period[0]);
+        } else if ($period && $timenow >= $period[1]) {
+            $data['warning'] = get_string('editingended', 'journal') . ': ' . userdate($period[1]);
         }
 
-        if ($data['canedit'] && !empty($journal->days)) {
-            $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($timefinish);
+        if ($data['canedit'] && $period) {
+            $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($period[1]);
         }
 
         // Load existing entry.
