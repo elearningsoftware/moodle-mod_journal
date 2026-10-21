@@ -33,14 +33,6 @@ if ($ADMIN->fulltree) {
         ['0' => get_string('no'), '1' => get_string('yes')]
     ));
 
-    $settings->add(new admin_setting_configselect(
-        'journal/overview',
-        get_string('showoverview', 'journal'),
-        get_string('showoverview', 'journal'),
-        1,
-        ['0' => get_string('no'), '1' => get_string('yes')]
-    ));
-
     // Setting: Default Grade.
     $settings->add(new admin_setting_configtext(
         'journal/defaultgrade',

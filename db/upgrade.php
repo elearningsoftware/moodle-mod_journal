@@ -203,5 +203,13 @@ function xmldb_journal_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2026102100, 'journal');
     }
 
+    if ($oldversion < 2026102101) {
+        // The overview setting was only used by the My Moodle overview, which no longer exists.
+        unset_config('overview', 'journal');
+
+        // Journal savepoint reached.
+        upgrade_mod_savepoint(true, 2026102101, 'journal');
+    }
+
     return true;
 }

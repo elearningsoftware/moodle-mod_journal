@@ -268,12 +268,8 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
     }
 
     $dbparams = [$timestart, $course->id, 'journal'];
-    if (class_exists('\core_user\fields')) {
-        $userfieldsapi = \core_user\fields::for_userpic();
-        $namefields = $userfieldsapi->get_sql('u', false, '', 'userid', false)->selects;
-    } else {
-        $namefields = user_picture::fields('u', null, 'userid');
-    }
+    $userfieldsapi = \core_user\fields::for_userpic();
+    $namefields = $userfieldsapi->get_sql('u', false, '', 'userid', false)->selects;
     $sql = "SELECT je.id, je.modified, cm.id AS cmid, $namefields
          FROM {journal_entries} je
               JOIN {journal} j         ON j.id = je.journal
@@ -366,39 +362,6 @@ function journal_print_recent_activity($course, $viewfullnames, $timestart) {
         );
     }
     return true;
-}
-
-/**
- * Returns the users with data in one journal
- * (users with records in journal_entries, students and teachers)
- * @param int $journalid Journal ID
- * @return array Array of user ids
- */
-function journal_get_participants($journalid) {
-    global $DB;
-
-    // Get students using explicit JOINs.
-    $sqlstudents = "SELECT DISTINCT u.id
-                    FROM {user} u
-                    JOIN {journal_entries} j ON u.id = j.userid
-                   WHERE j.journal = ?";
-    $students = $DB->get_records_sql($sqlstudents, [$journalid]);
-
-    // Get teachers using explicit JOINs.
-    $sqlteachers = "SELECT DISTINCT u.id
-                    FROM {user} u
-                    JOIN {journal_entries} j ON u.id = j.teacher
-                   WHERE j.journal = ?";
-    $teachers = $DB->get_records_sql($sqlteachers, [$journalid]);
-
-    // Add teachers to students.
-    if ($teachers) {
-        foreach ($teachers as $teacher) {
-            $students[$teacher->id] = $teacher;
-        }
-    }
-    // Return students array (it contains an array of unique users).
-    return $students;
 }
 
 /**
@@ -520,76 +483,6 @@ function journal_reset_gradebook($courseid) {
     $journals = $DB->get_records_sql($sql, ['modname' => 'journal', 'courseid' => $courseid]);
     foreach ($journals as $journal) {
         journal_grade_item_update($journal, 'reset');
-    }
-}
-
-/**
- * Print journal overview
- *
- * @param array $courses Courses array
- * @param array $htmlarray HTML array
- * @return void
- */
-function journal_print_overview($courses, &$htmlarray) {
-    global $USER, $CFG, $DB;
-
-    if (!get_config('journal', 'overview')) {
-        return;
-    }
-
-    if (empty($courses) || !is_array($courses) || count($courses) == 0) {
-        return;
-    }
-
-    if (!$journals = get_all_instances_in_courses('journal', $courses)) {
-        return;
-    }
-
-    $strjournal = get_string('modulename', 'journal');
-
-    $timenow = time();
-    foreach ($journals as $journal) {
-        if (empty($courses[$journal->course]->format)) {
-            $courses[$journal->course]->format = $DB->get_field('course', 'format', ['id' => $journal->course]);
-        }
-
-        if ($courses[$journal->course]->format == 'weeks' && $journal->days) {
-            $coursestartdate = $courses[$journal->course]->startdate;
-
-            // Fix for MBS-10135: Use get_fast_modinfo to get the correct section number.
-            // $journal->section often contains the Section DB ID, not the sequence number.
-            $modinfo = get_fast_modinfo($courses[$journal->course]);
-            $sectionnum = 0;
-
-            // Check if the CM exists in modinfo to avoid errors.
-            if (isset($modinfo->cms[$journal->coursemodule])) {
-                $sectionnum = $modinfo->cms[$journal->coursemodule]->sectionnum;
-            }
-
-            $journal->timestart = $coursestartdate + (($sectionnum - 1) * 604800);
-
-            if (!empty($journal->days)) {
-                $journal->timefinish = $journal->timestart + (3600 * 24 * (int) $journal->days);
-            } else {
-                $journal->timefinish = 9999999999;
-            }
-            $journalopen = ($journal->timestart < $timenow && $timenow < $journal->timefinish);
-        } else {
-            $journalopen = true;
-        }
-
-        if ($journalopen) {
-            $str = '<div class="journal overview"><div class="name">' .
-                $strjournal . ': <a ' . ($journal->visible ? '' : ' class="dimmed"') .
-                ' href="' . $CFG->wwwroot . '/mod/journal/view.php?id=' . $journal->coursemodule . '">' .
-                $journal->name . '</a></div></div>';
-
-            if (empty($htmlarray[$journal->course]['journal'])) {
-                $htmlarray[$journal->course]['journal'] = $str;
-            } else {
-                $htmlarray[$journal->course]['journal'] .= $str;
-            }
-        }
     }
 }
 
@@ -883,23 +776,6 @@ function journal_get_unmailed_graded($cutofftime) {
             WHERE je.mailed = 0 AND je.timemarked < ? AND je.timemarked > 0
             AND (je.rating <> -1 OR (je.entrycomment IS NOT NULL AND trim(je.entrycomment) <> ?))';
     return $DB->get_records_sql($sql, [$cutofftime, '']);
-}
-
-/**
- * Log info
- *
- * @param stdClass $log Log object
- * @return stdClass|null Log object
- */
-function journal_log_info($log) {
-    global $DB;
-
-    $sql = 'SELECT j.*, u.firstname, u.lastname
-            FROM {journal} j
-            JOIN {journal_entries} je ON je.journal = j.id
-            JOIN {user} u ON u.id = je.userid
-            WHERE je.id = ?';
-    return $DB->get_record_sql($sql, [$log->info]);
 }
 
 /**

@@ -45,32 +45,16 @@ class behat_mod_journal extends behat_base {
      * @Then /^the journal activity "(?P<activityname>(?:[^"]|\\")*)" should be marked as (?P<state>complete|not complete)$/
      */
     public function the_journal_activity_should_be_marked_as($activityname, $state) {
-        global $CFG;
+        // New completion UI (Badges).
+        // "not complete" maps to "todo".
+        // "complete" maps to "done".
+        $completionstatus = ($state === 'complete') ? 'done' : 'todo';
+        $conditionname = get_string('completiondetail:completion_create_entry', 'mod_journal');
 
-        // Moodle 4.0+ (Build 2022041900 or higher approx, we use branch 400).
-        if ($CFG->branch >= 311) {
-            // New completion UI (Badges).
-            // "not complete" maps to "todo".
-            // "complete" maps to "done".
-            $completionstatus = ($state === 'complete') ? 'done' : 'todo';
-            $conditionname = get_string('completiondetail:completion_create_entry', 'mod_journal');
-
-            // We need to execute the step:
-            // the :conditionname completion condition of :activityname is displayed as :completionstatus.
-            $this->execute('behat_completion::activity_completion_condition_displayed_as', [
-                $conditionname, $activityname, $completionstatus,
-            ]);
-        } else {
-            // Moodle 3.9 (Old Icons).
-            if ($state === 'complete') {
-                $this->execute('behat_completion::activity_marked_as_complete', [
-                    $activityname, 'journal', 'auto',
-                ]);
-            } else {
-                $this->execute('behat_completion::activity_marked_as_not_complete', [
-                    $activityname, 'journal', 'auto',
-                ]);
-            }
-        }
+        // We need to execute the step:
+        // the :conditionname completion condition of :activityname is displayed as :completionstatus.
+        $this->execute('behat_completion::activity_completion_condition_displayed_as', [
+            $conditionname, $activityname, $completionstatus,
+        ]);
     }
 }

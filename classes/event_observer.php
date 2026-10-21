@@ -54,11 +54,7 @@ class event_observer {
         $user = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
 
         // Find teachers/managers in this context.
-        if (class_exists('\core_user\fields')) {
-            $userfields = \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects;
-        } else {
-            $userfields = get_all_user_name_fields(true, 'u');
-        }
+        $userfields = \core_user\fields::for_name()->get_sql('u', false, '', '', false)->selects;
 
         // Changed from get_users_by_capability to get_enrolled_users to prevent site admins
         // receiving notifications unless they are explicitly enrolled in the course.

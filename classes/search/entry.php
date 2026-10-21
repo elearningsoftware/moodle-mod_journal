@@ -32,28 +32,13 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/journal/lib.php');
 
 /**
- * Return proper class name
- *
- * @return void
- */
-function get_dynamic_parent_entry() {
-    global $CFG;
-    if (class_exists('\core_search\area\base_mod')) {
-        return '\core_search\area\base_mod';
-    } else {
-        return '\core_search\base_mod';
-    }
-}
-class_alias(get_dynamic_parent_entry(), '\mod_journal\search\DynamicParentEntry');
-
-/**
  * Journal entries search.
  *
  * @package    mod_journal
  * @copyright  2016 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class entry extends \mod_journal\search\DynamicParentEntry {
+class entry extends \core_search\base_mod {
     /**
      * Returns recordset containing required data for indexing journal entries.
      *

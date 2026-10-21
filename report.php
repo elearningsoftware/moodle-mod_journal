@@ -54,10 +54,7 @@ $PAGE->navbar->add(get_string('entries', 'journal'));
 $PAGE->set_title(get_string('modulenameplural', 'journal'));
 $PAGE->set_heading($course->fullname);
 
-// Moodle 4.0+ Activity Header support.
-if (method_exists($PAGE, 'set_activity_record')) {
-    $PAGE->set_activity_record($journal);
-}
+$PAGE->set_activity_record($journal);
 
 $PAGE->requires->js_call_amd('mod_journal/report', 'init');
 

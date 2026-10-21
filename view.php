@@ -54,31 +54,16 @@ $PAGE->set_url('/mod/journal/view.php', ['id' => $id]);
 $PAGE->set_title($journalname);
 $PAGE->set_heading($course->fullname);
 
-// Moodle 4.0+ Activity Header support.
-// We use method_exists for the setter to avoid fatal errors in 3.9.
-if (method_exists($PAGE, 'set_activity_record')) {
-    $PAGE->set_activity_record($journal);
-}
+$PAGE->set_activity_record($journal);
 
-// Fix for duplicate description in Moodle 4.0+.
-// In Moodle 4.0+, the activity header automatically displays the description (intro).
-// However, this page also manually displays the intro in a box below (see $OUTPUT->box call).
-// To prevent the description from appearing twice, we hide it in the activity header.
-// We use a branch check ($CFG->branch >= 400) because accessing $PAGE->activityheader
-// in Moodle 3.9 triggers a coding error (magic getter fails).
-if ($CFG->branch >= 400) {
-    $PAGE->activityheader->set_description('');
-}
+// The activity header displays the description (intro), but this page displays it in a box below.
+// To prevent the description from appearing twice, hide it in the activity header.
+$PAGE->activityheader->set_description('');
 
 $PAGE->force_settings_menu(); // Ensure settings menu is displayed.
 
 // Display the page header.
 echo $OUTPUT->header();
-
-// Moodle < 4.0 does not automatically print the activity heading via header().
-if ($CFG->branch < 400) {
-    echo $OUTPUT->heading($journalname);
-}
 
 // Display journal introduction if available.
 if (!empty($journal->intro)) {
