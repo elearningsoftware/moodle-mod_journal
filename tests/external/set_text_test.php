@@ -86,6 +86,33 @@ final class set_text_test extends advanced_testcase {
     }
 
     /**
+     * The journal can be given by its course module ID instead, which takes precedence over the instance ID.
+     *
+     * @return void
+     * @covers ::execute
+     */
+    public function test_text_is_set_in_journal_by_cmid(): void {
+        global $DB, $USER;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $journal1 = $this->getDataGenerator()->create_module('journal', ['course' => $course]);
+        $journal2 = $this->getDataGenerator()->create_module('journal', ['course' => $course]);
+
+        $result = set_text::execute(0, 'bycmid', FORMAT_PLAIN, 0, $journal2->cmid);
+        $this->assertEquals('bycmid', $result['text']);
+        $this->assertEquals('bycmid', $DB->get_field('journal_entries', 'text', [
+            'journal' => $journal2->id,
+            'userid' => $USER->id,
+        ]));
+
+        set_text::execute($journal1->id, 'precedence', FORMAT_PLAIN, 0, $journal2->cmid);
+        $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $journal1->id]));
+        $this->assertEquals('precedence', $DB->get_field('journal_entries', 'text', ['journal' => $journal2->id]));
+    }
+
+    /**
      * Text with an unknown format is rejected.
      *
      * @return void

@@ -45,10 +45,11 @@ class set_text extends journal_external_api_base {
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters(
             [
-                'journalid' => new external_value(PARAM_INT, 'journal instance id'),
+                'journalid' => new external_value(PARAM_INT, 'journal instance id, ignored if cmid is given'),
                 'text' => new external_value(PARAM_RAW, 'text to set'),
                 'format' => new external_value(PARAM_INT, 'format of text'),
                 'itemid' => new external_value(PARAM_INT, 'Draft item id for files', VALUE_DEFAULT, 0),
+                'cmid' => new external_value(PARAM_INT, 'course module id of journal', VALUE_DEFAULT, 0),
             ]
         );
     }
@@ -71,26 +72,32 @@ class set_text extends journal_external_api_base {
     /**
      * Sets the text for the element.
      *
-     * @param int $journalid Journal instance ID
+     * @param int $journalid Journal instance ID, ignored if $cmid is given
      * @param string $text Text parameter
      * @param int|string $format Format constant for the string
      * @param int $itemid Item id for draft area (files)
+     * @param int $cmid Journal course module ID, as taken by mod_journal_get_entry
      * @return array
      */
-    public static function execute(int $journalid, string $text, $format, int $itemid = 0) {
+    public static function execute(int $journalid, string $text, $format, int $itemid = 0, int $cmid = 0) {
         global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $params = self::validate_parameters(
             self::execute_parameters(),
-            ['journalid' => $journalid, 'text' => $text, 'format' => $format, 'itemid' => $itemid]
+            ['journalid' => $journalid, 'text' => $text, 'format' => $format, 'itemid' => $itemid, 'cmid' => $cmid]
         );
 
         if (!in_array($params['format'], [FORMAT_MOODLE, FORMAT_HTML, FORMAT_PLAIN, FORMAT_MARKDOWN])) {
             throw new invalid_parameter_exception('Invalid text format: ' . $params['format']);
         }
 
-        if (!$cm = get_coursemodule_from_instance('journal', $params['journalid'])) {
+        if ($params['cmid']) {
+            $cm = get_coursemodule_from_id('journal', $params['cmid']);
+        } else {
+            $cm = get_coursemodule_from_instance('journal', $params['journalid']);
+        }
+        if (!$cm) {
             throw new invalid_parameter_exception(get_string('incorrectcmid', 'journal'));
         }
 
