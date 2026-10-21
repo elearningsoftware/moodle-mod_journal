@@ -16,63 +16,54 @@
 /**
  * Javascript module for the report page
  *
- * @module      mod_journal/createtemplate
+ * @module      mod_journal/report
  * @copyright   2022 elearning & software srl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import {call as fetchMany} from 'core/ajax';
 import Notification from 'core/notification';
-import { get_string as getString } from 'core/str';
-import { add as addToast } from 'core/toast';
-import $ from 'jquery';
+import {get_string as getString} from 'core/str';
+import {add as addToast} from 'core/toast';
+
+/**
+ * Save the feedback and grade of one entry.
+ *
+ * @param {HTMLElement} button The save button of the entry
+ * @returns {Promise}
+ */
+const saveFeedback = (button) => {
+    const entryid = button.dataset.entryid;
+    const feedback = document.querySelector('[name="c' + entryid + '[text]"]');
+    const grade = document.getElementById('r' + entryid);
+
+    return fetchMany([{
+        methodname: 'mod_journal_save_feedback',
+        args: {
+            cmid: parseInt(button.dataset.cmid),
+            entryid: parseInt(entryid),
+            userid: parseInt(button.dataset.userid),
+            grade: grade && grade.value !== '' ? parseInt(grade.value) : -1,
+            feedback: feedback ? feedback.value : '',
+            itemid: parseInt(button.dataset.itemid),
+        },
+    }])[0].then(result => {
+        if (result.changed) {
+            return getString('feedbackupdatedforuser', 'mod_journal', button.dataset.fullname);
+        }
+        return getString('nodatachanged', 'mod_journal');
+    }).then(addToast);
+};
 
 export const init = () => {
-    $('.saveindividualfeedback').on('click', event => {
+    document.addEventListener('click', event => {
+        const button = event.target.closest('.saveindividualfeedback');
+        if (!button) {
+            return;
+        }
         event.preventDefault();
-        const editorupdated = new CustomEvent('form:editorUpdated');
-        event.target.dispatchEvent(editorupdated);
-        const element = $(event.currentTarget);
-        const sesskey = M.cfg.sesskey;
-        const cmid = element.attr('data-cmid');
-        const userid = element.attr('data-userid');
-        const entryid = element.attr('data-entryid');
-        const feedback = $('[name="c' + entryid + '[text]"]').val();
-        const grade = $('#r' + entryid).val();
-        const itemid = element.attr('data-itemid');
-
-        $.ajax(M.cfg.wwwroot + '/mod/journal/ajax/ajax.php', {
-            data: {
-                action: 'saveindividualfeedback',
-                sesskey,
-                cmid,
-                userid,
-                entryid,
-                feedback,
-                grade,
-                itemid
-            },
-            dataType: 'json',
-            method: 'post',
-            success: (response) => {
-                if (response.status === 'ok') {
-                    addToast(response.content);
-                } else {
-                    getString('saving_failed', 'feedback').then(string => {
-                        return Notification.addNotification({
-                            type: 'error',
-                            message: string + ': ' + response.content
-                        });
-                    }).catch();
-                }
-            },
-            error: (error) => {
-                getString('saving_failed', 'feedback').then(string => {
-                    return Notification.addNotification({
-                        type: 'error',
-                        message: string + ': ' + error
-                    });
-                }).catch();
-            }
-        });
+        // Let the editor update the textarea with its content.
+        button.dispatchEvent(new CustomEvent('form:editorUpdated'));
+        saveFeedback(button).catch(Notification.exception);
     });
 };

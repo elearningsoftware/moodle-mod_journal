@@ -67,7 +67,6 @@ $string['incorrectcoursesectionid'] = 'Selected course section is incorrect';
 $string['incorrectjournalentry'] = 'Selected journal entry is incorrect';
 $string['incorrectjournalid'] = 'Selected journal ID is incorrect';
 $string['incorrectuserid'] = 'Selected user ID is incorrect';
-$string['invalidgrade'] = 'The grade is not valid for this journal';
 $string['journal:addentries'] = 'Add journal entries';
 $string['journal:addinstance'] = 'Add a new journal';
 $string['journal:manageentries'] = 'Manage journal entries';

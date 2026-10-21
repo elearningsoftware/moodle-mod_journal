@@ -1023,12 +1023,16 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         }
 
         // Feedback save button.
-        echo '<p class="feedbacksave">';
-        echo '<input type="button" data-cmid="' . $cmid . '" data-entryid="' . $entry->id . '"
-            data-userid="' . $user->id . '" data-itemid="' . $draftitemid . '" ';
-        echo 'value="' . get_string('savefeedback', 'journal') . '"
-            class="saveindividualfeedback btn btn-secondary mt-1 m-t-1"/>';
-        echo '</p>';
+        echo html_writer::tag('p', html_writer::empty_tag('input', [
+            'type' => 'button',
+            'data-cmid' => $cmid,
+            'data-entryid' => $entry->id,
+            'data-userid' => $user->id,
+            'data-fullname' => fullname($user),
+            'data-itemid' => $draftitemid,
+            'value' => get_string('savefeedback', 'journal'),
+            'class' => 'saveindividualfeedback btn btn-secondary mt-1 m-t-1',
+        ]), ['class' => 'feedbacksave']);
 
         $feedbackhtml = ob_get_clean();
 
