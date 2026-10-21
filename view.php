@@ -110,7 +110,7 @@ if ($entriesmanager) {
 $timenow = time();
 if ($course->format == 'weeks' && $journal->days) {
     $modinfo = get_fast_modinfo($course);
-    $sectionnum = $modinfo->get_section_info_by_id($cm->section)->sectionnum;
+    $sectionnum = $modinfo->get_section_info_by_id($cm->section)->section;
     $timestart = $course->startdate + (($sectionnum - 1) * 604800);
     $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
 } else {

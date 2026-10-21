@@ -1500,7 +1500,7 @@ function journal_is_open($journal, $course, $cm, $timenow = null): bool {
     }
 
     $timenow = $timenow ?? time();
-    $sectionnum = get_fast_modinfo($course)->get_section_info_by_id($cm->section)->sectionnum;
+    $sectionnum = get_fast_modinfo($course)->get_section_info_by_id($cm->section)->section;
     $timestart = $course->startdate + (($sectionnum - 1) * 604800);
     $timefinish = $timestart + (3600 * 24 * (int) $journal->days);
 
