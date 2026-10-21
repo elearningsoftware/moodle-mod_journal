@@ -94,7 +94,7 @@ if ($entriesmanager) {
 // Determine time constraints for journal editing.
 $timenow = time();
 $period = journal_get_editing_period($journal, $course, $cm);
-$started = !$period || $timenow > $period[0];
+$started = !$period || $timenow >= $period[0];
 $isopen = journal_is_open($journal, $course, $cm, $timenow);
 
 // Display journal entry form or message.
@@ -141,7 +141,7 @@ if ($started) {
         if (!empty($entry->modified) && !empty($entry->timemarked) && $entry->modified > $entry->timemarked) {
             echo $OUTPUT->notification(get_string('needsregrade', 'journal'), \core\output\notification::NOTIFY_WARNING);
         }
-        if ($period) {
+        if ($period && $period[1]) {
             echo html_writer::div(
                 '<strong>' . get_string('editingends', 'journal') . ':</strong> ' . userdate($period[1]),
                 'editend'

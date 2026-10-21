@@ -22,6 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/** Event type of the calendar event for the opening of a journal. */
+define('JOURNAL_EVENT_TYPE_OPEN', 'open');
+
+/** Event type of the calendar event for the closing of a journal. */
+define('JOURNAL_EVENT_TYPE_CLOSE', 'close');
+
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod.html) this function
@@ -42,6 +48,7 @@ function journal_add_instance($journal) {
     $journal->id = $DB->insert_record('journal', $journal);
 
     journal_grade_item_update($journal);
+    journal_set_events($journal);
 
     $completiontimeexpected = !empty($journal->completionexpected) ? $journal->completionexpected : null;
     \core_completion\api::update_completion_date_event(
@@ -74,6 +81,7 @@ function journal_update_instance($journal) {
     $result = $DB->update_record('journal', $journal);
 
     journal_grade_item_update($journal);
+    journal_set_events($journal);
 
     journal_update_grades($journal, 0, false);
 
@@ -115,6 +123,8 @@ function journal_delete_instance($id) {
         $fs->delete_area_files($context->id, 'mod_journal', 'feedback');
         $fs->delete_area_files($context->id, 'mod_journal', 'entry');
     }
+
+    $DB->delete_records('event', ['modulename' => 'journal', 'instance' => $journal->id]);
 
     if (!$DB->delete_records('journal_entries', ['journal' => $journal->id])) {
         $result = false;
@@ -460,6 +470,18 @@ function journal_reset_userdata($data) {
         $status[] = [
             'component' => get_string('modulenameplural', 'journal'),
             'item' => get_string('removeentries', 'journal'),
+            'error' => false,
+        ];
+    }
+
+    // Updating dates - shift may be negative too.
+    if (!empty($data->timeshift)) {
+        // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
+        shift_course_mod_dates('journal', ['timeopen', 'timeclose'], $data->timeshift, $data->courseid);
+        journal_refresh_events($data->courseid);
+        $status[] = [
+            'component' => get_string('modulenameplural', 'journal'),
+            'item' => get_string('date'),
             'error' => false,
         ];
     }
@@ -1258,6 +1280,10 @@ function mod_journal_core_calendar_provide_event_action(
         return null;
     }
 
+    if ($event->eventtype == JOURNAL_EVENT_TYPE_OPEN || $event->eventtype == JOURNAL_EVENT_TYPE_CLOSE) {
+        return journal_provide_open_close_event_action($cm, $factory, $userid);
+    }
+
     $completion = new \completion_info($cm->get_course());
 
     $completiondata = $completion->get_data($cm, false, $userid);
@@ -1271,6 +1297,45 @@ function mod_journal_core_calendar_provide_event_action(
         new \moodle_url('/mod/journal/view.php', ['id' => $cm->id]),
         1,
         true
+    );
+}
+
+/**
+ * Returns the action of the opening or closing event of a journal for a user who can add entries.
+ *
+ * @param cm_info $cm Course module of the journal
+ * @param \core_calendar\action_factory $factory The factory to create the action
+ * @param int $userid User ID
+ * @return \core_calendar\local\event\entities\action_interface|null The action, null if there is none
+ */
+function journal_provide_open_close_event_action(
+    cm_info $cm,
+    \core_calendar\action_factory $factory,
+    int $userid
+): ?\core_calendar\local\event\entities\action_interface {
+    global $DB;
+
+    if (has_capability('mod/journal:manageentries', $cm->context, $userid)) {
+        // Teachers are not participants who write entries.
+        return null;
+    }
+
+    $now = time();
+    if (!empty($cm->customdata['timeclose']) && $cm->customdata['timeclose'] <= $now) {
+        // The journal has closed so the user can no longer edit their entry.
+        return null;
+    }
+
+    if ($DB->record_exists('journal_entries', ['journal' => $cm->instance, 'userid' => $userid])) {
+        // There is no action left if the user has written an entry.
+        return null;
+    }
+
+    return $factory->create_instance(
+        get_string('startoredit', 'journal'),
+        new \moodle_url('/mod/journal/view.php', ['id' => $cm->id]),
+        1,
+        empty($cm->customdata['timeopen']) || $cm->customdata['timeopen'] <= $now
     );
 }
 
@@ -1323,7 +1388,8 @@ function journal_get_coursemodule_info($cm): ?cached_cm_info {
     global $DB;
 
     // Fetch necessary fields including intro/format for description display.
-    if (!$journal = $DB->get_record('journal', ['id' => $cm->instance], 'id, name, intro, introformat, completion_create_entry')) {
+    $fields = 'id, name, intro, introformat, timeopen, timeclose, completion_create_entry';
+    if (!$journal = $DB->get_record('journal', ['id' => $cm->instance], $fields)) {
         return null;
     }
 
@@ -1337,6 +1403,14 @@ function journal_get_coursemodule_info($cm): ?cached_cm_info {
 
     if ($cm->completion == COMPLETION_TRACKING_AUTOMATIC) {
         $result->customdata['customcompletionrules']['completion_create_entry'] = $journal->completion_create_entry;
+    }
+
+    // Populate the dates shown on the course page and in the activity header.
+    if ($journal->timeopen) {
+        $result->customdata['timeopen'] = $journal->timeopen;
+    }
+    if ($journal->timeclose) {
+        $result->customdata['timeclose'] = $journal->timeclose;
     }
 
     return $result;
@@ -1365,15 +1439,21 @@ function journal_get_printable_count($text) {
 /**
  * Returns the period in which entries of the journal can be edited.
  *
- * Only journals in courses in weekly format with a number of days available have an editing period,
- * starting with the week of their section. All other journals are always open.
+ * Journals with an opening or closing time are open between these times. Otherwise, only journals in
+ * courses in weekly format with a number of days available have an editing period, starting with the
+ * week of their section. All other journals are always open.
  *
  * @param stdClass $journal Journal record
  * @param stdClass $course Course record
  * @param stdClass|cm_info $cm Course module of the journal
- * @return int[]|null The start and end time of the editing period, null if the journal is always open
+ * @return int[]|null The start and end time of the editing period, each 0 if there is no limit,
+ *     or null if the journal is always open
  */
 function journal_get_editing_period($journal, $course, $cm): ?array {
+    if (!empty($journal->timeopen) || !empty($journal->timeclose)) {
+        return [(int) ($journal->timeopen ?? 0), (int) ($journal->timeclose ?? 0)];
+    }
+
     if ($course->format != 'weeks' || empty($journal->days)) {
         return null;
     }
@@ -1399,7 +1479,99 @@ function journal_is_open($journal, $course, $cm, $timenow = null): bool {
     }
 
     $timenow = $timenow ?? time();
-    return $timenow > $period[0] && $timenow < $period[1];
+    return $timenow >= $period[0] && (!$period[1] || $timenow < $period[1]);
+}
+
+/**
+ * Creates, updates or deletes the calendar events of the opening and closing of a journal.
+ *
+ * @param stdClass $journal Journal record, with the course module ID in coursemodule if known
+ */
+function journal_set_events($journal) {
+    global $CFG, $DB;
+    require_once($CFG->dirroot . '/calendar/lib.php');
+
+    if (!isset($journal->coursemodule)) {
+        $journal->coursemodule = get_coursemodule_from_instance('journal', $journal->id, $journal->course, false, MUST_EXIST)->id;
+    }
+
+    $events = [
+        JOURNAL_EVENT_TYPE_OPEN => ['time' => $journal->timeopen ?? 0, 'name' => 'calendaropen'],
+        JOURNAL_EVENT_TYPE_CLOSE => ['time' => $journal->timeclose ?? 0, 'name' => 'calendarclose'],
+    ];
+    foreach ($events as $eventtype => $settings) {
+        $eventid = $DB->get_field('event', 'id', [
+            'modulename' => 'journal',
+            'instance' => $journal->id,
+            'eventtype' => $eventtype,
+        ]);
+
+        if (empty($settings['time'])) {
+            // The event is no longer needed.
+            if ($eventid) {
+                calendar_event::load($eventid)->delete();
+            }
+            continue;
+        }
+
+        $event = (object) [
+            'name' => get_string($settings['name'], 'journal', $journal->name),
+            'description' => format_module_intro('journal', $journal, $journal->coursemodule, false),
+            'format' => FORMAT_HTML,
+            // The opening is only shown on the timeline if there is no closing time.
+            'type' => ($eventtype == JOURNAL_EVENT_TYPE_CLOSE || empty($journal->timeclose)) ?
+                CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD,
+            'timestart' => $settings['time'],
+            'timesort' => $settings['time'],
+            'timeduration' => 0,
+            'visible' => instance_is_visible('journal', $journal),
+        ];
+
+        if ($eventid) {
+            calendar_event::load($eventid)->update($event, false);
+        } else {
+            $event->eventtype = $eventtype;
+            $event->courseid = $journal->course;
+            $event->groupid = 0;
+            $event->userid = 0;
+            $event->modulename = 'journal';
+            $event->instance = $journal->id;
+            calendar_event::create($event, false);
+        }
+    }
+}
+
+/**
+ * Updates the calendar events of journals.
+ *
+ * This is called by the refresh events scheduled task and when dates of journals are shifted.
+ *
+ * @param int $courseid Course ID, 0 for all courses
+ * @param int|stdClass|null $instance Journal ID or record, to only update the events of this journal
+ * @param stdClass|cm_info|null $cm Course module of the journal
+ * @return bool
+ */
+function journal_refresh_events($courseid = 0, $instance = null, $cm = null) {
+    global $DB;
+
+    if (isset($instance)) {
+        if (!is_object($instance)) {
+            $instance = $DB->get_record('journal', ['id' => $instance], '*', MUST_EXIST);
+        }
+        if (isset($cm)) {
+            $instance->coursemodule = $cm->id;
+        }
+        journal_set_events($instance);
+        return true;
+    }
+
+    $journals = $DB->get_records('journal', $courseid ? ['course' => $courseid] : []);
+    foreach ($journals as $journal) {
+        if (get_coursemodule_from_instance('journal', $journal->id, $journal->course)) {
+            journal_set_events($journal);
+        }
+    }
+    return true;
 }
 
 /**

@@ -325,8 +325,8 @@ final class lib_test extends \advanced_testcase {
         $timestart = $startdate + WEEKSECS;
         $timefinish = $timestart + 3 * DAYSECS;
         $this->assertEquals([$timestart, $timefinish], journal_get_editing_period($journal, $weekly, $cm));
-        $this->assertFalse(journal_is_open($journal, $weekly, $cm, $timestart));
-        $this->assertTrue(journal_is_open($journal, $weekly, $cm, $timestart + 1));
+        $this->assertFalse(journal_is_open($journal, $weekly, $cm, $timestart - 1));
+        $this->assertTrue(journal_is_open($journal, $weekly, $cm, $timestart));
         $this->assertTrue(journal_is_open($journal, $weekly, $cm, $timefinish - 1));
         $this->assertFalse(journal_is_open($journal, $weekly, $cm, $timefinish));
 

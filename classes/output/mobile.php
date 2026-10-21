@@ -161,9 +161,9 @@ class mobile {
         $journalopen = journal_is_open($journal, $course, $cm, $timenow);
 
         // Populate warning messages if journal is closed or not open yet.
-        if ($period && $timenow <= $period[0]) {
+        if ($period && $timenow < $period[0]) {
             $data['warning'] = get_string('notopenuntil', 'journal') . ': ' . userdate($period[0]);
-        } else if ($period && $timenow >= $period[1]) {
+        } else if ($period && $period[1] && $timenow >= $period[1]) {
             $data['warning'] = get_string('editingended', 'journal') . ': ' . userdate($period[1]);
         }
 
@@ -218,7 +218,7 @@ class mobile {
 
         // Determine if editing is allowed.
         $data['canedit'] = $canadd && $journalopen;
-        if ($data['canedit'] && $period) {
+        if ($data['canedit'] && $period && $period[1]) {
             $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($period[1]);
         }
 
@@ -285,13 +285,13 @@ class mobile {
         ];
 
         // Warnings logic.
-        if ($period && $timenow <= $period[0]) {
+        if ($period && $timenow < $period[0]) {
             $data['warning'] = get_string('notopenuntil', 'journal') . ': ' . userdate($period[0]);
-        } else if ($period && $timenow >= $period[1]) {
+        } else if ($period && $period[1] && $timenow >= $period[1]) {
             $data['warning'] = get_string('editingended', 'journal') . ': ' . userdate($period[1]);
         }
 
-        if ($data['canedit'] && $period) {
+        if ($data['canedit'] && $period && $period[1]) {
             $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($period[1]);
         }
 

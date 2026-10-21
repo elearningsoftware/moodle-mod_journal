@@ -67,6 +67,13 @@ class mod_journal_mod_form extends moodleform_mod {
             $mform->setDefault('days', '0');
         }
 
+        $mform->addElement('date_time_selector', 'timeopen', get_string('timeopen', 'journal'), ['optional' => true]);
+        $mform->addHelpButton('timeopen', 'timeopen', 'journal');
+        $mform->addElement('date_time_selector', 'timeclose', get_string('timeclose', 'journal'), ['optional' => true]);
+        // The days available are only used without opening and closing times.
+        $mform->hideIf('days', 'timeopen[enabled]', 'checked');
+        $mform->hideIf('days', 'timeclose[enabled]', 'checked');
+
         // Notifications settings.
         $config = get_config('journal');
 
@@ -94,6 +101,23 @@ class mod_journal_mod_form extends moodleform_mod {
         $this->standard_coursemodule_elements();
 
         $this->add_action_buttons();
+    }
+
+    /**
+     * Validates the opening and closing times.
+     *
+     * @param array $data Submitted data
+     * @param array $files Submitted files
+     * @return array Errors by element name
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        if (!empty($data['timeopen']) && !empty($data['timeclose']) && $data['timeclose'] <= $data['timeopen']) {
+            $errors['timeclose'] = get_string('closebeforeopen', 'journal');
+        }
+
+        return $errors;
     }
 
     /**

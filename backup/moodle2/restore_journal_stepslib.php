@@ -62,6 +62,9 @@ class restore_journal_activity_structure_step extends restore_activity_structure
 
         $data->course = $this->get_courseid();
         $data->timemodified = $this->apply_date_offset($data->timemodified);
+        // Journals backed up before the dates were added have none.
+        $data->timeopen = $this->apply_date_offset($data->timeopen ?? 0);
+        $data->timeclose = $this->apply_date_offset($data->timeclose ?? 0);
 
         $newid = $DB->insert_record('journal', $data);
         $this->apply_activity_instance($newid);

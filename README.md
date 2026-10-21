@@ -12,7 +12,7 @@ The Journal activity allows teachers to obtain student feedback or reflections o
 *   **Simple Interface:** A single page for students to write and refine their entry.
 *   **Private:** Entries are visible only to the student and the teacher.
 *   **Grading & Feedback:** Teachers can grade entries and provide feedback.
-*   **Time Constraints:** Set availability windows (days/weeks).
+*   **Time Constraints:** Set opening and closing times, shown in the calendar and on the timeline, or availability windows (days/weeks) in weekly courses.
 *   **Mobile Support:** Fully compatible with the official Moodle Mobile App.
 *   **Privacy API:** Full compliance with Moodle's GDPR privacy API.
 

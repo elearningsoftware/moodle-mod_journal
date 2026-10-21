@@ -211,5 +211,24 @@ function xmldb_journal_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2026102101, 'journal');
     }
 
+    if ($oldversion < 2026102102) {
+        // Define fields timeopen and timeclose to be added to journal.
+        $table = new xmldb_table('journal');
+        $fields = [
+            new xmldb_field('timeopen', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'days'),
+            new xmldb_field('timeclose', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timeopen'),
+        ];
+
+        // Conditionally launch add fields timeopen and timeclose.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Journal savepoint reached.
+        upgrade_mod_savepoint(true, 2026102102, 'journal');
+    }
+
     return true;
 }
