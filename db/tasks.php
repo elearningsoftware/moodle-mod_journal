@@ -28,7 +28,7 @@ $tasks = [
     [
         'classname' => 'mod_journal\task\cron_task',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '*/5',
         'hour' => '*',
         'day' => '*',
         'month' => '*',

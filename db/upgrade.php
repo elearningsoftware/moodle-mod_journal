@@ -189,5 +189,19 @@ function xmldb_journal_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2026102001, 'journal');
     }
 
+    if ($oldversion < 2026102100) {
+        // Define index mailedtimemarked (not unique) to be added to journal_entries.
+        $table = new xmldb_table('journal_entries');
+        $index = new xmldb_index('mailedtimemarked', XMLDB_INDEX_NOTUNIQUE, ['mailed', 'timemarked']);
+
+        // Conditionally launch add index mailedtimemarked.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Journal savepoint reached.
+        upgrade_mod_savepoint(true, 2026102100, 'journal');
+    }
+
     return true;
 }
