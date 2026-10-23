@@ -371,6 +371,22 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * The notify teachers setting keeps valid values, turns an unchecked setting off and other values on.
+     *
+     * @covers ::journal_clean_notify_teachers
+     */
+    public function test_clean_notify_teachers(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        $this->assertSame(manager::NOTIFY_NEVER, journal_clean_notify_teachers(null));
+        $this->assertSame(manager::NOTIFY_NEVER, journal_clean_notify_teachers('0'));
+        $this->assertSame(manager::NOTIFY_ALWAYS, journal_clean_notify_teachers('1'));
+        $this->assertSame(manager::NOTIFY_NEEDSGRADING, journal_clean_notify_teachers('2'));
+        $this->assertSame(manager::NOTIFY_ALWAYS, journal_clean_notify_teachers(7));
+    }
+
+    /**
      * Texts are converted to plain text the same way whatever their format, and plain text converts to itself.
      *
      * @covers ::journal_get_plain_text

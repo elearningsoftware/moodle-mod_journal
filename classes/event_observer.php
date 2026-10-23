@@ -44,6 +44,10 @@ class event_observer {
         if (empty($journal->notifyteachers)) {
             return;
         }
+        // Entries that already needed grading before this save were already notified about.
+        if ($journal->notifyteachers == manager::NOTIFY_NEEDSGRADING && empty($event->other['needsgrading'])) {
+            return;
+        }
 
         $course = get_course($event->courseid);
         $context = \context_module::instance($cm->id);

@@ -41,8 +41,8 @@ function journal_add_instance($journal) {
 
     $journal->timemodified = time();
 
+    $journal->notifyteachers = journal_clean_notify_teachers($journal->notifyteachers ?? null);
     // Checkbox handling: Use !empty to ensure 0 is saved as 0.
-    $journal->notifyteachers = !empty($journal->notifyteachers) ? 1 : 0;
     $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
     $journal->id = $DB->insert_record('journal', $journal);
@@ -74,8 +74,8 @@ function journal_update_instance($journal) {
     $journal->timemodified = time();
     $journal->id = $journal->instance;
 
+    $journal->notifyteachers = journal_clean_notify_teachers($journal->notifyteachers ?? null);
     // Checkbox handling: Use !empty to ensure 0 is saved as 0.
-    $journal->notifyteachers = !empty($journal->notifyteachers) ? 1 : 0;
     $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
     $result = $DB->update_record('journal', $journal);
@@ -787,6 +787,30 @@ function journal_count_entries($journal, $groupids = 0, bool $needsgrading = fal
  */
 function journal_entry_needs_grading($entry): bool {
     return !empty($entry) && (empty($entry->timemarked) || $entry->modified > $entry->timemarked);
+}
+
+/**
+ * Returns the options of the notify teachers setting of a journal.
+ *
+ * @return string[] The option names, by manager::NOTIFY_ constant
+ */
+function journal_get_notify_teachers_options(): array {
+    return [
+        \mod_journal\manager::NOTIFY_NEVER => get_string('notifyteachersnever', 'journal'),
+        \mod_journal\manager::NOTIFY_NEEDSGRADING => get_string('notifyteachersneedsgrading', 'journal'),
+        \mod_journal\manager::NOTIFY_ALWAYS => get_string('notifyteachersalways', 'journal'),
+    ];
+}
+
+/**
+ * Returns a valid value for the notify teachers setting of a journal.
+ *
+ * @param mixed $value The submitted value, null or empty if the setting is off
+ * @return int One of the manager::NOTIFY_ constants
+ */
+function journal_clean_notify_teachers($value): int {
+    $value = (int) $value;
+    return array_key_exists($value, journal_get_notify_teachers_options()) ? $value : \mod_journal\manager::NOTIFY_ALWAYS;
 }
 
 /**

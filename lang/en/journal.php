@@ -143,7 +143,14 @@ $string['notifystudents_help'] = 'If enabled, students will receive a notificati
 $string['notifyteachers'] = 'Notify teachers';
 $string['notifyteachers_default'] = 'Notify teachers by default';
 $string['notifyteachers_default_help'] = 'Default setting for new Journal activities.';
-$string['notifyteachers_help'] = 'If enabled, teachers will receive a notification via Moodle messaging when a student creates or updates a journal entry.';
+$string['notifyteachers_help'] = 'When teachers receive a notification via Moodle messaging about the entries of students.
+
+* Never: teachers are not notified.
+* When an entry needs grading: teachers are notified when a student creates an entry, and the first time a student changes their entry after it was graded.
+* Every time an entry is saved: teachers are notified each time a student creates or updates an entry.';
+$string['notifyteachersalways'] = 'Every time an entry is saved';
+$string['notifyteachersneedsgrading'] = 'When an entry needs grading';
+$string['notifyteachersnever'] = 'Never';
 $string['notopenuntil'] = 'This journal won\'t be open until';
 $string['notstarted'] = 'You have not started this journal yet';
 $string['nousersyet'] = 'There are no users yet';

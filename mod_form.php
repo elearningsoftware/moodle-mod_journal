@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/mod/journal/lib.php');
 
 /**
  * The mod_journal_mod_form class.
@@ -77,9 +78,17 @@ class mod_journal_mod_form extends moodleform_mod {
         // Notifications settings.
         $config = get_config('journal');
 
-        $mform->addElement('checkbox', 'notifyteachers', get_string('notifyteachers', 'journal'));
+        $mform->addElement(
+            'select',
+            'notifyteachers',
+            get_string('notifyteachers', 'journal'),
+            journal_get_notify_teachers_options()
+        );
         $mform->addHelpButton('notifyteachers', 'notifyteachers', 'journal');
-        $mform->setDefault('notifyteachers', isset($config->notifyteachers_default) ? $config->notifyteachers_default : 1);
+        $mform->setDefault(
+            'notifyteachers',
+            $config->notifyteachers_default ?? \mod_journal\manager::NOTIFY_NEEDSGRADING
+        );
 
         $mform->addElement('checkbox', 'notifystudents', get_string('notifystudents', 'journal'));
         $mform->addHelpButton('notifystudents', 'notifystudents', 'journal');

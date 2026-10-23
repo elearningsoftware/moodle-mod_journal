@@ -31,6 +31,15 @@ class manager {
     /** Module name. */
     public const MODULE = 'journal';
 
+    /** Teachers are not notified of saved entries. */
+    public const NOTIFY_NEVER = 0;
+
+    /** Teachers are notified every time an entry is saved. */
+    public const NOTIFY_ALWAYS = 1;
+
+    /** Teachers are notified when an entry is created, or changed after it was graded. */
+    public const NOTIFY_NEEDSGRADING = 2;
+
     /** @var context_module the current context. */
     private $context;
 
@@ -257,12 +266,15 @@ class manager {
      * @return stdClass The saved entry
      */
     public function save_entry(string $text, int $format, int $draftitemid = 0): stdClass {
-        global $USER;
+        global $CFG, $USER;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $transaction = $this->db->start_delegated_transaction();
 
         $entry = $this->db->get_record('journal_entries', ['journal' => $this->instance->id, 'userid' => $USER->id]);
         $isnew = !$entry;
+        // Whether this save makes the entry need grading, because it is new or was graded since it was last changed.
+        $needsgrading = $isnew || !journal_entry_needs_grading($entry);
         if ($isnew) {
             // The entry needs an ID before the files of the draft area can be saved.
             $entry = (object) [
@@ -297,6 +309,7 @@ class manager {
             'objectid' => $entry->id,
             'relateduserid' => $entry->userid,
             'context' => $this->context,
+            'other' => ['needsgrading' => $needsgrading],
         ]);
         $this->add_event_snapshots($event);
         $event->trigger();

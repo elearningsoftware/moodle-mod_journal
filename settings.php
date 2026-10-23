@@ -25,6 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
+    require_once($CFG->dirroot . '/mod/journal/lib.php');
+
     $settings->add(new admin_setting_configselect(
         'journal/showrecentactivity',
         get_string('showrecentactivity', 'journal'),
@@ -43,11 +45,12 @@ if ($ADMIN->fulltree) {
     ));
 
     // Setting: Default Notify Teachers.
-    $settings->add(new admin_setting_configcheckbox(
+    $settings->add(new admin_setting_configselect(
         'journal/notifyteachers_default',
         get_string('notifyteachers_default', 'journal'),
         get_string('notifyteachers_default_help', 'journal'),
-        1
+        \mod_journal\manager::NOTIFY_NEEDSGRADING,
+        journal_get_notify_teachers_options()
     ));
 
     // Setting: Default Notify Students.

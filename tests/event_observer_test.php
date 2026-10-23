@@ -93,4 +93,61 @@ final class event_observer_test extends advanced_testcase {
         $this->assertCount(0, $sink->get_messages());
         $sink->close();
     }
+
+    /**
+     * Teachers are notified of every save, or only of saves after which the entry needs grading.
+     *
+     * @return void
+     * @covers ::entry_modified
+     */
+    public function test_entry_modified_notification_modes(): void {
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+
+        // The number of messages sent by each save: create, update, update after grading, update.
+        $modes = [
+            manager::NOTIFY_NEVER => [0, 0, 0, 0],
+            manager::NOTIFY_ALWAYS => [1, 1, 1, 1],
+            manager::NOTIFY_NEEDSGRADING => [1, 0, 1, 0],
+        ];
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+
+        foreach ($modes as $notifyteachers => $expected) {
+            $student = $generator->create_and_enrol($course, 'student');
+            $journal = $generator->create_module('journal', ['course' => $course, 'notifyteachers' => $notifyteachers]);
+            $manager = manager::create_from_coursemodule(get_coursemodule_from_instance('journal', $journal->id));
+
+            $sink = $this->redirectMessages();
+            $sent = [];
+
+            $this->setUser($student);
+            $manager->save_entry('First version', FORMAT_HTML);
+            $sent[] = $sink->count();
+            $sink->clear();
+
+            $this->waitForSecond();
+            $entry = $manager->save_entry('Second version', FORMAT_HTML);
+            $sent[] = $sink->count();
+            $sink->clear();
+
+            $this->setUser($teacher);
+            $this->waitForSecond();
+            $manager->save_feedback($entry, 50, 'Good');
+            $this->setUser($student);
+            $this->waitForSecond();
+            $manager->save_entry('Third version', FORMAT_HTML);
+            $sent[] = $sink->count();
+            $sink->clear();
+
+            $this->waitForSecond();
+            $manager->save_entry('Fourth version', FORMAT_HTML);
+            $sent[] = $sink->count();
+            $sink->close();
+
+            $this->assertEquals($expected, $sent, 'Notify teachers: ' . $notifyteachers);
+        }
+    }
 }
