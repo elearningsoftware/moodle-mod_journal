@@ -116,6 +116,30 @@ final class manager_test extends advanced_testcase {
     }
 
     /**
+     * The users who can write an entry are counted without the teachers.
+     *
+     * @covers ::count_all_users
+     */
+    public function test_count_all_users(): void {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $generator->create_and_enrol($course, 'teacher');
+        $student = $generator->create_and_enrol($course, 'student');
+        $generator->create_and_enrol($course, 'student');
+        $group = $generator->create_group(['courseid' => $course->id]);
+        $generator->create_group_member(['groupid' => $group->id, 'userid' => $student->id]);
+        $journal = $generator->create_module('journal', ['course' => $course]);
+        $manager = manager::create_from_coursemodule(get_coursemodule_from_instance('journal', $journal->id));
+
+        $this->setUser($teacher);
+        $this->assertEquals(2, $manager->count_all_users());
+        $this->assertEquals(2, $manager->count_all_users([$group->id]));
+    }
+
+    /**
      * Entries that were never graded or were edited since they were graded need grading.
      *
      * @return void

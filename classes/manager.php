@@ -159,6 +159,8 @@ class manager {
     /**
      * Return the count of users who can submit entries to this journal module, that the current user can see.
      *
+     * Users who can manage the entries are not counted.
+     *
      * @param int[] $groupids the group identifiers to filter by, empty array means no filtering
      * @return int the number of answers that the user can see
      */
@@ -171,6 +173,8 @@ class manager {
 
         // Get all users with the capability to choose in this context.
         $users = get_users_by_capability($this->context, 'mod/journal:addentries', 'u.id');
+        // Teachers can add entries too, but are not expected to, as on the report page.
+        $users = array_diff_key($users, get_users_by_capability($this->context, 'mod/journal:manageentries', 'u.id'));
 
         if (empty($users)) {
             return 0;
