@@ -26,6 +26,7 @@
 // phpcs:disable moodle.Files.LangFilesOrdering.UnexpectedComment
 
 $string['accessdenied'] = 'Access denied';
+$string['allentries'] = 'All entries';
 $string['alwaysopen'] = 'Always open';
 $string['blankentry'] = 'Blank entry';
 $string['calendarclose'] = '{$a} closes';
@@ -48,6 +49,7 @@ $string['editingended'] = 'Editing period has ended';
 $string['editingends'] = 'Editing period ends';
 $string['entries'] = 'Entries';
 $string['entry'] = 'Entry';
+$string['entryxofy'] = 'Entry {$a->index} of {$a->count}';
 $string['evententriesviewed'] = 'Journal entries viewed';
 $string['evententrycreated'] = 'Journal entry created';
 $string['evententryupdated'] = 'Journal entry updated';
@@ -64,6 +66,7 @@ $string['firstnamedesc'] = 'Firstname Descending';
 $string['grade'] = 'Grade';
 $string['gradedby'] = 'Graded by';
 $string['gradeingradebook'] = 'Current grade in gradebook';
+$string['gradeonebyone'] = 'Grade one by one';
 $string['incorrectcmid'] = 'Course module ID is incorrect';
 $string['incorrectcourseid'] = 'Course ID is incorrect';
 $string['incorrectcoursesectionid'] = 'Selected course section is incorrect';
@@ -177,6 +180,7 @@ $string['removemessages'] = 'Remove all Journal entries';
 $string['saveallfeedback'] = 'Save all my feedback';
 $string['savechanges'] = 'Save changes';
 $string['savefeedback'] = 'Save feedback';
+$string['savefeedbackandnext'] = 'Save and show next';
 $string['search:activity'] = 'Journal - activity information';
 $string['search:entry'] = 'Journal - entries';
 $string['showrecentactivity'] = 'Show recent activity';

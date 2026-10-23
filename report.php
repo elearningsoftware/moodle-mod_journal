@@ -193,12 +193,33 @@ if ($data = data_submitted()) {
     $event->trigger();
 }
 
-$usersdone = journal_get_users_done($journal, $currentgroup);
+$usersdone = journal_get_users_done($journal, $currentgroup) ?: [];
+mod_journal_sort_users($usersdone, $sortby, $entrybyuser);
 $needsgradingcount = 0;
-foreach ($usersdone ?: [] as $user) {
+foreach ($usersdone as $user) {
     if (journal_entry_needs_grading($entrybyuser[$user->id] ?? null)) {
         $needsgradingcount++;
     }
+}
+
+// The users whose entries are shown, in order, to grade them one by one. The selected user stays in the list once graded.
+$getgradeableids = function (int $selecteduser) use ($usersdone, $entrybyuser, $show): array {
+    $ids = [];
+    foreach ($usersdone as $user) {
+        if ($show === 'all' || $user->id == $selecteduser || journal_entry_needs_grading($entrybyuser[$user->id])) {
+            $ids[] = (int) $user->id;
+        }
+    }
+    return $ids;
+};
+$gradeableids = $getgradeableids($selecteduser);
+$position = array_search($selecteduser, $gradeableids);
+
+// Move on to the next entry once the feedback of the selected one is saved.
+if ($position !== false && isset($gradeableids[$position + 1]) && optional_param('savenext', '', PARAM_RAW) !== '') {
+    $selecteduser = $gradeableids[$position + 1];
+    $gradeableids = $getgradeableids($selecteduser);
+    $position = array_search($selecteduser, $gradeableids);
 }
 
 if (!$users && !$usersdone) {
@@ -284,6 +305,41 @@ if (!$users && !$usersdone) {
 
     echo html_writer::end_div(); // End Toolbar.
 
+    // Navigation between the entries, to grade them one by one.
+    if ($position !== false) {
+        $navigation = [];
+        if ($position > 0) {
+            $navigation[] = html_writer::link(
+                new moodle_url($baseurl, ['selecteduser' => $gradeableids[$position - 1]]),
+                get_string('previous'),
+                ['class' => 'btn btn-secondary me-2 mr-2 previousentry']
+            );
+        }
+        $navigation[] = html_writer::span(
+            get_string('entryxofy', 'journal', ['index' => $position + 1, 'count' => count($gradeableids)]),
+            'me-2 mr-2 entryposition'
+        );
+        if (isset($gradeableids[$position + 1])) {
+            $navigation[] = html_writer::link(
+                new moodle_url($baseurl, ['selecteduser' => $gradeableids[$position + 1]]),
+                get_string('next'),
+                ['class' => 'btn btn-secondary me-2 mr-2 nextentry']
+            );
+        }
+        $navigation[] = html_writer::link(
+            new moodle_url($baseurl, ['selecteduser' => 0]),
+            get_string('allentries', 'journal'),
+            ['class' => 'btn btn-link allentries']
+        );
+        echo html_writer::div(implode('', $navigation), 'd-flex align-items-center mb-3 entrynavigation');
+    } else if ($selecteduser == 0 && $gradeableids) {
+        echo html_writer::div(html_writer::link(
+            new moodle_url($baseurl, ['selecteduser' => $gradeableids[0]]),
+            get_string('gradeonebyone', 'journal'),
+            ['class' => 'btn btn-secondary gradeonebyone']
+        ), 'mb-3');
+    }
+
     $grades = make_grades_menu($journal->grade);
 
     // Start the form.
@@ -298,16 +354,12 @@ if (!$users && !$usersdone) {
 
     // Users with an entry come first, then the users without an entry, who have nothing to grade.
     $rows = [];
-    if ($usersdone) {
-        mod_journal_sort_users($usersdone, $sortby, $entrybyuser);
-        foreach ($usersdone as $user) {
-            $shown = $show === 'all' || journal_entry_needs_grading($entrybyuser[$user->id]);
-            if ($shown && ($selecteduser == 0 || $selecteduser == $user->id)) {
-                $rows[] = [$user, $entrybyuser[$user->id]];
-            }
-            // Remove user from the "Not Completed" list if they are in the "Done" list.
-            unset($users[$user->id]);
+    foreach ($usersdone as $user) {
+        if ($selecteduser == 0 ? in_array($user->id, $gradeableids) : $selecteduser == $user->id) {
+            $rows[] = [$user, $entrybyuser[$user->id]];
         }
+        // Remove user from the "Not Completed" list if they are in the "Done" list.
+        unset($users[$user->id]);
     }
     if ($users && $show === 'all') {
         mod_journal_sort_users($users, $sortby, $entrybyuser);
@@ -384,15 +436,20 @@ if (!$users && !$usersdone) {
     ]);
 
     // Add the submit button inside a paragraph with class.
-    echo html_writer::tag(
-        'p',
-        html_writer::empty_tag('input', [
+    $savebuttons = html_writer::empty_tag('input', [
+        'type' => 'submit',
+        'value' => get_string('saveallfeedback', 'journal'),
+        'class' => 'btn btn-secondary mt-1',
+    ]);
+    if ($position !== false && isset($gradeableids[$position + 1])) {
+        $savebuttons .= ' ' . html_writer::empty_tag('input', [
             'type' => 'submit',
-            'value' => get_string('saveallfeedback', 'journal'),
-            'class' => 'btn btn-secondary mt-1',
-        ]),
-        ['class' => 'feedbacksave']
-    );
+            'name' => 'savenext',
+            'value' => get_string('savefeedbackandnext', 'journal'),
+            'class' => 'btn btn-primary mt-1',
+        ]);
+    }
+    echo html_writer::tag('p', $savebuttons, ['class' => 'feedbacksave']);
 
     // Close the form.
     echo html_writer::end_tag('form');
