@@ -11,10 +11,14 @@ The Journal activity allows teachers to obtain student feedback or reflections o
 ## Features
 *   **Simple Interface:** A single page for students to write and refine their entry.
 *   **Private:** Entries are visible only to the student and the teacher.
-*   **Grading & Feedback:** Teachers can grade entries and provide feedback.
+*   **Grading & Feedback:** Teachers can grade entries and provide feedback, all at once or one entry at a time, and filter the entries that need grading.
 *   **Time Constraints:** Set opening and closing times, shown in the calendar and on the timeline, or availability windows (days/weeks) in weekly courses.
+*   **Word Limits:** Set a minimum and a maximum number of words for entries.
+*   **Notifications:** Teachers can be notified when an entry needs grading, every time one is saved, or not at all, and students are notified of their feedback.
+*   **Completion:** Activities can be completed by writing an entry.
+*   **Course Overview:** The course activities overview of Moodle 5.0 and later shows the number of entries and how many need grading.
 *   **Mobile Support:** Fully compatible with the official Moodle Mobile App.
-*   **Privacy API:** Full compliance with Moodle's GDPR privacy API.
+*   **Backup & Restore, Privacy API and Global Search:** Full support for Moodle's backup, GDPR privacy and search APIs.
 
 ## Installation
 
@@ -37,7 +41,10 @@ The Journal activity allows teachers to obtain student feedback or reflections o
 5. Log in to your Moodle site as an administrator and go to **Site administration > Notifications** to complete the installation.
 
 ## Compatibility
-This version is compatible with Moodle 4.0 and higher.
+This version is compatible with Moodle 4.0 to 5.3.
+
+## Changes
+See [CHANGES.md](CHANGES.md).
 
 ## Credits
 *   Originally developed by Martin Dougiamas.
