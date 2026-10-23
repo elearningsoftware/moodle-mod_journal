@@ -43,6 +43,12 @@ class save_feedback extends journal_external_api_base {
             'grade' => new external_value(PARAM_INT, 'Grade (-1 = no grade)'),
             'feedback' => new external_value(PARAM_RAW, 'Feedback text', VALUE_DEFAULT, ''),
             'itemid' => new external_value(PARAM_INT, 'Draft item id', VALUE_DEFAULT, 0),
+            'feedbackformat' => new external_value(
+                PARAM_INT,
+                'Format of the feedback, FORMAT_HTML or FORMAT_PLAIN to keep the feedback if its plain text is unchanged',
+                VALUE_DEFAULT,
+                FORMAT_HTML
+            ),
         ]);
     }
 
@@ -55,6 +61,7 @@ class save_feedback extends journal_external_api_base {
      * @param int $grade
      * @param string $feedback
      * @param int $itemid
+     * @param int $feedbackformat
      * @return array
      * @throws \coding_exception
      * @throws \core_external\restricted_context_exception
@@ -71,7 +78,8 @@ class save_feedback extends journal_external_api_base {
         int $userid,
         int $grade,
         string $feedback = '',
-        int $itemid = 0
+        int $itemid = 0,
+        int $feedbackformat = FORMAT_HTML
     ): array {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
@@ -83,7 +91,12 @@ class save_feedback extends journal_external_api_base {
             'grade' => $grade,
             'feedback' => $feedback,
             'itemid' => $itemid,
+            'feedbackformat' => $feedbackformat,
         ]);
+
+        if (!in_array($params['feedbackformat'], [FORMAT_HTML, FORMAT_PLAIN])) {
+            throw new invalid_parameter_exception('Invalid feedback format: ' . $params['feedbackformat']);
+        }
 
         $cm = get_coursemodule_from_id('journal', $params['cmid'], 0, false, MUST_EXIST);
         $course = get_course($cm->course);
@@ -106,10 +119,21 @@ class save_feedback extends journal_external_api_base {
             throw new \moodle_exception('nopermissions', 'error', '', get_string('savefeedback', 'journal'));
         }
 
+        $feedback = (string) $params['feedback'];
+        if ($params['feedbackformat'] == FORMAT_PLAIN) {
+            // The mobile app edits the feedback as plain text, which must not replace the HTML feedback if unchanged.
+            $feedback = journal_normalise_plain_text($feedback);
+            if ($feedback === journal_get_plain_text($entry->entrycomment, FORMAT_HTML, $context)) {
+                $feedback = (string) $entry->entrycomment;
+            } else {
+                $feedback = nl2br(s($feedback));
+            }
+        }
+
         $changed = manager::create_from_coursemodule($cm)->save_feedback(
             $entry,
             $params['grade'],
-            (string) $params['feedback'],
+            $feedback,
             $params['itemid']
         );
 

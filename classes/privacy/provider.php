@@ -176,16 +176,35 @@ class provider implements
         $sqluserjournal = "(userid = :userid OR teacher = :teacher) AND journal $injournalsql";
         $paramsuserjournal = array_merge($injournalparams, ['userid' => $userid, 'teacher' => $userid]);
 
-        // Export the entries.
-        $recordset = $DB->get_recordset_select('journal_entries', $sqluserjournal, $paramsuserjournal);
-        static::recordset_loop_and_export($recordset, 'journal', [], function ($carry, $record) {
+        // Export the entries, sorted by journal to export the entries of each journal at once.
+        $recordset = $DB->get_recordset_select('journal_entries', $sqluserjournal, $paramsuserjournal, 'journal, id');
+        static::recordset_loop_and_export($recordset, 'journal', [], function ($carry, $record) use ($journalidstocmids) {
+            $context = context_module::instance($journalidstocmids[$record->journal]);
+            $writer = writer::with_context($context);
+            $entrysubcontext = ['entries', $record->id, 'entry'];
+            $feedbacksubcontext = ['entries', $record->id, 'feedback'];
+            $writer->export_area_files($entrysubcontext, 'mod_journal', 'entry', $record->id);
+            $writer->export_area_files($feedbacksubcontext, 'mod_journal', 'feedback', $record->id);
+
             // There might be more than one row per journal if the user is a teacher, so we need to use $carry.
             $carry[] = [
                 'userid' => $record->userid,
                 'modified' => $record->modified !== null ? transform::datetime($record->modified) : null,
-                'text' => $record->text,
+                'text' => $writer->rewrite_pluginfile_urls(
+                    $entrysubcontext,
+                    'mod_journal',
+                    'entry',
+                    $record->id,
+                    $record->text
+                ),
                 'rating' => $record->rating,
-                'entrycomment' => $record->entrycomment,
+                'entrycomment' => $writer->rewrite_pluginfile_urls(
+                    $feedbacksubcontext,
+                    'mod_journal',
+                    'feedback',
+                    $record->id,
+                    (string) $record->entrycomment
+                ),
                 'teacher' => $record->teacher,
                 'timemarked' => $record->timemarked !== null ? transform::datetime($record->timemarked) : null,
             ];

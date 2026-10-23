@@ -132,6 +132,11 @@ class entry extends \core_search\base_mod {
             return \core_search\manager::ACCESS_DENIED;
         }
 
+        // Graders can only see entries of users in groups they have access to.
+        if ($entry->userid != $USER->id && !groups_user_groups_visible($cminfo->get_course(), $entry->userid, $cminfo)) {
+            return \core_search\manager::ACCESS_DENIED;
+        }
+
         return \core_search\manager::ACCESS_GRANTED;
     }
 

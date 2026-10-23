@@ -161,4 +161,41 @@ final class save_feedback_test extends advanced_testcase {
 
         $this->assertEquals(-1, $DB->get_field('journal_entries', 'rating', ['id' => $entryid]));
     }
+
+    /**
+     * Feedback saved unchanged as plain text by the mobile app keeps its HTML, other plain text is saved as HTML.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_with_plain_text_feedback(): void {
+        global $DB;
+        $entryid = $this->create_entry($this->studenta);
+        $html = '<p>Very <strong>good</strong> work</p><p><img src="@@PLUGINFILE@@/a.png" alt="A star" /></p>';
+        $DB->set_field('journal_entries', 'entrycomment', $html, ['id' => $entryid]);
+        $DB->set_field('journal_entries', 'rating', 50, ['id' => $entryid]);
+        $this->setUser($this->teacher);
+
+        $plain = journal_get_plain_text($html, FORMAT_HTML, \context_module::instance($this->journal->cmid));
+        $result = save_feedback::execute($this->journal->cmid, $entryid, $this->studenta->id, 60, $plain . "\r\n", 0, FORMAT_PLAIN);
+        $this->assertEquals(1, $result['changed']);
+        $entry = $DB->get_record('journal_entries', ['id' => $entryid], '*', MUST_EXIST);
+        $this->assertEquals(60, $entry->rating);
+        $this->assertSame($html, $entry->entrycomment);
+
+        save_feedback::execute($this->journal->cmid, $entryid, $this->studenta->id, 60, "Line 1\nLine <2>", 0, FORMAT_PLAIN);
+        $this->assertSame("Line 1<br />\nLine &lt;2&gt;", $DB->get_field('journal_entries', 'entrycomment', ['id' => $entryid]));
+    }
+
+    /**
+     * Feedback in other formats than HTML and plain text is rejected.
+     *
+     * @covers ::execute
+     */
+    public function test_execute_rejects_invalid_feedback_format(): void {
+        $entryid = $this->create_entry($this->studenta);
+        $this->setUser($this->teacher);
+
+        $this->expectException(\invalid_parameter_exception::class);
+        save_feedback::execute($this->journal->cmid, $entryid, $this->studenta->id, 60, 'Good', 0, FORMAT_MARKDOWN);
+    }
 }

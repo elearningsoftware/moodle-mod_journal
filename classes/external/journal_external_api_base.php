@@ -39,6 +39,7 @@ if (!class_exists('core_external\external_api')) {
     class_alias('external_function_parameters', 'core_external\external_function_parameters');
     class_alias('external_single_structure', 'core_external\external_single_structure');
     class_alias('external_value', 'core_external\external_value');
+    class_alias('external_settings', 'core_external\external_settings');
 }
 
 class_alias('core_external\external_api', 'mod_journal\external\journal_external_api_base');

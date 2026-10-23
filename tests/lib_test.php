@@ -340,4 +340,127 @@ final class lib_test extends \advanced_testcase {
         $this->assertNull(journal_get_editing_period($topicsjournal, $topics, $topicscm));
         $this->assertTrue(journal_is_open($topicsjournal, $topics, $topicscm, $startdate - YEARSECS));
     }
+
+    /**
+     * The individual save button is not shown for a grade overridden in the gradebook.
+     *
+     * @covers ::journal_print_user_entry
+     */
+    public function test_print_user_entry_hides_save_button_of_overridden_grade(): void {
+        $input = $this->render_overridden_feedback_input('<p>Good</p>');
+
+        $xpath = new \DOMXPath($input->ownerDocument);
+        $this->assertCount(0, $xpath->query('//input[contains(@class, "saveindividualfeedback")]'));
+    }
+
+    /**
+     * Entries have feedback to show if they have a grade, including 0, or a feedback text.
+     *
+     * @covers ::journal_entry_has_feedback
+     */
+    public function test_entry_has_feedback(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        $this->assertFalse(journal_entry_has_feedback(null));
+        $this->assertFalse(journal_entry_has_feedback((object) ['rating' => -1, 'entrycomment' => '']));
+        $this->assertFalse(journal_entry_has_feedback((object) ['rating' => null, 'entrycomment' => null]));
+        $this->assertTrue(journal_entry_has_feedback((object) ['rating' => '0', 'entrycomment' => '']));
+        $this->assertTrue(journal_entry_has_feedback((object) ['rating' => 5, 'entrycomment' => null]));
+        $this->assertTrue(journal_entry_has_feedback((object) ['rating' => -1, 'entrycomment' => '<p>Good</p>']));
+    }
+
+    /**
+     * Texts are converted to plain text the same way whatever their format, and plain text converts to itself.
+     *
+     * @covers ::journal_get_plain_text
+     */
+    public function test_get_plain_text(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+        $context = \context_system::instance();
+
+        $this->assertSame(
+            "Hello world\n\nSecond & paragraph\nnext line",
+            journal_get_plain_text('<p>Hello <b>world</b></p><p>Second &amp; paragraph<br>next line</p>', FORMAT_HTML, $context)
+        );
+        $this->assertSame("Line one\nLine two", journal_get_plain_text("Line one\r\nLine two\n", FORMAT_MOODLE, $context));
+        $this->assertSame('', journal_get_plain_text(null, FORMAT_HTML, $context));
+
+        $plain = "A <b> & \"quoted\" text\nnext line";
+        $this->assertSame($plain, journal_get_plain_text($plain, FORMAT_PLAIN, $context));
+        // Plain text feedback is saved as HTML with line breaks.
+        $this->assertSame($plain, journal_get_plain_text(nl2br(s($plain)), FORMAT_HTML, $context));
+    }
+
+    /**
+     * Sorting by date puts the users without an entry last.
+     *
+     * @covers ::mod_journal_sort_users
+     */
+    public function test_sort_users(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        $users = [];
+        foreach ([1 => 'Carl', 2 => 'Anna', 3 => 'Bert', 4 => 'Dora'] as $id => $firstname) {
+            $users[$id] = (object) ['id' => $id, 'firstname' => $firstname, 'lastname' => 'Doe'];
+        }
+        $entrybyuser = [
+            2 => (object) ['modified' => 200],
+            4 => (object) ['modified' => 100],
+        ];
+
+        mod_journal_sort_users($users, 'dateasc', $entrybyuser);
+        $this->assertSame([4, 2], array_slice(array_keys($users), 0, 2));
+        $this->assertEqualsCanonicalizing([1, 3], array_slice(array_keys($users), 2));
+
+        mod_journal_sort_users($users, 'datedesc', $entrybyuser);
+        $this->assertSame([2, 4], array_slice(array_keys($users), 0, 2));
+        $this->assertEqualsCanonicalizing([1, 3], array_slice(array_keys($users), 2));
+
+        mod_journal_sort_users($users, 'firstnamedesc', $entrybyuser);
+        $this->assertSame([4, 1, 3, 2], array_keys($users));
+    }
+
+    /**
+     * Entries graded before the cut-off time are returned once, unless they have neither a grade nor feedback.
+     *
+     * @covers ::journal_get_unmailed_graded
+     */
+    public function test_get_unmailed_graded(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $journalgenerator = $generator->get_plugin_generator('mod_journal');
+        $course = $generator->create_course();
+        $journal = $journalgenerator->create_instance(['course' => $course->id]);
+        $now = time();
+        $entries = [
+            'zero' => ['rating' => 0, 'entrycomment' => null],
+            'comment' => ['rating' => -1, 'entrycomment' => '<p>Good</p>'],
+            'blank' => ['rating' => -1, 'entrycomment' => '  '],
+            'nothing' => ['rating' => -1, 'entrycomment' => null],
+            'nullrating' => ['rating' => null, 'entrycomment' => ''],
+            'mailed' => ['rating' => 5, 'entrycomment' => null, 'mailed' => 1],
+            'recent' => ['rating' => 5, 'entrycomment' => null, 'timemarked' => $now],
+        ];
+        $ids = [];
+        foreach ($entries as $name => $entry) {
+            $ids[$name] = $journalgenerator->create_entry((object) ($entry + [
+                'journal' => $journal->id,
+                'userid' => $generator->create_user()->id,
+                'teacher' => get_admin()->id,
+                'timemarked' => $now - HOURSECS,
+            ]));
+        }
+
+        $this->assertEqualsCanonicalizing(
+            [$ids['zero'], $ids['comment']],
+            array_keys(journal_get_unmailed_graded($now - MINSECS))
+        );
+    }
 }

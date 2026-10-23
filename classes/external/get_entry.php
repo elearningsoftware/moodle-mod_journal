@@ -18,6 +18,7 @@ namespace mod_journal\external;
 
 use context_module;
 use core_external\external_function_parameters;
+use core_external\external_settings;
 use core_external\external_single_structure;
 use core_external\external_value;
 use invalid_parameter_exception;
@@ -75,11 +76,25 @@ class get_entry extends journal_external_api_base {
         require_capability('mod/journal:addentries', $context);
 
         if ($entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id])) {
+            // The feedback is only shown, so the URLs of its files are rewritten for the client.
+            $comment = (string) $entry->entrycomment;
+            $settings = external_settings::get_instance();
+            if ($settings->get_fileurl()) {
+                $comment = file_rewrite_pluginfile_urls(
+                    $comment,
+                    $settings->get_file(),
+                    $context->id,
+                    'mod_journal',
+                    'feedback',
+                    $entry->id
+                );
+            }
+
             return [
                 'text' => (string) $entry->text,
                 'modified' => $entry->modified,
                 'rating' => $entry->rating === null ? -1.0 : (float) $entry->rating,
-                'comment' => (string) $entry->entrycomment,
+                'comment' => $comment,
                 'teacher' => $entry->teacher,
             ];
         }

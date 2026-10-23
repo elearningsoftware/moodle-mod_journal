@@ -116,4 +116,22 @@ final class view_journal_test extends advanced_testcase {
         );
         view_journal::execute($journal->cmid);
     }
+
+    /**
+     * A manager, who can grade entries but not write any, can open the journal via the WS like on the web.
+     *
+     * @return void
+     * @covers ::execute
+     */
+    public function test_manager_can_view_journal(): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $manager = $this->getDataGenerator()->create_and_enrol($course, 'manager');
+        $journal = $this->getDataGenerator()->create_module('journal', ['course' => $course]);
+        $this->assertFalse(has_capability('mod/journal:addentries', \context_module::instance($journal->cmid), $manager));
+
+        $this->setUser($manager);
+        $this->assertNull(view_journal::execute($journal->cmid));
+    }
 }

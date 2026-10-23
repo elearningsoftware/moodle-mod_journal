@@ -78,7 +78,7 @@ class set_text extends journal_external_api_base {
      * @return array
      */
     public static function execute(int $journalid, string $text, $format, int $itemid = 0, int $cmid = 0) {
-        global $CFG, $DB;
+        global $CFG, $DB, $USER;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $params = self::validate_parameters(
@@ -113,6 +113,18 @@ class set_text extends journal_external_api_base {
 
         if (!journal_is_open($journal, $course, $cm)) {
             throw new \moodle_exception('journalclosed', 'journal');
+        }
+
+        if ($params['format'] == FORMAT_PLAIN && !$params['itemid']) {
+            // The mobile app edits the entry as plain text, which must not replace the formatted entry if unchanged.
+            $entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'userid' => $USER->id]);
+            $text = journal_normalise_plain_text($params['text']);
+            if ($entry && $text === journal_get_plain_text($entry->text, $entry->format, $context)) {
+                return [
+                    'status' => 'ok',
+                    'text' => $entry->text,
+                ];
+            }
         }
 
         $entry = manager::create_from_coursemodule($cm)->save_entry(

@@ -155,7 +155,7 @@ if ($started) {
     }
 
     // Feedback.
-    if (!empty($entry->entrycomment) || (!empty($entry->rating) && $entry->rating != -1)) {
+    if (journal_entry_has_feedback($entry)) {
         $grades = make_grades_menu($journal->grade);
         echo $OUTPUT->heading(get_string('feedback'));
         journal_print_feedback($course, $entry, $grades);

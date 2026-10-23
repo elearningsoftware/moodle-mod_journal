@@ -65,6 +65,10 @@ class restore_journal_activity_structure_step extends restore_activity_structure
         // Journals backed up before the dates were added have none.
         $data->timeopen = $this->apply_date_offset($data->timeopen ?? 0);
         $data->timeclose = $this->apply_date_offset($data->timeclose ?? 0);
+        if ($data->grade < 0) {
+            // The journal is graded with a scale, which may have been restored with a new ID.
+            $data->grade = -($this->get_mappingid('scale', abs($data->grade)));
+        }
 
         $newid = $DB->insert_record('journal', $data);
         $this->apply_activity_instance($newid);
@@ -89,6 +93,8 @@ class restore_journal_activity_structure_step extends restore_activity_structure
         $data->timemarked = $this->apply_date_offset($data->timemarked);
         $data->userid = $this->get_mappingid('user', $data->userid);
         $data->teacher = $this->get_mappingid('user', $data->teacher);
+        // The students were notified of their feedback in the original course, or no longer need to be.
+        $data->mailed = 1;
 
         $newid = $DB->insert_record('journal_entries', $data);
         $this->set_mapping('journal_entry', $oldid, $newid, true);

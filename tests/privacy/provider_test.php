@@ -109,6 +109,66 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
     }
 
     /**
+     * Exporting the data of a grader exports all the entries they graded in each journal, with their files.
+     */
+    public function test_export_user_data_of_grader(): void {
+        $generator = $this->getDataGenerator();
+        $journalgenerator = $generator->get_plugin_generator('mod_journal');
+        $course = $generator->create_course();
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $journals = [
+            $journalgenerator->create_instance(['course' => $course->id]),
+            $journalgenerator->create_instance(['course' => $course->id]),
+        ];
+
+        // The entries of the two journals are created in turns.
+        $entryids = [];
+        foreach ([0, 1, 0] as $index) {
+            $journal = $journals[$index];
+            $student = $generator->create_and_enrol($course, 'student');
+            $entryid = $journalgenerator->create_entry((object) [
+                'journal' => $journal->id,
+                'userid' => $student->id,
+                'text' => '<img src="@@PLUGINFILE@@/entry.png" alt="Entry">',
+                'format' => FORMAT_HTML,
+                'entrycomment' => '<img src="@@PLUGINFILE@@/feedback.png" alt="Feedback">',
+                'teacher' => $teacher->id,
+                'timemarked' => time(),
+            ]);
+            $entryids[$index][] = $entryid;
+            foreach (['entry', 'feedback'] as $filearea) {
+                get_file_storage()->create_file_from_string([
+                    'contextid' => \context_module::instance($journal->cmid)->id,
+                    'component' => 'mod_journal',
+                    'filearea' => $filearea,
+                    'itemid' => $entryid,
+                    'filepath' => '/',
+                    'filename' => $filearea . '.png',
+                ], $filearea);
+            }
+        }
+
+        $contextids = array_map(function ($journal) {
+            return \context_module::instance($journal->cmid)->id;
+        }, $journals);
+        provider::export_user_data(new approved_contextlist($teacher, 'mod_journal', $contextids));
+
+        foreach ($journals as $index => $journal) {
+            $writer = \core_privacy\local\request\writer::with_context(\context_module::instance($journal->cmid));
+            $entries = $writer->get_related_data([], 'entries');
+            $this->assertCount(count($entryids[$index]), $entries);
+            foreach ($entryids[$index] as $entryid) {
+                foreach (['entry', 'feedback'] as $filearea) {
+                    $files = $writer->get_files(['entries', $entryid, $filearea]);
+                    $this->assertArrayHasKey($filearea . '.png', $files);
+                }
+            }
+            $this->assertStringNotContainsString('@@PLUGINFILE@@', $entries[0]['text']);
+            $this->assertStringNotContainsString('@@PLUGINFILE@@', $entries[0]['entrycomment']);
+        }
+    }
+
+    /**
      * Returns the distinct item IDs of the entry and feedback files left in the journal.
      *
      * @return int[]

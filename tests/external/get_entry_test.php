@@ -87,4 +87,32 @@ final class get_entry_test extends advanced_testcase {
         $this->assertEquals($maindata['text'], $result['text']);
         $this->assertEquals($maindata['comment'], $result['comment']);
     }
+
+    /**
+     * The URLs of the files in the feedback are rewritten for the client.
+     *
+     * @return void
+     * @covers ::execute
+     */
+    public function test_feedback_file_urls_are_rewritten(): void {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_and_enrol($course, 'student');
+        $journal = $generator->create_module('journal', ['course' => $course]);
+        $entryid = $generator->get_plugin_generator('mod_journal')->create_entry((object) [
+            'journal' => $journal->id,
+            'userid' => $student->id,
+            'entrycomment' => '<img src="@@PLUGINFILE@@/star.png" alt="Star">',
+        ]);
+        $this->setUser($student);
+
+        $result = get_entry::execute($journal->cmid);
+        $contextid = \context_module::instance($journal->cmid)->id;
+        $this->assertStringContainsString(
+            "/webservice/pluginfile.php/$contextid/mod_journal/feedback/$entryid/star.png",
+            $result['comment']
+        );
+    }
 }

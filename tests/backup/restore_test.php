@@ -191,4 +191,39 @@ final class restore_test extends \advanced_testcase {
         $this->assertEquals($journal->timeopen, $restored->timeopen);
         $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $restored->id]));
     }
+
+    /**
+     * Restoring a journal graded with a course scale uses the restored scale, and does not notify students again.
+     */
+    public function test_restore_with_course_scale(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['startdate' => self::STARTDATE]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $scale = $generator->create_scale(['courseid' => $course->id, 'scale' => 'Bad,Good']);
+        $journal = $generator->create_module('journal', ['course' => $course->id, 'grade' => -$scale->id]);
+        $generator->get_plugin_generator('mod_journal')->create_entry((object) [
+            'journal' => $journal->id,
+            'userid' => $student->id,
+            'rating' => 2,
+            'teacher' => get_admin()->id,
+            'timemarked' => self::STARTDATE,
+            'mailed' => 0,
+        ]);
+
+        $newcourseid = $this->backup_and_restore($course, self::STARTDATE, true);
+
+        $newscale = $DB->get_record('scale', ['courseid' => $newcourseid], '*', MUST_EXIST);
+        $this->assertNotEquals($scale->id, $newscale->id);
+        $restored = $DB->get_record('journal', ['course' => $newcourseid], '*', MUST_EXIST);
+        $this->assertEquals(-$newscale->id, $restored->grade);
+        $gradeitem = \grade_item::fetch(['itemmodule' => 'journal', 'iteminstance' => $restored->id, 'courseid' => $newcourseid]);
+        $this->assertEquals($newscale->id, $gradeitem->scaleid);
+
+        $entry = $DB->get_record('journal_entries', ['journal' => $restored->id], '*', MUST_EXIST);
+        $this->assertEquals(1, $entry->mailed);
+    }
 }

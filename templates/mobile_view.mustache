@@ -174,6 +174,8 @@
                                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: white; color: #000; -webkit-appearance: none;">{{feedback_plain}}</textarea>
                         </div>
 
+                        <!-- The feedback is plain text, the web service keeps the HTML feedback if it is unchanged -->
+                        <input type="hidden" name="feedbackformat" value="{{commentformat}}">
                         <!-- itemid required by WS, keep 0 for now -->
                         <input type="hidden" name="itemid" value="0">
                     </form>

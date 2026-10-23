@@ -790,6 +790,45 @@ function journal_entry_needs_grading($entry): bool {
 }
 
 /**
+ * Returns whether an entry has a grade or feedback to show to its author.
+ *
+ * @param stdClass|null $entry Journal entry, null if the user has not written one
+ * @return bool True if the entry has a grade, including a grade of 0, or a feedback
+ */
+function journal_entry_has_feedback($entry): bool {
+    return !empty($entry) && (!empty($entry->entrycomment) || (isset($entry->rating) && $entry->rating != -1));
+}
+
+/**
+ * Returns a text as plain text, as edited in the textareas of the mobile app.
+ *
+ * @param string|null $text The text
+ * @param int $format The format of the text
+ * @param context $context The context of the text
+ * @return string
+ */
+function journal_get_plain_text($text, $format, context $context): string {
+    $html = format_text((string) $text, $format, ['context' => $context, 'filter' => false, 'para' => false]);
+    // Keep the case of bold text, headings and table headers, which html_to_text writes in capitals.
+    $html = preg_replace(
+        ['~<(/?)(?:b|strong)\b[^>]*>~i', '~<(/?)h[1-6]\b[^>]*>~i', '~<(/?)th\b[^>]*>~i'],
+        ['<$1span>', '<$1p>', '<$1td>'],
+        $html
+    );
+    return journal_normalise_plain_text(html_to_text($html, 0, false));
+}
+
+/**
+ * Normalises the line breaks, spaces and surrounding whitespace of a plain text.
+ *
+ * @param string $text The plain text
+ * @return string
+ */
+function journal_normalise_plain_text(string $text): string {
+    return trim(str_replace(["\r\n", "\r", "\xc2\xa0"], ["\n", "\n", ' '], $text));
+}
+
+/**
  * Get list of graded unmailed users
  *
  * @param int $cutofftime Timestamp
@@ -803,8 +842,13 @@ function journal_get_unmailed_graded($cutofftime) {
             FROM {journal_entries} je
             JOIN {journal} j ON je.journal = j.id
             WHERE je.mailed = 0 AND je.timemarked < ? AND je.timemarked > 0
-            AND (je.rating <> -1 OR (je.entrycomment IS NOT NULL AND trim(je.entrycomment) <> ?))';
-    return $DB->get_records_sql($sql, [$cutofftime, '']);
+            AND (je.rating <> -1 OR je.entrycomment IS NOT NULL)';
+    $entries = $DB->get_records_sql($sql, [$cutofftime]);
+
+    // Text columns cannot be compared in SQL on all databases, so blank feedback is skipped here.
+    return array_filter($entries, function ($entry) {
+        return ($entry->rating !== null && $entry->rating != -1) || trim((string) $entry->entrycomment) !== '';
+    });
 }
 
 /**
@@ -1058,17 +1102,19 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             ]);
         }
 
-        // Feedback save button.
-        echo html_writer::tag('p', html_writer::empty_tag('input', [
-            'type' => 'button',
-            'data-cmid' => $cmid,
-            'data-entryid' => $entry->id,
-            'data-userid' => $user->id,
-            'data-fullname' => fullname($user),
-            'data-itemid' => $draftitemid,
-            'value' => get_string('savefeedback', 'journal'),
-            'class' => 'saveindividualfeedback btn btn-secondary mt-1 m-t-1',
-        ]), ['class' => 'feedbacksave']);
+        // Feedback save button, unless the grade is locked or overridden in the gradebook.
+        if ($feedbackdisabledstr == '') {
+            echo html_writer::tag('p', html_writer::empty_tag('input', [
+                'type' => 'button',
+                'data-cmid' => $cmid,
+                'data-entryid' => $entry->id,
+                'data-userid' => $user->id,
+                'data-fullname' => fullname($user),
+                'data-itemid' => $draftitemid,
+                'value' => get_string('savefeedback', 'journal'),
+                'class' => 'saveindividualfeedback btn btn-secondary mt-1 m-t-1',
+            ]), ['class' => 'feedbacksave']);
+        }
 
         $feedbackhtml = ob_get_clean();
 
@@ -1100,9 +1146,8 @@ function journal_print_feedback($course, $entry, $grades) {
 
     require_once($CFG->dirroot . '/lib/gradelib.php');
 
-    if (!$teacher = $DB->get_record('user', ['id' => $entry->teacher])) {
-        throw new \moodle_exception('incorrectuserid', 'journal');
-    }
+    // The grader is unknown if they were not restored with the entry.
+    $teacher = $DB->get_record('user', ['id' => $entry->teacher]);
 
     $module = $DB->get_record('modules', ['name' => 'journal']);
     $cmid = $DB->get_field('course_modules', 'id', ['module' => $module->id, 'instance' => $entry->journal]);
@@ -1112,11 +1157,17 @@ function journal_print_feedback($course, $entry, $grades) {
 
     echo '<tr>';
     echo '<td class="left picture">';
-    echo $OUTPUT->user_picture($teacher, ['courseid' => $course->id, 'alttext' => true]);
+    if ($teacher) {
+        echo $OUTPUT->user_picture($teacher, ['courseid' => $course->id, 'alttext' => true]);
+    }
     echo '</td>';
     echo '<td class="entryheader">';
-    echo '<span class="author">' . fullname($teacher) . '</span>';
-    echo '&nbsp;&nbsp;<span class="time">' . userdate($entry->timemarked) . '</span>';
+    if ($teacher) {
+        echo '<span class="author">' . fullname($teacher) . '</span>&nbsp;&nbsp;';
+    }
+    if ($entry->timemarked) {
+        echo '<span class="time">' . userdate($entry->timemarked) . '</span>';
+    }
     echo '</td>';
     echo '</tr>';
 
@@ -1364,31 +1415,22 @@ function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
     uasort($users, function ($a, $b) use ($sortby, $entrybyuser) {
         switch ($sortby) {
             case 'firstnamedesc':
-                return $a->firstname < $b->firstname ? 1 :
-                    ($a->firstname > $b->firstname ? -1 : 0);
+                return $b->firstname <=> $a->firstname;
             case 'firstnameasc':
-                return $a->firstname < $b->firstname ? -1 :
-                    ($a->firstname > $b->firstname ? 1 : 0);
+                return $a->firstname <=> $b->firstname;
             case 'lastnamedesc':
-                return $a->lastname < $b->lastname ? 1 :
-                    ($a->lastname > $b->lastname ? -1 : 0);
+                return $b->lastname <=> $a->lastname;
             case 'lastnameasc':
-                return $a->lastname < $b->lastname ? -1 :
-                    ($a->lastname > $b->lastname ? 1 : 0);
-            case 'datedesc':
-                if (!isset($entrybyuser[$a->id]->modified) || !isset($entrybyuser[$b->id]->modified)) {
-                    return 1;
-                }
-                return $entrybyuser[$a->id]->modified < $entrybyuser[$b->id]->modified ? 1 :
-                    ($entrybyuser[$a->id]->modified > $entrybyuser[$b->id]->modified ? -1 : 0);
-            case 'dateasc':
-            default:
-                if (!isset($entrybyuser[$a->id]->modified) || !isset($entrybyuser[$b->id]->modified)) {
-                    return -1;
-                }
-                return $entrybyuser[$a->id]->modified < $entrybyuser[$b->id]->modified ? -1 :
-                    ($entrybyuser[$a->id]->modified > $entrybyuser[$b->id]->modified ? 1 : 0);
+                return $a->lastname <=> $b->lastname;
         }
+
+        // Users without an entry come last.
+        $amodified = $entrybyuser[$a->id]->modified ?? null;
+        $bmodified = $entrybyuser[$b->id]->modified ?? null;
+        if ($amodified === null || $bmodified === null) {
+            return ($amodified === null) <=> ($bmodified === null);
+        }
+        return $sortby === 'datedesc' ? $bmodified <=> $amodified : $amodified <=> $bmodified;
     });
 }
 

@@ -159,4 +159,43 @@ final class set_text_test extends advanced_testcase {
 
         $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $journal->id]));
     }
+
+    /**
+     * An entry saved unchanged as plain text by the mobile app keeps its formatting, other plain text replaces it.
+     *
+     * @return void
+     * @covers ::execute
+     */
+    public function test_plain_text_keeps_unchanged_entry(): void {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_and_enrol($course, 'student');
+        $journal = $generator->create_module('journal', ['course' => $course]);
+        $html = '<p>My <strong>formatted</strong> entry</p><p>Second paragraph</p>';
+        $entryid = $generator->get_plugin_generator('mod_journal')->create_entry((object) [
+            'journal' => $journal->id,
+            'userid' => $student->id,
+            'text' => $html,
+            'format' => FORMAT_HTML,
+            'modified' => 1000,
+        ]);
+        $this->setUser($student);
+
+        $plain = journal_get_plain_text($html, FORMAT_HTML, \context_module::instance($journal->cmid));
+        $result = set_text::execute($journal->id, $plain, FORMAT_PLAIN);
+        $this->assertSame($html, $result['text']);
+        $entry = $DB->get_record('journal_entries', ['id' => $entryid], '*', MUST_EXIST);
+        $this->assertSame($html, $entry->text);
+        $this->assertEquals(FORMAT_HTML, $entry->format);
+        $this->assertEquals(1000, $entry->modified);
+
+        set_text::execute($journal->id, $plain . ' Changed', FORMAT_PLAIN);
+        $entry = $DB->get_record('journal_entries', ['id' => $entryid], '*', MUST_EXIST);
+        $this->assertSame($plain . ' Changed', $entry->text);
+        $this->assertEquals(FORMAT_PLAIN, $entry->format);
+    }
 }

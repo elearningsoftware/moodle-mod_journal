@@ -53,7 +53,10 @@ class view_journal extends journal_external_api_base {
 
         $context = context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/journal:addentries', $context);
+        // Like the view page, the journal can be viewed by its participants and its graders.
+        if (!has_capability('mod/journal:manageentries', $context)) {
+            require_capability('mod/journal:addentries', $context);
+        }
 
         // Trigger event.
         $event = \mod_journal\event\course_module_viewed::create([
