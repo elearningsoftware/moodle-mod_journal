@@ -27,28 +27,54 @@ namespace mod_journal;
  */
 final class lib_test extends \advanced_testcase {
     /**
-     * Test reset function.
+     * Resetting the journals of a course removes their entries and files, and leaves the other courses alone.
      *
      * @covers ::journal_reset_userdata
      */
     public function test_reset(): void {
+        global $DB;
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
         $journalgenerator = $generator->get_plugin_generator('mod_journal');
+        $fs = get_file_storage();
 
-        // Create a course.
-        $course = $generator->create_course();
+        $files = [];
+        $journals = [];
+        foreach (['reset', 'kept'] as $name) {
+            $course = $generator->create_course();
+            $journal = $journalgenerator->create_instance(['course' => $course->id]);
+            $entryid = $journalgenerator->create_entry((object)['journal' => $journal->id]);
+            $context = \context_module::instance($journal->cmid);
+            foreach (['entry', 'feedback'] as $filearea) {
+                $files[$name][] = $fs->create_file_from_string([
+                    'contextid' => $context->id,
+                    'component' => 'mod_journal',
+                    'filearea' => $filearea,
+                    'itemid' => $entryid,
+                    'filepath' => '/',
+                    'filename' => 'file.txt',
+                ], 'Content');
+            }
+            $journals[$name] = $journal;
+        }
 
-        // Create a journal instance.
-        $journal = $journalgenerator->create_instance(['course' => $course->id]);
-
-        $entryrecord = (object)['journal' => $journal->id];
-        $entry = $journalgenerator->create_entry($entryrecord);
-
-        $status = journal_reset_userdata((object)['reset_journal' => true, 'courseid' => $course->id]);
+        $status = journal_reset_userdata((object)['reset_journal' => true, 'courseid' => $journals['reset']->course]);
         $this->assertCount(1, $status);
         $this->assertFalse($status[0]['error']);
+
+        $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $journals['reset']->id]));
+        $this->assertTrue($DB->record_exists('journal_entries', ['journal' => $journals['kept']->id]));
+        foreach ($files['reset'] as $file) {
+            $this->assertFalse($fs->file_exists_by_hash($file->get_pathnamehash()));
+        }
+        foreach ($files['kept'] as $file) {
+            $this->assertTrue($fs->file_exists_by_hash($file->get_pathnamehash()));
+        }
+
+        // Without the option, nothing is removed.
+        $this->assertSame([], journal_reset_userdata((object)['courseid' => $journals['kept']->course]));
+        $this->assertTrue($DB->record_exists('journal_entries', ['journal' => $journals['kept']->id]));
     }
 
     /**
