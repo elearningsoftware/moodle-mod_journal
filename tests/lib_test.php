@@ -371,6 +371,24 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
+     * Words are counted across paragraphs and line breaks, and Chinese and Japanese characters one by one.
+     *
+     * @covers ::journal_count_words
+     * @covers ::journal_get_printable_count
+     */
+    public function test_count_words(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        $this->assertSame(0, journal_count_words(''));
+        $this->assertSame(3, journal_count_words('<p>One</p><p>two<br>three</p>'));
+        $this->assertSame(2, journal_count_words('One <b>two</b>'));
+        $this->assertSame(4, journal_count_words('<p>日本語文</p>'));
+        $this->assertEquals('3 words', journal_get_printable_count('<p>One</p><p>two</p><p>three</p>'));
+        $this->assertEquals('4 characters', journal_get_printable_count('<p>日本語文</p>'));
+    }
+
+    /**
      * The notify teachers setting keeps valid values, turns an unchecked setting off and other values on.
      *
      * @covers ::journal_clean_notify_teachers

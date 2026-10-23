@@ -75,6 +75,15 @@ class mod_journal_mod_form extends moodleform_mod {
         $mform->hideIf('days', 'timeopen[enabled]', 'checked');
         $mform->hideIf('days', 'timeclose[enabled]', 'checked');
 
+        $mform->addElement('text', 'minwords', get_string('minwords', 'journal'), ['size' => 6]);
+        $mform->setType('minwords', PARAM_INT);
+        $mform->setDefault('minwords', 0);
+        $mform->addHelpButton('minwords', 'minwords', 'journal');
+        $mform->addElement('text', 'maxwords', get_string('maxwords', 'journal'), ['size' => 6]);
+        $mform->setType('maxwords', PARAM_INT);
+        $mform->setDefault('maxwords', 0);
+        $mform->addHelpButton('maxwords', 'maxwords', 'journal');
+
         // Notifications settings.
         $config = get_config('journal');
 
@@ -113,7 +122,7 @@ class mod_journal_mod_form extends moodleform_mod {
     }
 
     /**
-     * Validates the opening and closing times.
+     * Validates the opening and closing times and the limits of the number of words.
      *
      * @param array $data Submitted data
      * @param array $files Submitted files
@@ -124,6 +133,15 @@ class mod_journal_mod_form extends moodleform_mod {
 
         if (!empty($data['timeopen']) && !empty($data['timeclose']) && $data['timeclose'] <= $data['timeopen']) {
             $errors['timeclose'] = get_string('closebeforeopen', 'journal');
+        }
+
+        foreach (['minwords', 'maxwords'] as $field) {
+            if (isset($data[$field]) && $data[$field] < 0) {
+                $errors[$field] = get_string('negativewords', 'journal');
+            }
+        }
+        if (!isset($errors['maxwords']) && !empty($data['maxwords']) && $data['maxwords'] < $data['minwords']) {
+            $errors['maxwords'] = get_string('maxbelowminwords', 'journal');
         }
 
         return $errors;

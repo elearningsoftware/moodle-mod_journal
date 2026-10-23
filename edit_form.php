@@ -47,9 +47,31 @@ class mod_journal_entry_form extends moodleform {
         );
         $this->_form->setType('text_editor', PARAM_RAW);
         $this->_form->addRule('text_editor', null, 'required', null, 'client');
+        $wordlimit = $this->_customdata['manager']->get_word_limit();
+        if ($wordlimit) {
+            $this->_form->addElement('static', 'wordlimit', get_string('wordlimit', 'journal'), $wordlimit);
+        }
         $this->_form->addElement('hidden', 'id');
         $this->_form->setType('id', PARAM_INT);
 
         $this->add_action_buttons();
+    }
+
+    /**
+     * Checks the number of words of the entry.
+     *
+     * @param array $data Submitted data
+     * @param array $files Submitted files
+     * @return array Errors by element name
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+
+        $error = $this->_customdata['manager']->get_word_count_error($data['text_editor']['text'] ?? '');
+        if ($error) {
+            $errors['text_editor'] = $error;
+        }
+
+        return $errors;
     }
 }

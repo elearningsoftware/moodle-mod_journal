@@ -106,6 +106,8 @@ final class restore_test extends \advanced_testcase {
             'grade' => 50,
             'timeopen' => self::STARTDATE + DAYSECS,
             'timeclose' => self::STARTDATE + WEEKSECS,
+            'minwords' => 10,
+            'maxwords' => 500,
             'notifyteachers' => 0,
             'notifystudents' => 1,
             'completion_create_entry' => 1,
@@ -151,7 +153,9 @@ final class restore_test extends \advanced_testcase {
         $newcourseid = $this->backup_and_restore($course, self::STARTDATE + $offset, true);
 
         $restored = $DB->get_record('journal', ['course' => $newcourseid], '*', MUST_EXIST);
-        foreach (['name', 'intro', 'days', 'grade', 'notifyteachers', 'notifystudents', 'completion_create_entry'] as $field) {
+        $fields = ['name', 'intro', 'days', 'minwords', 'maxwords', 'grade', 'notifyteachers', 'notifystudents',
+            'completion_create_entry'];
+        foreach ($fields as $field) {
             $this->assertEquals($journal->$field, $restored->$field, $field);
         }
         $this->assertEquals($journal->timeopen + $offset, $restored->timeopen);

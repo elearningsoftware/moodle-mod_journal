@@ -216,6 +216,62 @@ final class manager_test extends advanced_testcase {
     }
 
     /**
+     * Entries can only be saved with a number of words within the limits of the journal.
+     *
+     * @covers ::save_entry
+     * @covers ::get_word_count_error
+     * @covers ::get_word_limit
+     */
+    public function test_save_entry_word_limits(): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_and_enrol($course, 'student');
+        $journal = $generator->create_module('journal', ['course' => $course, 'minwords' => 3, 'maxwords' => 5]);
+        $this->setUser($student);
+        $manager = manager::create_from_coursemodule(get_coursemodule_from_instance('journal', $journal->id));
+
+        $this->assertEquals('Between 3 and 5', $manager->get_word_limit());
+        $this->assertEquals(
+            'Your entry has 2 words, but it needs at least 3.',
+            $manager->get_word_count_error('<p>One</p><p>two</p>')
+        );
+        $this->assertEquals(
+            'Your entry has 6 words, but it can have at most 5.',
+            $manager->get_word_count_error('One two three four five six')
+        );
+        $this->assertNull($manager->get_word_count_error('<p>One</p><p>two</p><p>three</p>'));
+
+        try {
+            $manager->save_entry('Too short', FORMAT_HTML);
+            $this->fail('An entry with too few words was saved');
+        } catch (\moodle_exception $e) {
+            $this->assertEquals('toofewwords', $e->errorcode);
+        }
+        $this->assertFalse($DB->record_exists('journal_entries', ['journal' => $journal->id]));
+
+        $manager->save_entry('Long enough now', FORMAT_HTML);
+        $this->assertTrue($DB->record_exists('journal_entries', ['journal' => $journal->id]));
+
+        $journal = $generator->create_module('journal', ['course' => $course, 'minwords' => 3]);
+        $manager = manager::create_from_coursemodule(get_coursemodule_from_instance('journal', $journal->id));
+        $this->assertEquals('At least 3', $manager->get_word_limit());
+        $this->assertNull($manager->get_word_count_error(str_repeat('word ', 1000)));
+
+        $journal = $generator->create_module('journal', ['course' => $course, 'maxwords' => 5]);
+        $manager = manager::create_from_coursemodule(get_coursemodule_from_instance('journal', $journal->id));
+        $this->assertEquals('At most 5', $manager->get_word_limit());
+        $this->assertNull($manager->get_word_count_error(''));
+
+        $journal = $generator->create_module('journal', ['course' => $course]);
+        $manager = manager::create_from_coursemodule(get_coursemodule_from_instance('journal', $journal->id));
+        $this->assertNull($manager->get_word_limit());
+        $this->assertNull($manager->get_word_count_error(''));
+    }
+
+    /**
      * Saving feedback updates the entry and the gradebook, once per change.
      *
      * @return void

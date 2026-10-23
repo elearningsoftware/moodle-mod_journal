@@ -230,5 +230,24 @@ function xmldb_journal_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2026102102, 'journal');
     }
 
+    if ($oldversion < 2026102300) {
+        // Define fields minwords and maxwords to be added to journal.
+        $table = new xmldb_table('journal');
+        $fields = [
+            new xmldb_field('minwords', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timeclose'),
+            new xmldb_field('maxwords', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'minwords'),
+        ];
+
+        // Conditionally launch add fields minwords and maxwords.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Journal savepoint reached.
+        upgrade_mod_savepoint(true, 2026102300, 'journal');
+    }
+
     return true;
 }

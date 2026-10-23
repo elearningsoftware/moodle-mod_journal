@@ -288,6 +288,12 @@ class mobile {
         if ($data['canedit'] && $period && $period[1]) {
             $data['info'] = get_string('editingends', 'journal') . ': ' . userdate($period[1]);
         }
+        if ($data['canedit']) {
+            $wordlimit = \mod_journal\manager::create_from_coursemodule($cm)->get_word_limit();
+            if ($wordlimit) {
+                $data['wordlimit'] = get_string('wordlimit', 'journal') . ': ' . $wordlimit;
+            }
+        }
 
         // Load existing entry.
         $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);

@@ -83,7 +83,11 @@ $editoroptions = $manager->get_entry_editor_options();
 
 $data = file_prepare_standard_editor($data, 'text', $editoroptions, $context, 'mod_journal', 'entry', $data->entryid);
 
-$form = new mod_journal_entry_form(null, ['entryid' => $data->entryid, 'editoroptions' => $editoroptions]);
+$form = new mod_journal_entry_form(null, [
+    'entryid' => $data->entryid,
+    'editoroptions' => $editoroptions,
+    'manager' => $manager,
+]);
 $form->set_data($data);
 
 if ($form->is_cancelled()) {

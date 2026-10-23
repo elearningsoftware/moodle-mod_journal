@@ -102,4 +102,25 @@ final class mobile_test extends \advanced_testcase {
         $this->setUser($teacher);
         $this->assertStringContainsString('Hidden Student', $this->render_course_view($journal));
     }
+
+    /**
+     * The edit page shows the limits of the number of words to students.
+     *
+     * @covers ::mobile_entry_edit
+     */
+    public function test_entry_edit_shows_word_limit(): void {
+        global $PAGE;
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $student = $generator->create_and_enrol($course, 'student');
+        $limited = $generator->create_module('journal', ['course' => $course->id, 'minwords' => 50]);
+        $unlimited = $generator->create_module('journal', ['course' => $course->id]);
+
+        $this->setUser($student);
+        $result = mobile::mobile_entry_edit(['cmid' => $limited->cmid, 'courseid' => $course->id]);
+        $this->assertStringContainsString('Number of words: At least 50', $result['templates'][0]['html']);
+        $PAGE = new moodle_page();
+        $result = mobile::mobile_entry_edit(['cmid' => $unlimited->cmid, 'courseid' => $course->id]);
+        $this->assertStringNotContainsString('Number of words', $result['templates'][0]['html']);
+    }
 }

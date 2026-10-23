@@ -42,6 +42,8 @@ function journal_add_instance($journal) {
     $journal->timemodified = time();
 
     $journal->notifyteachers = journal_clean_notify_teachers($journal->notifyteachers ?? null);
+    $journal->minwords = max(0, (int) ($journal->minwords ?? 0));
+    $journal->maxwords = max(0, (int) ($journal->maxwords ?? 0));
     // Checkbox handling: Use !empty to ensure 0 is saved as 0.
     $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
@@ -75,6 +77,8 @@ function journal_update_instance($journal) {
     $journal->id = $journal->instance;
 
     $journal->notifyteachers = journal_clean_notify_teachers($journal->notifyteachers ?? null);
+    $journal->minwords = max(0, (int) ($journal->minwords ?? 0));
+    $journal->maxwords = max(0, (int) ($journal->maxwords ?? 0));
     // Checkbox handling: Use !empty to ensure 0 is saved as 0.
     $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
@@ -1504,16 +1508,36 @@ function journal_get_coursemodule_info($cm): ?cached_cm_info {
  */
 function journal_get_printable_count($text) {
     $text = isset($text) ? (string) $text : '';
-    $text = strip_tags($text);
+    $count = journal_count_words($text);
 
-    // Check for CJK characters.
-    if (preg_match("/\p{Han}|\p{Hiragana}|\p{Katakana}/u", $text)) {
-        $count = mb_strlen($text, 'UTF-8');
+    if (journal_counts_characters($text)) {
         return get_string('numchars', 'journal', $count);
     }
-
-    $count = count_words($text);
     return get_string('numwords', 'moodle', $count);
+}
+
+/**
+ * Returns whether the characters of a text are counted instead of its words, as in Chinese and Japanese.
+ *
+ * @param string $text The text, in HTML
+ * @return bool
+ */
+function journal_counts_characters(string $text): bool {
+    return (bool) preg_match("/\p{Han}|\p{Hiragana}|\p{Katakana}/u", strip_tags($text));
+}
+
+/**
+ * Returns the number of words of a text, or of characters in Chinese and Japanese.
+ *
+ * @param string $text The text, in HTML
+ * @return int
+ */
+function journal_count_words(string $text): int {
+    if (journal_counts_characters($text)) {
+        return mb_strlen(strip_tags($text), 'UTF-8');
+    }
+    // Words in separate paragraphs are only told apart before removing the tags.
+    return count_words($text);
 }
 
 /**

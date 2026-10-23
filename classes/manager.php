@@ -255,6 +255,61 @@ class manager {
     }
 
     /**
+     * Return the limits of the number of words of the entries, for students to read.
+     *
+     * @return string|null The limits, null if there are none
+     */
+    public function get_word_limit(): ?string {
+        $min = (int) ($this->instance->minwords ?? 0);
+        $max = (int) ($this->instance->maxwords ?? 0);
+        if ($min && $max) {
+            return get_string('wordlimitrange', 'journal', ['min' => $min, 'max' => $max]);
+        } else if ($min) {
+            return get_string('wordlimitmin', 'journal', $min);
+        } else if ($max) {
+            return get_string('wordlimitmax', 'journal', $max);
+        }
+        return null;
+    }
+
+    /**
+     * Return why an entry text cannot be saved because of its number of words.
+     *
+     * @param string $text The entry text
+     * @return string|null The error, null if the number of words is within the limits
+     */
+    public function get_word_count_error(string $text): ?string {
+        $error = $this->check_word_count($text);
+        return $error ? get_string($error[0], 'journal', $error[1]) : null;
+    }
+
+    /**
+     * Check the number of words of an entry text against the limits of the journal.
+     *
+     * @param string $text The entry text
+     * @return array|null The string identifier and parameter of the error, null if the number of words is within the limits
+     */
+    private function check_word_count(string $text): ?array {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        $min = (int) ($this->instance->minwords ?? 0);
+        $max = (int) ($this->instance->maxwords ?? 0);
+        if (!$min && !$max) {
+            return null;
+        }
+
+        $count = journal_count_words($text);
+        if ($min && $count < $min) {
+            return ['toofewwords', (object) ['count' => $count, 'limit' => $min]];
+        }
+        if ($max && $count > $max) {
+            return ['toomanywords', (object) ['count' => $count, 'limit' => $max]];
+        }
+        return null;
+    }
+
+    /**
      * Save the entry of the current user, creating it if needed.
      *
      * Moves the files of the draft area into the entry, triggers the entry created or updated event
@@ -264,10 +319,15 @@ class manager {
      * @param int $format The format of the text
      * @param int $draftitemid The draft area of the files in the text, 0 for none
      * @return stdClass The saved entry
+     * @throws \moodle_exception If the number of words of the text is outside the limits of the journal
      */
     public function save_entry(string $text, int $format, int $draftitemid = 0): stdClass {
         global $CFG, $USER;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        if ($error = $this->check_word_count($text)) {
+            throw new \moodle_exception($error[0], 'journal', '', $error[1]);
+        }
 
         $transaction = $this->db->start_delegated_transaction();
 

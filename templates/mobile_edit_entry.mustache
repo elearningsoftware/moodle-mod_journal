@@ -30,6 +30,7 @@
     Variables optional for this template:
       * warning: Message displayed as a warning notice at the top.
       * info: Additional information line below the title.
+      * wordlimit: The limits of the number of words of the entry.
       * hasentry, hasfeedback: Booleans for display/logic.
       * userid, id, entryid, studentid, courseid
       * studentpic, studentname, teacherpic, teachername
@@ -42,6 +43,7 @@
     {
       "id": 123,
       "cmid": 456,
+      "wordlimit": "Number of words: At least 100",
       "userid": 789,
       "timemodified": "2026-01-17 12:34",
       "attempt": 1,
@@ -97,6 +99,7 @@
         <ion-card-content>
             <h3 style="margin-top: 0;">{{#str}}startoredit, mod_journal{{/str}}</h3>
             {{#info}}<p><i>{{info}}</i></p>{{/info}}
+            {{#wordlimit}}<p><i>{{wordlimit}}</i></p>{{/wordlimit}}
 
             {{^canedit}}
                 <core-alert message="{{#str}}editingended, mod_journal{{/str}}" type="info"></core-alert>
