@@ -311,7 +311,7 @@ if (!$users && !$usersdone) {
         if ($position > 0) {
             $navigation[] = html_writer::link(
                 new moodle_url($baseurl, ['selecteduser' => $gradeableids[$position - 1]]),
-                get_string('previous'),
+                get_string('previousentry', 'journal'),
                 ['class' => 'btn btn-secondary me-2 mr-2 previousentry']
             );
         }
@@ -322,7 +322,7 @@ if (!$users && !$usersdone) {
         if (isset($gradeableids[$position + 1])) {
             $navigation[] = html_writer::link(
                 new moodle_url($baseurl, ['selecteduser' => $gradeableids[$position + 1]]),
-                get_string('next'),
+                get_string('nextentry', 'journal'),
                 ['class' => 'btn btn-secondary me-2 mr-2 nextentry']
             );
         }

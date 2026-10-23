@@ -446,16 +446,24 @@ final class lib_test extends \advanced_testcase {
             4 => (object) ['modified' => 100],
         ];
 
+        // Users who compare equal are sorted by ID.
         mod_journal_sort_users($users, 'dateasc', $entrybyuser);
-        $this->assertSame([4, 2], array_slice(array_keys($users), 0, 2));
-        $this->assertEqualsCanonicalizing([1, 3], array_slice(array_keys($users), 2));
+        $this->assertSame([4, 2, 1, 3], array_keys($users));
 
         mod_journal_sort_users($users, 'datedesc', $entrybyuser);
-        $this->assertSame([2, 4], array_slice(array_keys($users), 0, 2));
-        $this->assertEqualsCanonicalizing([1, 3], array_slice(array_keys($users), 2));
+        $this->assertSame([2, 4, 1, 3], array_keys($users));
 
         mod_journal_sort_users($users, 'firstnamedesc', $entrybyuser);
         $this->assertSame([4, 1, 3, 2], array_keys($users));
+
+        $users = array_reverse($users, true);
+        mod_journal_sort_users($users, 'lastnameasc', $entrybyuser);
+        $this->assertSame([1, 2, 3, 4], array_keys($users));
+
+        $entrybyuser[1] = (object) ['modified' => 100];
+        $users = array_reverse($users, true);
+        mod_journal_sort_users($users, 'dateasc', $entrybyuser);
+        $this->assertSame([1, 4, 2, 3], array_keys($users));
     }
 
     /**

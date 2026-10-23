@@ -43,8 +43,8 @@ Feature: Teacher can grade entries one by one
     Then I should see "Entry 1 of 3"
     And I should see "Student 1 reply"
     And I should not see "Student 2 reply"
-    And "Previous" "link" should not exist
-    And I follow "Next"
+    And "Previous entry" "link" should not exist
+    And I follow "Next entry"
     And I should see "Entry 2 of 3"
     And I should see "Student 2 reply"
     And I set the field "Student 2 Grade" to "70"
@@ -52,9 +52,9 @@ Feature: Teacher can grade entries one by one
     And I should see "Feedback updated for 1 entries"
     And I should see "Entry 3 of 3"
     And I should see "Student 3 reply"
-    And "Next" "link" should not exist
+    And "Next entry" "link" should not exist
     And "Save and show next" "button" should not exist
-    And I follow "Previous"
+    And I follow "Previous entry"
     And the field "Student 2 Grade" matches value "70"
     And I follow "All entries"
     And I should see "Student 1 reply"

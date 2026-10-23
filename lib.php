@@ -1440,7 +1440,7 @@ function journal_provide_open_close_event_action(
  * @param array $entrybyuser The sorted array
  */
 function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
-    uasort($users, function ($a, $b) use ($sortby, $entrybyuser) {
+    $compare = function ($a, $b) use ($sortby, $entrybyuser) {
         switch ($sortby) {
             case 'firstnamedesc':
                 return $b->firstname <=> $a->firstname;
@@ -1459,6 +1459,10 @@ function mod_journal_sort_users(array &$users, $sortby, array $entrybyuser) {
             return ($amodified === null) <=> ($bmodified === null);
         }
         return $sortby === 'datedesc' ? $bmodified <=> $amodified : $amodified <=> $bmodified;
+    };
+    // Users who compare equal are sorted by ID, so that they keep their order from one page to the next.
+    uasort($users, function ($a, $b) use ($compare) {
+        return $compare($a, $b) ?: $a->id <=> $b->id;
     });
 }
 
