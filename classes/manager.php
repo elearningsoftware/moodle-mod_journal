@@ -467,6 +467,49 @@ class manager {
     }
 
     /**
+     * Delete an entry, with its files, feedback and grade.
+     *
+     * Triggers the entry deleted event and updates the completion state of the author of the entry.
+     *
+     * @param stdClass $entry An entry of this journal
+     */
+    public function delete_entry(stdClass $entry): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        if ($entry->journal != $this->instance->id) {
+            throw new \coding_exception('The entry is not from this journal');
+        }
+
+        $transaction = $this->db->start_delegated_transaction();
+
+        $fs = get_file_storage();
+        $fs->delete_area_files($this->context->id, 'mod_journal', 'entry', $entry->id);
+        $fs->delete_area_files($this->context->id, 'mod_journal', 'feedback', $entry->id);
+        $this->db->delete_records('journal_entries', ['id' => $entry->id]);
+
+        $journal = clone $this->instance;
+        $journal->cmidnumber = $this->cm->idnumber;
+        journal_update_grades($journal, $entry->userid);
+
+        $event = event\entry_deleted::create([
+            'objectid' => $entry->id,
+            'relateduserid' => $entry->userid,
+            'context' => $this->context,
+        ]);
+        $this->add_event_snapshots($event);
+        $event->add_record_snapshot('journal_entries', $entry);
+        $event->trigger();
+
+        $transaction->allow_commit();
+
+        $completion = new \completion_info($this->course);
+        if ($completion->is_enabled($this->cm) && $this->instance->completion_create_entry) {
+            $completion->update_state($this->cm, COMPLETION_INCOMPLETE, $entry->userid);
+        }
+    }
+
+    /**
      * Add the records of the course, course module and journal to an event.
      *
      * @param \core\event\base $event

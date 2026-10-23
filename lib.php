@@ -939,6 +939,13 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
             get_string('lastedited') . ': ' . userdate($entry->modified),
             ['class' => 'lastedit']
         );
+        if (has_capability('mod/journal:deleteentries', $context)) {
+            $userfullname .= ' ' . html_writer::link(
+                new moodle_url('/mod/journal/delete.php', ['id' => $cmid, 'entryid' => $entry->id]),
+                get_string('deleteentry', 'journal'),
+                ['class' => 'deleteentry text-danger']
+            );
+        }
     }
     $content .= html_writer::tag('td', $userfullname, ['class' => 'userfullname']);
     $content .= html_writer::end_tag('tr');

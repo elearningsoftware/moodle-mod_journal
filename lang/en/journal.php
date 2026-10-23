@@ -45,13 +45,17 @@ $string['defaultgrade'] = 'Default entry grade';
 $string['defaultgrade_help'] = 'The default maximum grade for new Journal entries.
 * Enter **100** (or any positive number) to default to Point grading.
 * Enter **0** to default to "No grade" (useful for formative activities).';
+$string['deleteentry'] = 'Delete entry';
+$string['deleteentryconfirm'] = 'Delete the entry of {$a}? Its feedback and grade are deleted too. This cannot be undone.';
 $string['editingended'] = 'Editing period has ended';
 $string['editingends'] = 'Editing period ends';
 $string['entries'] = 'Entries';
 $string['entry'] = 'Entry';
+$string['entrydeleted'] = 'The entry of {$a} was deleted.';
 $string['entryxofy'] = 'Entry {$a->index} of {$a->count}';
 $string['evententriesviewed'] = 'Journal entries viewed';
 $string['evententrycreated'] = 'Journal entry created';
+$string['evententrydeleted'] = 'Journal entry deleted';
 $string['evententryupdated'] = 'Journal entry updated';
 $string['eventfeedbackupdated'] = 'Journal feedback updated';
 $string['eventjournalcreated'] = 'Journal created';
@@ -75,6 +79,7 @@ $string['incorrectjournalid'] = 'Selected journal ID is incorrect';
 $string['incorrectuserid'] = 'Selected user ID is incorrect';
 $string['journal:addentries'] = 'Add journal entries';
 $string['journal:addinstance'] = 'Add a new journal';
+$string['journal:deleteentries'] = 'Delete journal entries';
 $string['journal:manageentries'] = 'Manage journal entries';
 $string['journalclosed'] = 'This journal is not open for editing.';
 

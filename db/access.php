@@ -37,6 +37,17 @@ $capabilities = [
         ],
     ],
 
+    'mod/journal:deleteentries' => [
+        'riskbitmask' => RISK_DATALOSS,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
     'mod/journal:addentries' => [
 
         'captype' => 'write',

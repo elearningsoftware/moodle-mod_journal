@@ -370,4 +370,93 @@ final class manager_test extends advanced_testcase {
         $this->expectException(\invalid_parameter_exception::class);
         $manager->save_feedback($entry, 11, '<p>Feedback</p>');
     }
+
+    /**
+     * Deleting an entry removes its files and grade, triggers an event and updates the completion of its author.
+     *
+     * @return void
+     * @covers ::delete_entry
+     */
+    public function test_delete_entry(): void {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/gradelib.php');
+        require_once($CFG->libdir . '/completionlib.php');
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['enablecompletion' => 1]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $other = $generator->create_and_enrol($course, 'student');
+        $teacher = $generator->create_and_enrol($course, 'editingteacher');
+        $journal = $generator->create_module('journal', [
+            'course' => $course,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completion_create_entry' => 1,
+        ]);
+        $cm = get_coursemodule_from_instance('journal', $journal->id);
+        $context = \context_module::instance($cm->id);
+
+        $this->setUser($student);
+        $entry = manager::create_from_coursemodule($cm)->save_entry('My entry', FORMAT_HTML);
+        $this->setUser($other);
+        $otherentry = manager::create_from_coursemodule($cm)->save_entry('Other entry', FORMAT_HTML);
+
+        $this->setUser($teacher);
+        $manager = manager::create_from_coursemodule($cm);
+        $manager->save_feedback($entry, 80, 'Well done');
+        $fs = get_file_storage();
+        $file = $fs->create_file_from_string([
+            'contextid' => $context->id,
+            'component' => 'mod_journal',
+            'filearea' => 'entry',
+            'itemid' => $entry->id,
+            'filepath' => '/',
+            'filename' => 'file.txt',
+        ], 'Content');
+
+        $completion = new \completion_info(get_course($course->id));
+        $this->assertEquals(COMPLETION_COMPLETE, $completion->get_data($cm, false, $student->id)->completionstate);
+
+        $sink = $this->redirectEvents();
+        $manager->delete_entry($entry);
+        $events = array_values(array_filter($sink->get_events(), function ($event) {
+            return $event instanceof event\entry_deleted;
+        }));
+        $sink->close();
+
+        $this->assertFalse($DB->record_exists('journal_entries', ['id' => $entry->id]));
+        $this->assertTrue($DB->record_exists('journal_entries', ['id' => $otherentry->id]));
+        $this->assertFalse($fs->file_exists_by_hash($file->get_pathnamehash()));
+
+        $grades = grade_get_grades($course->id, 'mod', 'journal', $journal->id, $student->id);
+        $this->assertNull($grades->items[0]->grades[$student->id]->grade);
+
+        $this->assertCount(1, $events);
+        $this->assertEquals($entry->id, $events[0]->objectid);
+        $this->assertEquals($student->id, $events[0]->relateduserid);
+        $this->assertEquals($teacher->id, $events[0]->userid);
+        $this->assertEquals($context, $events[0]->get_context());
+
+        $this->assertEquals(COMPLETION_INCOMPLETE, $completion->get_data($cm, false, $student->id)->completionstate);
+        $this->assertEquals(COMPLETION_COMPLETE, $completion->get_data($cm, false, $other->id)->completionstate);
+    }
+
+    /**
+     * An entry of another journal cannot be deleted.
+     *
+     * @return void
+     * @covers ::delete_entry
+     */
+    public function test_delete_entry_of_other_journal(): void {
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $journal = $generator->create_module('journal', ['course' => $course]);
+        $otherjournal = $generator->create_module('journal', ['course' => $course]);
+        $entryid = $generator->get_plugin_generator('mod_journal')->create_entry((object) ['journal' => $otherjournal->id]);
+
+        $this->expectException(coding_exception::class);
+        manager::create_from_instance($journal)->delete_entry((object) ['id' => $entryid, 'journal' => $otherjournal->id]);
+    }
 }
