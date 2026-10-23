@@ -74,6 +74,15 @@ class mod_journal_mod_form extends moodleform_mod {
         // The days available are only used without opening and closing times.
         $mform->hideIf('days', 'timeopen[enabled]', 'checked');
         $mform->hideIf('days', 'timeclose[enabled]', 'checked');
+        $mform->addElement(
+            'select',
+            'remindbefore',
+            get_string('remindbefore', 'journal'),
+            journal_get_remind_before_options()
+        );
+        $mform->addHelpButton('remindbefore', 'remindbefore', 'journal');
+        $mform->setDefault('remindbefore', 0);
+        $mform->hideIf('remindbefore', 'timeclose[enabled]', 'notchecked');
 
         $mform->addElement('text', 'minwords', get_string('minwords', 'journal'), ['size' => 6]);
         $mform->setType('minwords', PARAM_INT);

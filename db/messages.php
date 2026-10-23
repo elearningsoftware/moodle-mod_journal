@@ -33,6 +33,14 @@ $messageproviders = [
             'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
         ],
     ],
+    // Remind students without an entry before the journal closes.
+    'reminder' => [
+        'capability' => 'mod/journal:addentries',
+        'defaults' => [
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_ENABLED,
+        ],
+    ],
     // Notify student when a teacher provides feedback.
     'journal_feedback' => [
         'capability' => 'mod/journal:addentries',

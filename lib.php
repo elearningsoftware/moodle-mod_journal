@@ -44,6 +44,7 @@ function journal_add_instance($journal) {
     $journal->notifyteachers = journal_clean_notify_teachers($journal->notifyteachers ?? null);
     $journal->minwords = max(0, (int) ($journal->minwords ?? 0));
     $journal->maxwords = max(0, (int) ($journal->maxwords ?? 0));
+    $journal->remindbefore = max(0, (int) ($journal->remindbefore ?? 0));
     // Checkbox handling: Use !empty to ensure 0 is saved as 0.
     $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
@@ -79,6 +80,7 @@ function journal_update_instance($journal) {
     $journal->notifyteachers = journal_clean_notify_teachers($journal->notifyteachers ?? null);
     $journal->minwords = max(0, (int) ($journal->minwords ?? 0));
     $journal->maxwords = max(0, (int) ($journal->maxwords ?? 0));
+    $journal->remindbefore = max(0, (int) ($journal->remindbefore ?? 0));
     // Checkbox handling: Use !empty to ensure 0 is saved as 0.
     $journal->notifystudents = !empty($journal->notifystudents) ? 1 : 0;
 
@@ -791,6 +793,19 @@ function journal_count_entries($journal, $groupids = 0, bool $needsgrading = fal
  */
 function journal_entry_needs_grading($entry): bool {
     return !empty($entry) && (empty($entry->timemarked) || $entry->modified > $entry->timemarked);
+}
+
+/**
+ * Returns the options of how long before the closing time of a journal students are reminded.
+ *
+ * @return string[] The option names, by time in seconds, 0 for no reminder
+ */
+function journal_get_remind_before_options(): array {
+    $options = [0 => get_string('never')];
+    foreach ([DAYSECS, 2 * DAYSECS, 3 * DAYSECS, WEEKSECS] as $time) {
+        $options[$time] = format_time($time);
+    }
+    return $options;
 }
 
 /**

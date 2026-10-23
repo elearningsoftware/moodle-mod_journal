@@ -49,3 +49,15 @@ Feature: Teachers can set when a journal opens and closes
       | Close the journal  | ##+1 days## |
     When I press "Save and display"
     Then I should see "The closing time must be after the opening time."
+
+  @javascript
+  Scenario: Teachers can remind students before the journal closes
+    Given I am on the "journal1" "Activity editing" page logged in as "teacher1"
+    And "Remind students before closing" "field" should not be visible
+    When I set the following fields to these values:
+      | timeclose[enabled]             | 1           |
+      | Close the journal              | ##+7 days## |
+    And I set the field "Remind students before closing" to "2 days"
+    And I press "Save and return to course"
+    And I am on the "journal1" "Activity editing" page
+    Then the field "Remind students before closing" matches value "2 days"

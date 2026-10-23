@@ -45,6 +45,7 @@ class backup_journal_activity_structure_step extends backup_activity_structure_s
             'timeclose',
             'minwords',
             'maxwords',
+            'remindbefore',
             'grade',
             'timemodified',
             'completion_create_entry',

@@ -249,5 +249,24 @@ function xmldb_journal_upgrade($oldversion = 0) {
         upgrade_mod_savepoint(true, 2026102300, 'journal');
     }
 
+    if ($oldversion < 2026102401) {
+        // Define fields remindbefore and remindedtimeclose to be added to journal.
+        $table = new xmldb_table('journal');
+        $fields = [
+            new xmldb_field('remindbefore', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'maxwords'),
+            new xmldb_field('remindedtimeclose', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'remindbefore'),
+        ];
+
+        // Conditionally launch add fields remindbefore and remindedtimeclose.
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        // Journal savepoint reached.
+        upgrade_mod_savepoint(true, 2026102401, 'journal');
+    }
+
     return true;
 }
