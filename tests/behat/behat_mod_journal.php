@@ -57,4 +57,27 @@ class behat_mod_journal extends behat_base {
             $conditionname, $activityname, $completionstatus,
         ]);
     }
+
+    /**
+     * Overrides the grade of a user in a journal in the gradebook.
+     *
+     * @param string $username The username of the user, who must already have a grade.
+     * @param string $idnumber The ID number of the journal.
+     *
+     * @Given /^the grade of "(?P<username>(?:[^"]|\\")*)" in the journal "(?P<idnumber>(?:[^"]|\\")*)" is overridden$/
+     */
+    public function the_grade_in_the_journal_is_overridden($username, $idnumber) {
+        global $CFG, $DB;
+        require_once($CFG->libdir . '/gradelib.php');
+
+        $cm = $DB->get_record('course_modules', ['idnumber' => $idnumber], '*', MUST_EXIST);
+        $userid = $DB->get_field('user', 'id', ['username' => $username], MUST_EXIST);
+        $gradeitem = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'journal',
+            'iteminstance' => $cm->instance,
+            'courseid' => $cm->course,
+        ]);
+        \grade_grade::fetch(['itemid' => $gradeitem->id, 'userid' => $userid])->set_overridden(true);
+    }
 }

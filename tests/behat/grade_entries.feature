@@ -106,3 +106,20 @@ Feature: Teacher can view, comment and grade students entries
     And I should see "Entry has changed since last feedback was saved"
     And I should see "Student 1 edited first reply"
     And I should see "Student 2 first reply"
+
+  Scenario: Saving all feedback keeps the feedback of overridden grades
+    Given I am on the "journal1" "Activity" page
+    And I follow "View 3 journal entries"
+    And I set the field "Student 1 Grade" to "80"
+    And I set the field "Student 1 Feedback" to "Feedback before the override"
+    And I press "Save all my feedback"
+    And the grade of "student1" in the journal "journal1" is overridden
+    And I am on the "journal1" "Activity" page
+    And I follow "View 3 journal entries"
+    And I should see "Current grade in gradebook"
+    When I set the field "Student 2 Grade" to "70"
+    And I press "Save all my feedback"
+    Then I should see "Feedback updated for 1 entries"
+    And the field "Student 2 Grade" matches value "70"
+    And I am on the "journal1" "Activity" page logged in as "student1"
+    And I should see "Feedback before the override"

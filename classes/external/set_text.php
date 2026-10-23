@@ -23,10 +23,8 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_single_structure;
 use invalid_parameter_exception;
-use mod_journal\event\entry_created;
-use mod_journal\event\entry_updated;
+use mod_journal\manager;
 use required_capability_exception;
-use stdClass;
 
 /**
  * External function to set a journal's text
@@ -80,7 +78,7 @@ class set_text extends journal_external_api_base {
      * @return array
      */
     public static function execute(int $journalid, string $text, $format, int $itemid = 0, int $cmid = 0) {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $params = self::validate_parameters(
@@ -117,69 +115,16 @@ class set_text extends journal_external_api_base {
             throw new \moodle_exception('journalclosed', 'journal');
         }
 
-        $entry = $DB->get_record('journal_entries', ['userid' => $USER->id, 'journal' => $journal->id]);
-
-        $timenow = time();
-        $newentry = new stdClass();
-        $newentry->text = $params['text'];
-        $newentry->format = $params['format'];
-        $newentry->modified = $timenow;
-        $newentry->userid = $USER->id;
-        $newentry->journal = $journal->id;
-
-        $isnew = empty($entry);
-        if ($isnew) {
-            // Create a record first to get an ID for file storage.
-            $tempentry = clone $newentry;
-            $tempentry->text = '';
-            $newentry->id = $DB->insert_record('journal_entries', $tempentry);
-        } else {
-            $newentry->id = $entry->id;
-        }
-
-        // Handle File Drafts.
-        if ($params['itemid'] > 0) {
-            $newentry->text = file_save_draft_area_files(
-                $params['itemid'],
-                $context->id,
-                'mod_journal',
-                'entry',
-                $newentry->id,
-                ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => -1],
-                $newentry->text
-            );
-        }
-
-        // Final Update.
-        $DB->update_record('journal_entries', $newentry);
-
-        // Trigger events.
-        if (!$isnew) {
-            $event = entry_updated::create([
-                'objectid' => $journal->id,
-                'context' => $context,
-            ]);
-        } else {
-            $event = entry_created::create([
-                'objectid' => $journal->id,
-                'context' => $context,
-            ]);
-        }
-        $event->add_record_snapshot('course_modules', $cm);
-        $event->add_record_snapshot('course', $course);
-        $event->add_record_snapshot('journal', $journal);
-        $event->trigger();
-
-        // Update completion.
-        $completion = new \completion_info($course);
-        if ($completion->is_enabled($cm) && $journal->completion_create_entry) {
-            $completion->update_state($cm, COMPLETION_COMPLETE);
-        }
+        $entry = manager::create_from_coursemodule($cm)->save_entry(
+            $params['text'],
+            $params['format'],
+            $params['itemid']
+        );
 
         // Return array matching execute_returns.
         return [
             'status' => 'ok',
-            'text' => $newentry->text,
+            'text' => $entry->text,
         ];
     }
 }

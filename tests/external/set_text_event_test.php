@@ -72,6 +72,11 @@ final class set_text_event_test extends advanced_testcase {
         $event = reset($events);
         $this->assertInstanceOf(entry_created::class, $event);
         $this->assertNotInstanceOf(entry_updated::class, $event);
+
+        global $DB, $USER;
+        $entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'userid' => $USER->id], '*', MUST_EXIST);
+        $this->assertEquals($entry->id, $event->objectid);
+        $this->assertEquals($USER->id, $event->relateduserid);
     }
 
     /**
@@ -107,5 +112,10 @@ final class set_text_event_test extends advanced_testcase {
         $event = reset($events);
         $this->assertInstanceOf(entry_updated::class, $event);
         $this->assertNotInstanceOf(entry_created::class, $event);
+
+        global $DB, $USER;
+        $entry = $DB->get_record('journal_entries', ['journal' => $journal->id, 'userid' => $USER->id], '*', MUST_EXIST);
+        $this->assertEquals($entry->id, $event->objectid);
+        $this->assertEquals($USER->id, $event->relateduserid);
     }
 }

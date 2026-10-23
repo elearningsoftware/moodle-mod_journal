@@ -39,7 +39,7 @@ class entry_created extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'journal';
+        $this->data['objecttable'] = 'journal_entries';
     }
 
     /**
@@ -57,8 +57,8 @@ class entry_created extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has created an entry for the journal activity with " .
-            "the course module id '$this->contextinstanceid'";
+        return "The user with id '$this->userid' has created the entry with id '$this->objectid' for the journal " .
+            "activity with the course module id '$this->contextinstanceid'";
     }
 
     /**
@@ -67,5 +67,27 @@ class entry_created extends \core\event\base {
      */
     public function get_url() {
         return new \moodle_url('/mod/journal/edit.php', ['id' => $this->contextinstanceid]);
+    }
+
+    /**
+     * Validates the data of the event.
+     *
+     * @throws \coding_exception
+     */
+    protected function validate_data() {
+        parent::validate_data();
+
+        if (!isset($this->relateduserid)) {
+            throw new \coding_exception('The \'relateduserid\' must be set.');
+        }
+    }
+
+    /**
+     * Returns how to map the entry when restoring logs.
+     *
+     * @return array
+     */
+    public static function get_objectid_mapping() {
+        return ['db' => 'journal_entries', 'restore' => 'journal_entry'];
     }
 }

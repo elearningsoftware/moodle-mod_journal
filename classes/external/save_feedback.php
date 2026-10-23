@@ -21,6 +21,7 @@ use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 use invalid_parameter_exception;
+use mod_journal\manager;
 
 /**
  * External function to save feedback and grade for a journal entry.
@@ -72,7 +73,7 @@ class save_feedback extends journal_external_api_base {
         string $feedback = '',
         int $itemid = 0
     ): array {
-        global $CFG, $DB, $USER;
+        global $CFG, $DB;
         require_once($CFG->dirroot . '/mod/journal/lib.php');
 
         $params = self::validate_parameters(self::execute_parameters(), [
@@ -93,7 +94,6 @@ class save_feedback extends journal_external_api_base {
         require_capability('mod/journal:manageentries', $context);
 
         $journal = $DB->get_record('journal', ['id' => $cm->instance], '*', MUST_EXIST);
-        $journal->cmidnumber = $cm->idnumber;
 
         // Entry must exist and must match both journal + user.
         $entry = $DB->get_record('journal_entries', [
@@ -106,60 +106,12 @@ class save_feedback extends journal_external_api_base {
             throw new \moodle_exception('nopermissions', 'error', '', get_string('savefeedback', 'journal'));
         }
 
-        $newgrade = (int) $params['grade'];
-        if ($newgrade < -1) {
-            $newgrade = -1;
-        }
-        if (!journal_is_valid_grade($journal, $newgrade)) {
-            throw new invalid_parameter_exception('Invalid grade: ' . $newgrade);
-        }
-
-        $newfeedback = clean_text((string) $params['feedback'], FORMAT_HTML);
-
-        // Only attempt draft file save if itemid > 0.
-        if (!empty($params['itemid'])) {
-            $newfeedback = file_save_draft_area_files(
-                $params['itemid'],
-                $context->id,
-                'mod_journal',
-                'feedback',
-                $entry->id,
-                [],
-                $newfeedback
-            );
-        }
-
-        $changed = ((int) $entry->rating !== $newgrade) || ((string) $entry->entrycomment !== (string) $newfeedback);
-
-        if ($changed) {
-            $timenow = time();
-
-            $updated = (object) [
-                'id' => $entry->id,
-                'rating' => $newgrade,
-                'entrycomment' => $newfeedback,
-                'teacher' => $USER->id,
-                'timemarked' => $timenow,
-                'mailed' => 0,
-            ];
-
-            $transaction = $DB->start_delegated_transaction();
-
-            $DB->update_record('journal_entries', $updated);
-            journal_update_grades($journal, $entry->userid);
-
-            // Teaching-level event.
-            $event = \mod_journal\event\feedback_updated::create([
-                'objectid' => $journal->id,
-                'context' => $context,
-            ]);
-            $event->add_record_snapshot('course_modules', $cm);
-            $event->add_record_snapshot('course', $course);
-            $event->add_record_snapshot('journal', $journal);
-            $event->trigger();
-
-            $transaction->allow_commit();
-        }
+        $changed = manager::create_from_coursemodule($cm)->save_feedback(
+            $entry,
+            $params['grade'],
+            (string) $params['feedback'],
+            $params['itemid']
+        );
 
         return [
             'status' => 'ok',

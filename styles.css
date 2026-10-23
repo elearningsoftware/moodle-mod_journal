@@ -80,6 +80,12 @@
 #page-mod-journal-report .journaluserentry td.userpix {
     width: 35px;
 }
+#page-mod-journal-report .journaluserentry tr:first-child td.userpix {
+    border-bottom: 1px solid #dedede;
+}
+#page-mod-journal-report .journaluserentry td.feedbackrow {
+    border-top: 1px solid #dedede;
+}
 #page-mod-journal-report .journaluserentry td.userfullname {
     white-space: nowrap;
     border-bottom: 1px solid #dedede;

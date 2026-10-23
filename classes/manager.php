@@ -230,4 +230,173 @@ class manager {
 
         return journal_count_entries($this->instance, $groupids ?: 0, true);
     }
+
+    /**
+     * Return the options of the editor of the entries.
+     *
+     * @return array
+     */
+    public function get_entry_editor_options(): array {
+        return [
+            'maxfiles' => EDITOR_UNLIMITED_FILES,
+            'context' => $this->context,
+            'subdirs' => false,
+            'enable_filemanagement' => true,
+        ];
+    }
+
+    /**
+     * Save the entry of the current user, creating it if needed.
+     *
+     * Moves the files of the draft area into the entry, triggers the entry created or updated event
+     * and updates the completion state.
+     *
+     * @param string $text The entry text
+     * @param int $format The format of the text
+     * @param int $draftitemid The draft area of the files in the text, 0 for none
+     * @return stdClass The saved entry
+     */
+    public function save_entry(string $text, int $format, int $draftitemid = 0): stdClass {
+        global $USER;
+
+        $transaction = $this->db->start_delegated_transaction();
+
+        $entry = $this->db->get_record('journal_entries', ['journal' => $this->instance->id, 'userid' => $USER->id]);
+        $isnew = !$entry;
+        if ($isnew) {
+            // The entry needs an ID before the files of the draft area can be saved.
+            $entry = (object) [
+                'journal' => $this->instance->id,
+                'userid' => $USER->id,
+                'text' => '',
+                'format' => $format,
+                'modified' => time(),
+            ];
+            $entry->id = $this->db->insert_record('journal_entries', $entry);
+        }
+
+        if ($draftitemid) {
+            $text = file_save_draft_area_files(
+                $draftitemid,
+                $this->context->id,
+                'mod_journal',
+                'entry',
+                $entry->id,
+                $this->get_entry_editor_options(),
+                $text
+            );
+        }
+
+        $entry->text = $text;
+        $entry->format = $format;
+        $entry->modified = time();
+        $this->db->update_record('journal_entries', $entry);
+
+        $eventclass = $isnew ? event\entry_created::class : event\entry_updated::class;
+        $event = $eventclass::create([
+            'objectid' => $entry->id,
+            'relateduserid' => $entry->userid,
+            'context' => $this->context,
+        ]);
+        $this->add_event_snapshots($event);
+        $event->trigger();
+
+        $transaction->allow_commit();
+
+        $completion = new \completion_info($this->course);
+        if ($completion->is_enabled($this->cm) && $this->instance->completion_create_entry) {
+            $completion->update_state($this->cm, COMPLETION_COMPLETE);
+        }
+
+        return $entry;
+    }
+
+    /**
+     * Save the grade and feedback of an entry, if they changed.
+     *
+     * Updates the gradebook and triggers the feedback updated event. The given entry is updated too.
+     *
+     * @param stdClass $entry An entry of this journal
+     * @param int $grade The grade, -1 for no grade
+     * @param string $feedback The feedback, in HTML
+     * @param int $draftitemid The draft area of the files in the feedback, 0 for none
+     * @return bool Whether the grade or the feedback changed
+     * @throws \invalid_parameter_exception If the grade is not in the grade menu of this journal
+     */
+    public function save_feedback(stdClass $entry, int $grade, string $feedback, int $draftitemid = 0): bool {
+        global $CFG, $USER;
+        require_once($CFG->dirroot . '/mod/journal/lib.php');
+
+        if ($entry->journal != $this->instance->id) {
+            throw new \coding_exception('The entry is not from this journal');
+        }
+
+        $grade = max($grade, -1);
+        $oldgrade = (int) ($entry->rating ?? -1);
+        // A locked grade is sent back unchanged, even if it is no longer valid.
+        if ($grade !== $oldgrade && !journal_is_valid_grade($this->instance, $grade)) {
+            throw new \invalid_parameter_exception('Invalid grade: ' . $grade);
+        }
+
+        $feedback = clean_text($feedback, FORMAT_HTML);
+        if ($draftitemid) {
+            $feedback = file_save_draft_area_files(
+                $draftitemid,
+                $this->context->id,
+                'mod_journal',
+                'feedback',
+                $entry->id,
+                [],
+                $feedback
+            );
+        }
+
+        if ($grade === $oldgrade && $feedback === (string) $entry->entrycomment) {
+            return false;
+        }
+
+        $entry->rating = $grade;
+        $entry->entrycomment = $feedback;
+        $entry->teacher = $USER->id;
+        $entry->timemarked = time();
+        $entry->mailed = 0;
+
+        $transaction = $this->db->start_delegated_transaction();
+
+        $this->db->update_record('journal_entries', (object) [
+            'id' => $entry->id,
+            'rating' => $entry->rating,
+            'entrycomment' => $entry->entrycomment,
+            'teacher' => $entry->teacher,
+            'timemarked' => $entry->timemarked,
+            'mailed' => $entry->mailed,
+        ]);
+
+        $journal = clone $this->instance;
+        $journal->cmidnumber = $this->cm->idnumber;
+        journal_update_grades($journal, $entry->userid);
+
+        $event = event\feedback_updated::create([
+            'objectid' => $entry->id,
+            'relateduserid' => $entry->userid,
+            'context' => $this->context,
+        ]);
+        $this->add_event_snapshots($event);
+        $event->trigger();
+
+        $transaction->allow_commit();
+
+        return true;
+    }
+
+    /**
+     * Add the records of the course, course module and journal to an event.
+     *
+     * @param \core\event\base $event
+     */
+    private function add_event_snapshots(\core\event\base $event): void {
+        $event->add_record_snapshot('course_modules', $this->cm->get_course_module_record());
+        $event->add_record_snapshot('course', $this->course);
+        $event->add_record_snapshot('journal', $this->instance);
+    }
 }

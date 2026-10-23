@@ -78,12 +78,8 @@ if ($entry) {
 
 $data->id = $cm->id;
 
-$editoroptions = [
-    'maxfiles' => EDITOR_UNLIMITED_FILES,
-    'context' => $context,
-    'subdirs' => false,
-    'enable_filemanagement' => true,
-];
+$manager = \mod_journal\manager::create_from_coursemodule($cm);
+$editoroptions = $manager->get_entry_editor_options();
 
 $data = file_prepare_standard_editor($data, 'text', $editoroptions, $context, 'mod_journal', 'entry', $data->entryid);
 
@@ -97,66 +93,12 @@ if ($form->is_cancelled()) {
 
     // Prevent CSFR.
     confirm_sesskey();
-    $timenow = time();
 
-    // This will be overwriten after being we have the entryid.
-    $newentry = new stdClass();
-    $newentry->text = $fromform->text_editor['text'];
-    $newentry->format = $fromform->text_editor['format'];
-    $newentry->modified = $timenow;
-
-    if ($entry) {
-        $newentry->id = $entry->id;
-        if (!$DB->update_record('journal_entries', $newentry)) {
-            throw new \moodle_exception('couldnotupdatejournal', 'journal');
-        }
-    } else {
-        $newentry->userid = $USER->id;
-        $newentry->journal = $journal->id;
-        if (!$newentry->id = $DB->insert_record('journal_entries', $newentry)) {
-            throw new \moodle_exception('countnotinsertjournalentry', 'journal');
-        }
-    }
-
-    // Update completion state.
-    $completion = new completion_info($course);
-    if ($completion->is_enabled($cm) && $journal->completion_create_entry) {
-        $completion->update_state($cm, COMPLETION_COMPLETE);
-    }
-
-    // Relink using the proper entryid.
-    // We need to do this as draft area didn't have an itemid associated when creating the entry.
-    $fromform = file_postupdate_standard_editor(
-        $fromform,
-        'text',
-        $editoroptions,
-        $editoroptions['context'],
-        'mod_journal',
-        'entry',
-        $newentry->id
+    $manager->save_entry(
+        $fromform->text_editor['text'],
+        $fromform->text_editor['format'],
+        $fromform->text_editor['itemid']
     );
-    $newentry->text = $fromform->text;
-    $newentry->format = $fromform->textformat;
-
-    $DB->update_record('journal_entries', $newentry);
-
-    if ($entry) {
-        // Trigger module entry updated event.
-        $event = \mod_journal\event\entry_updated::create([
-            'objectid' => $journal->id,
-            'context' => $context,
-        ]);
-    } else {
-        // Trigger module entry created event.
-        $event = \mod_journal\event\entry_created::create([
-            'objectid' => $journal->id,
-            'context' => $context,
-        ]);
-    }
-    $event->add_record_snapshot('course_modules', $cm);
-    $event->add_record_snapshot('course', $course);
-    $event->add_record_snapshot('journal', $journal);
-    $event->trigger();
 
     redirect(new moodle_url('/mod/journal/view.php?id=' . $cm->id));
     die;

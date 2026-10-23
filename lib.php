@@ -244,7 +244,7 @@ function journal_user_complete($course, $user, $mod, $journal) {
         echo $OUTPUT->box_start();
 
         if ($entry->modified) {
-            echo '<p><font size="1">' . get_string('lastedited') . ': ' . userdate($entry->modified) . '</font></p>';
+            echo html_writer::tag('p', get_string('lastedited') . ': ' . userdate($entry->modified), ['class' => 'small']);
         }
         if ($entry->text) {
             echo journal_format_entry_text($entry, $course, $mod);
@@ -703,20 +703,14 @@ function journal_get_users_done($journal, $currentgroup) {
         return null;
     }
 
+    $context = \context_module::instance($cm->id);
+    $canadd = get_users_by_capability($context, 'mod/journal:addentries', 'u.id');
+    $entriesmanager = get_users_by_capability($context, 'mod/journal:manageentries', 'u.id');
+
     // Remove unenrolled participants and Teachers/Managers.
     foreach ($journals as $key => $user) {
-        $context = \context_module::instance($cm->id);
-
-        $canadd = has_capability('mod/journal:addentries', $context, $user);
-        $entriesmanager = has_capability('mod/journal:manageentries', $context, $user);
-
         // Exclude users who can manage entries (Teachers, Admins, Managers) from the completed list.
-        if ($entriesmanager) {
-            unset($journals[$key]);
-            continue;
-        }
-
-        if (!$canadd) {
+        if (isset($entriesmanager[$user->id]) || !isset($canadd[$user->id])) {
             unset($journals[$key]);
         }
     }
@@ -856,7 +850,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
     $content .= html_writer::tag(
         'td',
         $OUTPUT->user_picture($user, ['courseid' => $course->id, 'alttext' => true]),
-        ['class' => 'userpix', 'style' => 'border-bottom: 1px solid #dedede;']
+        ['class' => 'userpix']
     );
 
     $userfullname = html_writer::tag('strong', fullname($user));
@@ -897,7 +891,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $content .= html_writer::tag(
             'td',
             empty($teacher) ? '' : $OUTPUT->user_picture($teacher, ['courseid' => $course->id, 'alttext' => true]),
-            ['class' => 'userpix', 'style' => 'border-top: 1px solid #dedede;']
+            ['class' => 'userpix feedbackrow']
         );
 
         $feedbacksection = get_string('grade', 'journal') . ': ';
@@ -969,7 +963,7 @@ function journal_print_user_entry($course, $user, $entry, $teachers, $grades, $c
         $feedbacksection .= $gradebookgradestr;
 
         // Finish the Grade Selector table row.
-        $content .= html_writer::tag('td', $feedbacksection, ['style' => 'border-top: 1px solid #dedede;']);
+        $content .= html_writer::tag('td', $feedbacksection, ['class' => 'feedbackrow']);
         $content .= html_writer::end_tag('tr');
 
         // Start capturing the feedback editor + button output.
