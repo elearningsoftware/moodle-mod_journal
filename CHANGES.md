@@ -1,8 +1,14 @@
 # Changes
 
-## Unreleased
+## 5.5.0 (2026-10-24)
+
+Supports Moodle 4.0 to 5.3.
 
 ### New features
+- Editing teachers and managers can delete an entry from the report page,
+  with its feedback and grade, so that the student can write a new one.
+- Journals can remind the students who have not written an entry one, two
+  or three days or a week before they close.
 - Teachers can grade entries one by one from the report page, moving to
   the previous and next entries and saving the feedback of each before
   showing the next one.
@@ -55,6 +61,11 @@
   `FORMAT_HTML` by default or `FORMAT_PLAIN`.
 - `mod_journal_set_text` throws an exception when the entry has too few
   or too many words.
+- The new capability `mod/journal:deleteentries` allows deleting entries,
+  with `\mod_journal\manager::delete_entry()`, which triggers the new
+  `entry_deleted` event.
+- The new scheduled task `\mod_journal\task\send_reminders` sends the
+  reminders, with the new message provider `reminder`.
 
 ## 5.4.0 (2026-10-21)
 

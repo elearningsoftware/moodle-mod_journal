@@ -14,6 +14,8 @@ The Journal activity allows teachers to obtain student feedback or reflections o
 *   **Grading & Feedback:** Teachers can grade entries and provide feedback, all at once or one entry at a time, and filter the entries that need grading.
 *   **Time Constraints:** Set opening and closing times, shown in the calendar and on the timeline, or availability windows (days/weeks) in weekly courses.
 *   **Word Limits:** Set a minimum and a maximum number of words for entries.
+*   **Reminders:** Students who have not written an entry can be reminded before the journal closes.
+*   **Deleting Entries:** Teachers can delete an entry so that the student can start again.
 *   **Notifications:** Teachers can be notified when an entry needs grading, every time one is saved, or not at all, and students are notified of their feedback.
 *   **Completion:** Activities can be completed by writing an entry.
 *   **Course Overview:** The course activities overview of Moodle 5.0 and later shows the number of entries and how many need grading.
