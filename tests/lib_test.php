@@ -260,6 +260,12 @@ final class lib_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $journal = $generator->get_plugin_generator('mod_journal')->create_instance(['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('journal', $journal->id, $course->id, false, MUST_EXIST);
+        // The Atto editor (default before Moodle 4.2) reads the page URL.
+        $PAGE->set_url('/mod/journal/report.php', ['id' => $cm->id]);
+        // Editor plugins may build the navigation, which needs the course of the module. Set it before
+        // enrolling, as the welcome message sets up the theme and the course cannot change after that.
+        $PAGE->set_cm($cm, $course);
         $teacher = $generator->create_and_enrol($course, 'editingteacher');
         $student = $generator->create_and_enrol($course, 'student');
         $entryid = $generator->get_plugin_generator('mod_journal')->create_entry((object)[
@@ -282,11 +288,6 @@ final class lib_test extends \advanced_testcase {
         \grade_grade::fetch(['itemid' => $gradeitem->id, 'userid' => $student->id])->set_overridden(true);
 
         $this->setUser($teacher);
-        $cm = get_coursemodule_from_instance('journal', $journal->id, $course->id, false, MUST_EXIST);
-        // The Atto editor (default before Moodle 4.2) reads the page URL.
-        $PAGE->set_url('/mod/journal/report.php', ['id' => $cm->id]);
-        // Editor plugins may build the navigation, which needs the course of the module.
-        $PAGE->set_cm($cm, $course);
         $entry = $DB->get_record('journal_entries', ['id' => $entryid]);
         ob_start();
         try {
